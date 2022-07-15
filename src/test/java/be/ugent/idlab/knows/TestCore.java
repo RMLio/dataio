@@ -16,7 +16,7 @@ public class TestCore {
 
     private static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
-    public void compareIterator(SourceIterator factory, Set<Source> expectedSources){
+    public void compareIterator(SourceIterator iterator, Set<Source> expectedSources){
 
 //        System.out.println("");
 //        System.out.println("Begin set printing");
@@ -24,16 +24,16 @@ public class TestCore {
 //        System.out.println("End set printing");
 //        System.out.println("");
 
-        while(factory.hasNext()) {
-            CSVSource csvSource = (CSVSource) factory.nextSource();
-            csvSource.getData().forEach((a,b) -> System.out.println(a + ": " + b));
+        while(iterator.hasNext()) {
+//            CSVSource csvSource = (CSVSource) factory.nextSource();
+//            csvSource.getData().forEach((a,b) -> System.out.println(a + ": " + b));
 //            System.out.println("");
 //            System.out.println("next source");
 //            ExcelSource excelSource = (ExcelSource) factory.nextSource();
 //            excelSource.printString();
 //            System.out.println("end next source");
 //            System.out.println("");
-            assert expectedSources.contains(csvSource);
+            assert expectedSources.contains(iterator.nextSource());
 //            System.out.println("Assert worked");
         }
     }

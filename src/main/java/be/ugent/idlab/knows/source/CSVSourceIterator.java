@@ -38,7 +38,7 @@ public class CSVSourceIterator implements SourceIterator {
 
     public Source nextSource(){
         if(iterator.hasNext()){
-            return new CSVSource(header, iterator.next() ,dataTypes);
+            return new CSVSource(header, iterator.next(), dataTypes);
         }
         return null;
     }

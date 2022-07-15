@@ -44,26 +44,6 @@ public class ExcelSourceIterator implements SourceIterator {
 
     }
 
-//    /**
-//     * Get Records for Excel file format.
-//     * @param access
-//     * @return
-//     * @throws IOException
-//     */
-//    public Stream<Source> getRecords(Access access) throws IOException, SQLException, ClassNotFoundException {
-//        Stream<Source> output = Stream.of();
-//        try (InputStream is = access.getInputStream();
-//             Workbook workbook = new XSSFWorkbook(is)) {
-//            for (Sheet datatypeSheet : workbook) {
-//                Row header = datatypeSheet.getRow(0);
-//                Stream<Source> temp_stream = StreamSupport.stream(datatypeSheet.spliterator(), false)
-//                        .skip(1).map(row -> new ExcelSource(header, row));
-//                output = Stream.concat(output, temp_stream);
-//            }
-//        }
-//        return output;
-//    }
-
     @Override
     public Source nextSource() {
         // has next updates the iterators

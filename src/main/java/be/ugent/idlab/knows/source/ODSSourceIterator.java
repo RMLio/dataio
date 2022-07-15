@@ -25,7 +25,6 @@ public class ODSSourceIterator implements SourceIterator {
             if(tableIterator.hasNext()){
                 iterator = tableIterator.next().getRowIterator();
             } else{
-                System.out.println("Tis gefucked");
                 //TODO exception
             }
 
@@ -35,7 +34,6 @@ public class ODSSourceIterator implements SourceIterator {
                 if(updateIterators()){
                     header = iterator.next();
                 } else{
-                    System.out.println("ook gefucked");
                     //TODO exception
                 }
             }

@@ -19,7 +19,8 @@ public class ExcelSource extends Source {
     private Row row;
     private Map<String, Cell> header = new HashMap<>();
 
-    ExcelSource(Row header, Row row) {
+    public ExcelSource(Row header, Row row) {
+        //TODO should this be switched to hashmap similar to CSVSource?
         for (Cell cell : header) {
             this.header.put(cell.getStringCellValue(), cell);
         }
@@ -38,6 +39,27 @@ public class ExcelSource extends Source {
             cell = row.getCell(index);
         }
         return getIRI(cell);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(this.getClass() != obj.getClass()) return false;
+
+        //TODO other object could have more columns in row then this.row and this would still return true
+        ExcelSource excelSource = (ExcelSource) obj;
+        for(String value: this.header.keySet()){
+
+            if(! this.get(value).equals(excelSource.get(value)))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        //TODO fix this hashcode as Row.hashcode() doesnt work like expected
+        return 1;
     }
 
 
@@ -97,6 +119,13 @@ public class ExcelSource extends Source {
                 return XSDDatatype.XSDboolean.getURI();
             default:
                 return XSDDatatype.XSDstring.getURI();
+        }
+    }
+
+    public void printString() {
+        for (String value : this.header.keySet()) {
+            System.out.print(value +  ": ");
+            System.out.println(this.get(value));
         }
     }
 }

@@ -1,6 +1,6 @@
 package be.ugent.idlab.knows.access;
 
-import be.ugent.rml.NAMESPACES;
+import be.ugent.idlab.knows.utils.NAMESPACES;
 import com.opencsv.CSVWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,7 +20,8 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static be.ugent.rml.Utils.getHashOfString;
+import static be.ugent.idlab.knows.utils.NAMESPACES.*;
+import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
 
 /**
  * This class represents the access to a relational database.
@@ -34,17 +35,6 @@ public class RDBAccess implements Access {
     private String query;
     private String contentType;
     private Map<String, String> datatypes = new HashMap<>();
-
-    // Datatype definitions
-    private final static String DOUBLE = "http://www.w3.org/2001/XMLSchema#double";
-    private final static String VARBINARY = "http://www.w3.org/2001/XMLSchema#hexBinary";
-    private final static String DECIMAL = "http://www.w3.org/2001/XMLSchema#decimal";
-    private final static String INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
-    private final static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
-    private final static String DATE = "http://www.w3.org/2001/XMLSchema#date";
-    private final static String TIME = "http://www.w3.org/2001/XMLSchema#time";
-    private final static String DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-
 
     /**
      * This constructor takes as arguments the dsn, database, username, password, query, and content type.

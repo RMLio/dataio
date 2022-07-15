@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import static be.ugent.rml.Utils.getHashOfString;
-import static be.ugent.rml.Utils.getInputStreamFromFile;
+import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
+import static be.ugent.idlab.knows.utils.Utils.getInputStreamFromFile;
 import static org.apache.commons.io.FileUtils.getFile;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 

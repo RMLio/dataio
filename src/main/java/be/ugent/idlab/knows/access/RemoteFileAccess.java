@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import static be.ugent.rml.Utils.getHashOfString;
-import static be.ugent.rml.Utils.getInputStreamFromURL;
+import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
+import static be.ugent.idlab.knows.utils.Utils.getInputStreamFromURL;
 
 /**
  * This class represents access to a remote file.

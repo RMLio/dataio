@@ -13,8 +13,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static be.ugent.rml.Utils.*;
-
+import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
+import static be.ugent.idlab.knows.utils.Utils.getInputStreamFromURL;
 
 public class WoTAccess implements Access {
 

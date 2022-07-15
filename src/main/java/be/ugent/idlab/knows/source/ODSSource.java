@@ -18,11 +18,9 @@ public class ODSSource extends Source {
     private Map<String, Cell> header = new HashMap<>();
 
     public ODSSource(Row header, Row row) {
-        // get name from first row and types from second row
-        Row nextRow = header.getNextRow();
         for (int i = 0; i < header.getCellCount(); i++) {
             Cell cell = header.getCellByIndex(i);
-            this.header.put(cell.getStringValue(), nextRow.getCellByIndex(i));
+            this.header.put(cell.getStringValue(), row.getCellByIndex(i));
         }
         this.row = row;
     }
@@ -39,6 +37,26 @@ public class ODSSource extends Source {
             cellType = header.get(value).getValueType();
         }
         return getIRI(cellType);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this.getClass() != obj.getClass()) return false;
+
+        //TODO other object could have more columns in row then this.row and this would still return true
+        ODSSource odsSource = (ODSSource) obj;
+        for(String value: this.header.keySet()){
+
+            if(! this.get(value).equals(odsSource.get(value)))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        //TODO
+        return 1;
     }
 
     /**

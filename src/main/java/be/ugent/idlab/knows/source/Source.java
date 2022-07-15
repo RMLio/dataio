@@ -18,4 +18,11 @@ public abstract class Source {
     public String getDataType(String value) {
         return null;
     }
+
+    @Override
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
+
 }

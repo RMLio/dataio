@@ -15,7 +15,7 @@ public class CSVSource extends Source {
     private Map<String, String> data;
     private Map<String, String> datatypes;
 
-    CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
+    public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
         this.data = new HashMap<>();
         for(int i = 0; i < header.length; i += 1){
             this.data.put(header[i], data[i]);
@@ -30,7 +30,6 @@ public class CSVSource extends Source {
      */
     public String getDataType(String value) {
         String datatype = null;
-
         if (datatypes != null) {
             datatype = datatypes.get(value);
             /*
@@ -81,5 +80,28 @@ public class CSVSource extends Source {
 
     public Map<String, String> getData() {
         return data;
+    }
+
+    @Override
+    public boolean equals(Object object){
+
+        if(object == null) return false;
+
+        if(this == object) return true;
+
+
+        if(getClass() != object.getClass()) return false;
+
+        CSVSource o = (CSVSource) object;
+
+        return this.data.equals(o.data) &&
+                ((this.datatypes != null && this.datatypes.equals(o.datatypes)) || (this.datatypes == null && o.datatypes == null));
+
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 31 * 7 + (data == null ? 0 : data.hashCode());
+        return 31 * hash + (datatypes == null ? 0 : datatypes.hashCode());
     }
 }

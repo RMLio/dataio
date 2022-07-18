@@ -1,8 +1,6 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
-import be.ugent.idlab.knows.source.ExcelSource;
-import be.ugent.idlab.knows.source.ExcelSourceIterator;
 import be.ugent.idlab.knows.source.HTMLSource;
 import be.ugent.idlab.knows.source.HTMLSourceIterator;
 import org.jsoup.nodes.Element;
@@ -18,7 +16,11 @@ public class HTMLTest extends TestCore {
         Element element = new Element("tr").appendChild(new Element("td").text("Venus"));
         List<String> headers = List.of("Name");
         HTMLSource source = new HTMLSource(element, headers);
-
+//        source.printString();
+//        System.out.println(source.get("Name"));
+//        HTMLSource source1 = (HTMLSource) (new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr").nextSource());
+//        source1.printString();
+//        System.out.println((new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr")).nextSource().get("Name"));
         compareIterator(new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr"), Set.of(source));
     }
 }

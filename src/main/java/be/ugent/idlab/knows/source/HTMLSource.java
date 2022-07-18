@@ -44,7 +44,7 @@ public class HTMLSource extends Source {
 
         HTMLSource o = (HTMLSource) obj;
 
-        return ((this.element != null && this.element.equals(o.element)) || (this.element == null && o.element == null)) &&
+        return ((this.element != null && this.element.text().equals(o.element.text())) || (this.element == null && o.element == null)) &&
                 ((this.headers != null && this.headers.equals(o.headers)) || (this.headers == null && o.headers == null));
     }
 

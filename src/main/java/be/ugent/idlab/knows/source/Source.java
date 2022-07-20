@@ -4,14 +4,14 @@ import java.util.List;
 
 public abstract class Source {
     /**
-     * This method returns the objects for a reference in the record.
+     * This method returns the objects for a reference in the source.
      * @param value the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     public abstract List<Object> get(String value);
 
     /**
-     * This method returns the datatype of a reference in the record.
+     * This method returns the datatype of a reference in the source.
      * @param value the reference for which the datatype needs to be returned.
      * @return the IRI of the datatype.
      */
@@ -23,6 +23,8 @@ public abstract class Source {
     public abstract boolean equals(Object obj);
 
     @Override
-    public abstract int hashCode();
+    public int hashCode(){
+        return 1;
+    };
 
 }

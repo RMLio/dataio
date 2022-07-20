@@ -1,26 +1,30 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
-import be.ugent.idlab.knows.source.HTMLSource;
-import be.ugent.idlab.knows.source.HTMLSourceIterator;
-import org.jsoup.nodes.Element;
+import be.ugent.idlab.knows.iterators.HTMLSourceIterator;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.Set;
 
 public class HTMLTest extends TestCore {
 
     @Test
     public void evaluate_0000_HTML(){
-        Element element = new Element("tr").appendChild(new Element("td").text("Venus"));
-        List<String> headers = List.of("Name");
-        HTMLSource source = new HTMLSource(element, headers);
-//        source.printString();
-//        System.out.println(source.get("Name"));
-//        HTMLSource source1 = (HTMLSource) (new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr").nextSource());
-//        source1.printString();
-//        System.out.println((new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr")).nextSource().get("Name"));
-        compareIterator(new HTMLSourceIterator(makeLocalAccess("/html/0000.html"), "table tbody tr"), Set.of(source));
+        HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
+        htmlSourceIterator.open(makeLocalAccess("/html/0000.html"), "table tbody tr");
+
+        evaluate_0000(htmlSourceIterator, false);
+
+//        Element element = new Element("tr").appendChild(new Element("td").text("Venus"));
+//        List<String> headers = List.of("Name");
+//        HTMLSource source = new HTMLSource(element, headers);
+//
+//        compareIterator(htmlSourceIterator, Set.of(source));
+    }
+
+    @Test
+    public void evaluate_0001_HTML(){
+        HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
+        htmlSourceIterator.open(makeLocalAccess("/html/0001.html"), "table tbody tr");
+
+        evaluate_0001(htmlSourceIterator);
     }
 }

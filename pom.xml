@@ -59,5 +59,10 @@
           <artifactId>jsoup</artifactId>
           <version>1.14.2</version>
       </dependency>
+      <dependency>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>Saxon-HE</artifactId>
+          <version>11.3</version>
+      </dependency>
   </dependencies>
 </project>

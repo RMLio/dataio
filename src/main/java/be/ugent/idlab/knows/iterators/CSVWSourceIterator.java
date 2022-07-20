@@ -1,6 +1,8 @@
-package be.ugent.idlab.knows.source;
+package be.ugent.idlab.knows.iterators;
 
 import be.ugent.idlab.knows.access.Access;
+import be.ugent.idlab.knows.source.CSVSource;
+import be.ugent.idlab.knows.source.Source;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
@@ -15,9 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 
-public class CSVWSourceIterator implements SourceIterator {
+public class CSVWSourceIterator extends SourceIterator {
 
-    private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CSVWSourceIterator.class);
 
     private com.opencsv.CSVParserBuilder csvParser = new CSVParserBuilder().withIgnoreLeadingWhiteSpace(true);
     private Charset csvCharset = StandardCharsets.UTF_8;
@@ -25,10 +27,18 @@ public class CSVWSourceIterator implements SourceIterator {
     private List<String> nulls;
     private Iterator<String[]> iterator;
     private String[] header;
-    private final Map<String, String> dataTypes;
+    private Map<String, String> dataTypes;
     private boolean trim;
 
-    public CSVWSourceIterator(Access access, com.opencsv.CSVParserBuilder csvParser, List<String> nulls, boolean skipHeader, boolean trim){
+    /**
+     * Opens the files using the access object and initiate the iterator, header, nulls list, csvParser and trim value.
+     * @param access the corresponding access object
+     * @param csvParser parser which is used to parse the file
+     * @param nulls a map which indicates if a certain string value should be seen as a null
+     * @param skipHeader indicates if the first record should be skipped or not
+     * @param trim indicates if the values should be String.trim()
+     */
+    public void open(Access access, com.opencsv.CSVParserBuilder csvParser, List<String> nulls, boolean skipHeader, boolean trim){
         if(csvParser != null){
             this.csvParser = csvParser;
         }
@@ -55,6 +65,11 @@ public class CSVWSourceIterator implements SourceIterator {
 
     }
 
+    /**
+     * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
+     * @param record
+     * @return
+     */
     public CSVSource replaceNulls(CSVSource record){
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
@@ -66,11 +81,11 @@ public class CSVWSourceIterator implements SourceIterator {
     }
 
     @Override
-    public Source nextSource() {
+    public Source next() {
         if(iterator.hasNext()){
             String[] item = iterator.next();
             // legacy code that should throw empty rows away
-            if (item.length == 0 || (item.length == 1 && item[0] == null)) return nextSource();
+            if (item.length == 0 || (item.length == 1 && item[0] == null)) return next();
 
             if(trim) {
                 item = Arrays.stream(item)
@@ -78,8 +93,9 @@ public class CSVWSourceIterator implements SourceIterator {
                         .toArray(String[]::new);
             }
             return replaceNulls(new CSVSource(header, item, dataTypes));
+        } else{
+            throw new NoSuchElementException();
         }
-        return null;
     }
 
     @Override

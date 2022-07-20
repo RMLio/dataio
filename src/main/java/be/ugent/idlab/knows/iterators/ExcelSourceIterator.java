@@ -1,6 +1,8 @@
-package be.ugent.idlab.knows.source;
+package be.ugent.idlab.knows.iterators;
 
 import be.ugent.idlab.knows.access.Access;
+import be.ugent.idlab.knows.source.ExcelSource;
+import be.ugent.idlab.knows.source.Source;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -10,16 +12,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 
-public class ExcelSourceIterator implements SourceIterator {
+public class ExcelSourceIterator extends SourceIterator {
 
-    private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelSourceIterator.class);
     private java.util.Iterator<org.apache.poi.ss.usermodel.Sheet> workbookIterator;
     private Iterator<Row> iterator;
     private Row header;
 
-    public ExcelSourceIterator(Access access) throws IOException {
+    /**
+     * Opens the files using the access object and initiates the workbookIterator, iterator and header.
+     * @param access the corresponding access object
+     */
+    public void open(Access access) {
         try (InputStream is = access.getInputStream()){
             workbookIterator = new XSSFWorkbook(is).iterator();
             if(workbookIterator.hasNext()){
@@ -38,23 +45,26 @@ public class ExcelSourceIterator implements SourceIterator {
                 }
             }
 
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
     @Override
-    public Source nextSource() {
+    public Source next() {
         // has next updates the iterators
         if (iterator.hasNext()){
             return new ExcelSource(header, iterator.next());
-        } else {
-            // TODO make exception
-            return null;
+        }  else{
+            throw new NoSuchElementException();
         }
     }
 
+    /**
+     * If the iterator of the current workbook is at its end look if there is a next workbook and initiate the new iterator and header
+     * @return true if (new) itererator hasNext()
+     */
     private boolean updateIterators(){
         if(! iterator.hasNext()){
             if(workbookIterator.hasNext()){

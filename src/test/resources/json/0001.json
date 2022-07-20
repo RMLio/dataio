@@ -1,0 +1,17 @@
+{
+  "pubs": [{
+    "name": "Trollekelder",
+    "description": "Beer café in the shadows of the St James' church",
+    "address": "Bij Sint-Jacobs 17 9000 Gent Belgium"
+  },
+  {
+    "name": "Hot Club Gent",
+    "description": "Live jazz concerts in an intimate setting",
+    "address": "Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"
+  },
+  {
+    "name": "Jan van Gent",
+    "description": "Quirky local pub with a popular summer terrace",
+    "address": "Annonciadenstraat 1 9000 Gent Belgium"
+  }]
+}

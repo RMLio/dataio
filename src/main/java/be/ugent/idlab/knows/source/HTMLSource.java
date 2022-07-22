@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.source;
 
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,11 +28,19 @@ public class HTMLSource extends Source {
     @Override
     public List<Object> get(String value) {
         int index = headers.indexOf(value);
-
-        return element.select("tr")
-                .stream()
-                .map(row -> row.select("td").get(index).text())
-                .collect(Collectors.toList());
+        if(index == -1){
+            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
+        }
+        Elements tr = element.select("tr");
+        if(tr.size() == 0){
+            // TODO decent exception
+            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
+        }
+        Elements td = tr.get(0).select("td");
+        if(td.size() <= index){
+            return List.of();
+        }
+        return List.of(td.get(index).text());
     }
 
     @Override

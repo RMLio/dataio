@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class CSVSourceIterator extends SourceIterator {
 
@@ -38,9 +36,23 @@ public class CSVSourceIterator extends SourceIterator {
                     .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                     .build().iterator();
             header = iterator.next();
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+            checkHeader(header);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void checkHeader(String[] header) throws Exception {
+        for(String cell: header){
+            if(cell == null){
+                logger.warn("Header contains null values");
+            }
+        }
+        Set<String> set = new HashSet<>(Arrays.asList(header));
+        if (set.size() != header.length){
+            logger.warn("Header contains duplicates");
+        }
+
     }
 
     /**

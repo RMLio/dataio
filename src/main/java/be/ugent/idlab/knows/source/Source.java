@@ -1,8 +1,13 @@
 package be.ugent.idlab.knows.source;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public abstract class Source {
+    public static final Logger logger = LoggerFactory.getLogger(Source.class);
+
     /**
      * This method returns the objects for a reference in the source.
      * @param value the reference for which objects need to be returned.

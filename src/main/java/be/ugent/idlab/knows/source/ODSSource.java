@@ -15,15 +15,47 @@ import java.util.Map;
  */
 public class ODSSource extends Source {
     private Row row;
-    private Map<String, Cell> header = new HashMap<>();
+    private Map<String, String> data_types = new HashMap<>();
+    private Map<String, Object> data = new HashMap<>();
 
     public ODSSource(Row header, Row row) {
         for (int i = 0; i < header.getCellCount(); i++) {
             Cell cell = header.getCellByIndex(i);
-            this.header.put(cell.getStringValue(), row.getCellByIndex(i));
+            data.put(cell.getStringValue(), getCellValue(row.getCellByIndex(i)));
+            data_types.put(cell.getStringValue(), getIRI(cell.getValueType()));
         }
         this.row = row;
     }
+
+    private Object getCellValue(Cell cell){
+//        Object obj;
+        try{
+            switch (cell.getValueType()) {
+                case "boolean" -> {
+                    return cell.getBooleanValue();
+                }
+                case "float" -> {
+                    double d = cell.getDoubleValue();
+                    // Cast to int if needed
+                    if (d % 1 == 0) {
+                        return (int) d;
+                    } else {
+                        return d;
+                    }
+                }
+                default -> {
+                    return cell.getStringValue();
+                }
+            }
+        // TODO don't stringify all types, but retain them
+        // needs object comparison in join function
+        // FunctionModel
+        // java.lang.IllegalArgumentException: argument type mismatch
+//        obj = String.valueOf(obj);
+    } catch (Exception e) {
+        return null;
+    }
+ }
 
     /**
      * This method returns the datatype of a reference in the record.
@@ -31,12 +63,13 @@ public class ODSSource extends Source {
      * @return the IRI of the datatype.
      */
     public String getDataType(String value) {
-        String cellType = null;
-
-        if (header != null && header.get(value) != null) {
-            cellType = header.get(value).getValueType();
-        }
-        return getIRI(cellType);
+        return data_types.getOrDefault(value, "");
+//        String cellType = null;
+//
+//        if (header != null && header.get(value) != null) {
+//            cellType = header.get(value).getValueType();
+//        }
+//        return getIRI(cellType);
     }
 
     @Override
@@ -45,7 +78,7 @@ public class ODSSource extends Source {
 
         //TODO other object could have more columns in row then this.row and this would still return true
         ODSSource odsSource = (ODSSource) obj;
-        for(String value: this.header.keySet()){
+        for(String value: this.data.keySet()){
 
             if(! this.get(value).equals(odsSource.get(value)))
                 return false;
@@ -66,40 +99,43 @@ public class ODSSource extends Source {
      */
     @Override
     public List<Object> get(String value) {
-        List<Object> result = new ArrayList<>();
-        Object obj;
-        try {
-            int index = header.get(value).getColumnIndex();
-            Cell cell = row.getCellByIndex(index);
-            switch (cell.getValueType()) {
-                case "boolean":
-                    obj = cell.getBooleanValue();
-                    break;
-                case "float":
-                    double d = cell.getDoubleValue();
-                    // Cast to int if needed
-                    if (d % 1 == 0) {
-                        obj = (int) d;
-                    } else {
-                        obj = d;
-                    }
-                    break;
-                case "string":
-                default:
-                    obj = cell.getStringValue();
-                    break;
-            }
-            // TODO don't stringify all types, but retain them
-            // needs object comparison in join function
-            // FunctionModel
-            // java.lang.IllegalArgumentException: argument type mismatch
-            obj = String.valueOf(obj);
-            result.add(obj);
-        } catch (Exception e) {
-            return result;
-        }
-
-        return result;
+        Object obj = data.getOrDefault(value, null);
+        if(obj == null) return List.of();
+        return List.of(obj);
+//        List<Object> result = new ArrayList<>();
+//        Object obj;
+//        try {
+//            int index = header.get(value).getColumnIndex();
+//            Cell cell = row.getCellByIndex(index);
+//            switch (cell.getValueType()) {
+//                case "boolean":
+//                    obj = cell.getBooleanValue();
+//                    break;
+//                case "float":
+//                    double d = cell.getDoubleValue();
+//                    // Cast to int if needed
+//                    if (d % 1 == 0) {
+//                        obj = (int) d;
+//                    } else {
+//                        obj = d;
+//                    }
+//                    break;
+//                case "string":
+//                default:
+//                    obj = cell.getStringValue();
+//                    break;
+//            }
+//            // TODO don't stringify all types, but retain them
+//            // needs object comparison in join function
+//            // FunctionModel
+//            // java.lang.IllegalArgumentException: argument type mismatch
+//            obj = String.valueOf(obj);
+//            result.add(obj);
+//        } catch (Exception e) {
+//            return result;
+//        }
+//
+//        return result;
     }
 
     /**
@@ -112,15 +148,12 @@ public class ODSSource extends Source {
         if (cellType == null) {
             return "";
         }
-        switch (cellType) {
-//            case "boolean":
-//                return XSDDatatype.XSDboolean.getURI();
-//            case "float":
-//                return XSDDatatype.XSDdouble.getURI();
+        return switch (cellType) {
+            case "boolean" -> XSDDatatype.XSDboolean.getURI();
+            case "float" -> XSDDatatype.XSDdouble.getURI();
 //            case "string":
 //                return XSDDatatype.XSDstring.getURI();
-            default:
-                return XSDDatatype.XSDstring.getURI();
-        }
+            default -> XSDDatatype.XSDstring.getURI();
+        };
     }
 }

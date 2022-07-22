@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.iterators.ExcelSourceIterator;
 import org.junit.Test;
 
@@ -45,4 +46,26 @@ public class ExcelTest  extends TestCore {
 //
 //        compareIterator(excelSourceIterator, Set.of(source1, source2, source3));
     }
+
+    @Test
+    public void evaluate_1001_header_col_missing_excel(){
+        ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator();
+        excelSourceIterator.open(makeLocalAccess("/excel/1001_header_col_missing.xlsx"));
+        //TODO should fail, check if it does
+    }
+
+    @Test
+    public void evaluate_1001_header_long_excel(){
+        ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator();
+        excelSourceIterator.open(makeLocalAccess("/excel/1001_header_long.xlsx"));
+        evaluate_1001_header_long(excelSourceIterator);
+    }
+
+    @Test
+    public void evaluate_1001_header_short_excel(){
+        ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator();
+        excelSourceIterator.open(makeLocalAccess("/excel/1001_header_short.xlsx"));
+        evaluate_1001_header_short(excelSourceIterator);
+    }
+
 }

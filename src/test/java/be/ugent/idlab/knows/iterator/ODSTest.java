@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.iterators.ODSSourceIterator;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public class ODSTest extends TestCore {
     public void evaluate_0000_ods(){
         ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
         odsSourceIterator.open(makeLocalAccess("/ods/0000.ods"));
-        evaluate_0000(odsSourceIterator, false);
+        evaluate_0000(odsSourceIterator, true);
 //        try {
 //            ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
 //            odsSourceIterator.open(makeLocalAccess("/ods/0000.ods"));
@@ -66,5 +67,26 @@ public class ODSTest extends TestCore {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    @Test
+    public void evaluate_1001_header_col_missing_CSV(){
+        ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
+        odsSourceIterator.open(makeLocalAccess("/ods/1001_header_col_missing.ods"));
+        //TODO should fail, check if it does
+    }
+
+    @Test
+    public void evaluate_1001_header_long_CSV(){
+        ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
+        odsSourceIterator.open(makeLocalAccess("/ods/1001_header_long.ods"));
+        evaluate_1001_header_long(odsSourceIterator);
+    }
+
+    @Test
+    public void evaluate_1001_header_short_CSV(){
+        ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
+        odsSourceIterator.open(makeLocalAccess("/ods/1001_header_short.ods"));
+        evaluate_1001_header_short(odsSourceIterator);
     }
 }

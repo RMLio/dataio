@@ -3,6 +3,7 @@ package be.ugent.idlab.knows.iterators;
 import be.ugent.idlab.knows.access.Access;
 import be.ugent.idlab.knows.source.ExcelSource;
 import be.ugent.idlab.knows.source.Source;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 
 public class ExcelSourceIterator extends SourceIterator {
@@ -44,9 +44,24 @@ public class ExcelSourceIterator extends SourceIterator {
                     //TODO exception
                 }
             }
-
-        } catch (SQLException | ClassNotFoundException | IOException e) {
+            checkHeader(header);
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+
+    }
+
+    public void checkHeader(Row header) {
+        Set<String> set = new HashSet<>();
+        for(Cell cell: header){
+            set.add(cell.getStringCellValue());
+            if(cell.toString() == null || cell.toString().equals("")){
+                logger.warn("Header contains null values");
+            }
+        }
+
+        if (set.size() != header.getLastCellNum()){
+            logger.warn("Header contains duplicates");
         }
 
     }

@@ -56,11 +56,27 @@ public class CSVWSourceIterator extends SourceIterator {
 
             if(iterator.hasNext()){
                 header =  iterator.next();
+                checkHeader(header);
             } else {
                 //TODO exception
             }
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void checkHeader(String[] header) throws Exception {
+        for(String cell: header){
+            if(cell == null){
+                logger.warn("Header contains null values");
+            }
+        }
+        Set<String> set = new HashSet<>(Arrays.asList(header));
+        if (set.size() != header.length){
+            logger.warn("Header contains duplicates");
         }
 
     }

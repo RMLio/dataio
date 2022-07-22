@@ -5,12 +5,12 @@ import be.ugent.idlab.knows.source.HTMLSource;
 import be.ugent.idlab.knows.source.Source;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  */
 public class HTMLSourceIterator extends SourceIterator {
 
+    private static final Logger logger = LoggerFactory.getLogger(HTMLSourceIterator.class);
     private Iterator<Element> iterator;
     private List<String> headers;
 
@@ -33,8 +34,24 @@ public class HTMLSourceIterator extends SourceIterator {
             if (this.iterator.hasNext()) {
                 headers = this.iterator.next().select("th").stream().map(Element::text).collect(Collectors.toList());
             }
+            checkHeader(headers);
         } catch (IOException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void checkHeader(List<String> header) {
+        Set<String> set = new HashSet<>();
+
+        for(String cell: header){
+            set.add(cell);
+            if(cell == null){
+                logger.warn("Header contains null values");
+            }
+        }
+
+        if (set.size() != header.size()){
+            logger.warn("Header contains duplicates");
         }
     }
 

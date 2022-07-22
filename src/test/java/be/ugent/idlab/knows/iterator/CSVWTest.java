@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.iterators.CSVWSourceIterator;
 import org.junit.Test;
@@ -18,18 +19,24 @@ public class CSVWTest extends TestCore {
         return list.toArray(new String[0]);
     }
 
+    private void defaultOpen(CSVWSourceIterator iterator, String inputFile){
+        iterator.open(makeLocalAccess(inputFile), null, List.of(), false, false);
+    }
+
     @Test
     public void evaluate_0000_CSVW(){
 
         CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
-        csvwSourceIterator.open(makeLocalAccess("/csv/0000.csv"), null, List.of(), false, false);
+        defaultOpen(csvwSourceIterator, "/csv/0000.csv");
+//        csvwSourceIterator.open(makeLocalAccess("/csv/0000.csv"), null, List.of(), false, false);
         evaluate_0000(csvwSourceIterator, false);
     }
 
     @Test
     public void evaluate_0001_CSVW(){
         CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
-        csvwSourceIterator.open(makeLocalAccess("/csv/0001.csv"), null, List.of(), false, false);
+        defaultOpen(csvwSourceIterator, "/csv/0001.csv");
+//        csvwSourceIterator.open(makeLocalAccess("/csv/0001.csv"), null, List.of(), false, false);
         evaluate_0001(csvwSourceIterator);
     }
 
@@ -57,6 +64,27 @@ public class CSVWTest extends TestCore {
         CSVSource source_null = new CSVSource(header, array, null);
 
         compareIterator(csvwSourceIterator, Set.of(source1, source2, source3, source_null));
+    }
+
+    @Test
+    public void evaluate_1001_header_col_missing_CSVW(){
+        CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
+        defaultOpen(csvwSourceIterator, "/csv/1001_header_col_missing.csv");
+        //TODO should fail, check if it does
+    }
+
+    @Test
+    public void evaluate_1001_header_long_CSVW(){
+        CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
+        defaultOpen(csvwSourceIterator, "/csv/1001_header_long.csv");
+        evaluate_1001_header_long(csvwSourceIterator);
+    }
+
+    @Test
+    public void evaluate_1001_header_short_CSVW(){
+        CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
+        defaultOpen(csvwSourceIterator, "/csv/1001_header_short.csv");
+        evaluate_1001_header_short(csvwSourceIterator);
     }
 
 }

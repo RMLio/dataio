@@ -1,5 +1,9 @@
 package be.ugent.idlab.knows.source;
 
+import be.ugent.idlab.knows.iterators.CSVSourceIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +19,20 @@ public class CSVSource extends Source {
     private Map<String, String> data;
     private Map<String, String> datatypes;
 
-    public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
+    public CSVSource(String[] header, String[] data, Map<String, String> datatypes){
         this.data = new HashMap<>();
+        if(header.length > data.length){
+            logger.warn("Header has more columns than this row");
+        }
+        if(header.length < data.length){
+            logger.warn("Header has less columns than this row, these extra values will be ignored");
+        }
         for(int i = 0; i < header.length; i += 1){
-            this.data.put(header[i], data[i]);
+            if(i < data.length){
+                this.data.put(header[i], data[i]);
+            } else{
+                this.data.put(header[i], "");
+            }
         }
         this.datatypes = datatypes;
     }
@@ -66,16 +80,9 @@ public class CSVSource extends Source {
         if(!this.data.containsKey(toDatabaseCase)){
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
         }
-
-        List<Object> result = new ArrayList<>();
-        Object obj = this.data.get(toDatabaseCase);
-
-        // needed for finding NULL in CSV serialization
-        if (obj != null) {
-            result.add(obj);
-        }
-
-        return result;
+        String obj = this.data.get(toDatabaseCase);
+        if(obj.equals("")) return List.of();
+        return List.of(obj);
     }
 
     public Map<String, String> getData() {

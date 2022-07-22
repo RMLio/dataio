@@ -16,15 +16,25 @@ import java.util.Map;
  */
 public class ExcelSource extends Source {
 
-    private Row row;
-    private Map<String, Cell> header = new HashMap<>();
+    private Map<String, Object> data = new HashMap<>();
+    private Map<String, String> data_types = new HashMap<>();
 
     public ExcelSource(Row header, Row row) {
-        //TODO should this be switched to hashmap similar to CSVSource?
-        for (Cell cell : header) {
-            this.header.put(cell.getStringCellValue(), cell);
+        if(header.getLastCellNum() > row.getLastCellNum()){
+            logger.warn("Header has more columns than this row, these will be filled with empty strings");
         }
-        this.row = row;
+        if(header.getLastCellNum() < row.getLastCellNum()){
+            logger.warn("Header has less columns than this row, these extra values will be ignored");
+        }
+        for (int i = 0; i < header.getLastCellNum(); i++) {
+            if(i < row.getLastCellNum()){
+                data.put(header.getCell(i).getStringCellValue(), getCellValue(row.getCell(i)));
+                data_types.put(header.getCell(i).getStringCellValue(), getIRI(row.getCell(i)));
+            } else {
+                data.put(header.getCell(i).getStringCellValue(), null);
+                data_types.put(header.getCell(i).getStringCellValue(), "");
+            }
+        }
     }
 
     /**
@@ -33,12 +43,7 @@ public class ExcelSource extends Source {
      * @return the IRI of the datatype.
      */
     public String getDataType(String value) {
-        Cell cell = null;
-        if (header != null && header.get(value) != null) {
-            int index = header.get(value).getColumnIndex();
-            cell = row.getCell(index);
-        }
-        return getIRI(cell);
+        return data_types.getOrDefault(value, "");
     }
 
     @Override
@@ -48,7 +53,7 @@ public class ExcelSource extends Source {
 
         //TODO other object could have more columns in row then this.row and this would still return true
         ExcelSource excelSource = (ExcelSource) obj;
-        for(String value: this.header.keySet()){
+        for(String value: this.data.keySet()){
 
             if(! this.get(value).equals(excelSource.get(value)))
                 return false;
@@ -70,13 +75,17 @@ public class ExcelSource extends Source {
      */
     @Override
     public List<Object> get(String value) {
-        List<Object> result = new ArrayList<>();
+        Object obj = data.getOrDefault(value, null);
+        if(obj == null) return List.of();
+        return List.of(obj);
+    }
+
+    private Object getCellValue(Cell cell){
+        if(cell == null) return null;
         Object obj;
         try {
-            int index = header.get(value).getColumnIndex();
-            Cell cell = row.getCell(index);
             switch (cell.getCellType()) {
-                case NUMERIC:
+                case NUMERIC -> {
                     double d = cell.getNumericCellValue();
                     // Cast to int if needed
                     if (d % 1 == 0) {
@@ -84,21 +93,15 @@ public class ExcelSource extends Source {
                     } else {
                         obj = d;
                     }
-                    break;
-                case BOOLEAN:
-                    obj = cell.getBooleanCellValue();
-                    break;
-                default:
-                    obj = cell.getStringCellValue();
-                    break;
+                }
+                case BOOLEAN -> obj = cell.getBooleanCellValue();
+                default -> obj = cell.getStringCellValue();
             }
-
-            result.add(obj);
+            return obj;
         } catch (Exception e) {
             e.printStackTrace();
-            return result;
+            return null;
         }
-        return result;
     }
 
     /**
@@ -112,18 +115,15 @@ public class ExcelSource extends Source {
         }
 
         CellType cellType = cell.getCellType();
-        switch (cellType) {
-            case NUMERIC:
-                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
-            case BOOLEAN:
-                return XSDDatatype.XSDboolean.getURI();
-            default:
-                return XSDDatatype.XSDstring.getURI();
-        }
+        return switch (cellType) {
+            case NUMERIC -> cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
+            case BOOLEAN -> XSDDatatype.XSDboolean.getURI();
+            default -> XSDDatatype.XSDstring.getURI();
+        };
     }
 
     public void printString() {
-        for (String value : this.header.keySet()) {
+        for (String value : this.data.keySet()) {
             System.out.print(value +  ": ");
             System.out.println(this.get(value));
         }

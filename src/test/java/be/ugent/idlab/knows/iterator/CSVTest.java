@@ -26,4 +26,26 @@ public class CSVTest extends TestCore {
 
         evaluate_0001(csvSourceIterator);
     }
+
+    @Test
+    public void evaluate_1001_header_col_missing_CSV(){
+        CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_col_missing.csv"));
+        //TODO should fail, check if it does
+    }
+
+    @Test
+    public void evaluate_1001_header_long_CSV(){
+        CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_long.csv"));
+        evaluate_1001_header_long(csvSourceIterator);
+    }
+
+    @Test
+    public void evaluate_1001_header_short_CSV(){
+        CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_short.csv"));
+        evaluate_1001_header_short(csvSourceIterator);
+    }
+
 }

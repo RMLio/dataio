@@ -4,14 +4,17 @@ import be.ugent.idlab.knows.access.Access;
 import be.ugent.idlab.knows.source.ODSSource;
 import be.ugent.idlab.knows.source.Source;
 import org.odftoolkit.simple.SpreadsheetDocument;
+import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Row;
 import org.odftoolkit.simple.table.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class ODSSourceIterator extends SourceIterator {
 
@@ -45,8 +48,26 @@ public class ODSSourceIterator extends SourceIterator {
                     //TODO exception
                 }
             }
+            checkHeader(header);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void checkHeader(Row header){
+        Set<String> set = new HashSet<>();
+        Cell cell;
+        for(int i = 0; i < header.getCellCount(); i++){
+            cell = header.getCellByIndex(i);
+
+            set.add(cell.getStringValue());
+            if(cell.toString() == null || cell.toString().equals("")){
+                logger.warn("Header contains null values");
+            }
+        }
+
+        if (set.size() != header.getCellCount()){
+            logger.warn("Header contains duplicates");
         }
     }
 

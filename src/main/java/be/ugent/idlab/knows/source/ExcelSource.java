@@ -85,7 +85,7 @@ public class ExcelSource extends Source {
         Object obj;
         try {
             switch (cell.getCellType()) {
-                case NUMERIC -> {
+                case NUMERIC :
                     double d = cell.getNumericCellValue();
                     // Cast to int if needed
                     if (d % 1 == 0) {
@@ -93,9 +93,14 @@ public class ExcelSource extends Source {
                     } else {
                         obj = d;
                     }
-                }
-                case BOOLEAN -> obj = cell.getBooleanCellValue();
-                default -> obj = cell.getStringCellValue();
+                    break;
+
+                case BOOLEAN :
+                    obj = cell.getBooleanCellValue();
+                    break;
+                default:
+                    obj = cell.getStringCellValue();
+                    break;
             }
             return obj;
         } catch (Exception e) {
@@ -115,11 +120,12 @@ public class ExcelSource extends Source {
         }
 
         CellType cellType = cell.getCellType();
-        return switch (cellType) {
-            case NUMERIC -> cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
-            case BOOLEAN -> XSDDatatype.XSDboolean.getURI();
-            default -> XSDDatatype.XSDstring.getURI();
-        };
+        switch (cellType) {
+            case NUMERIC:
+                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
+            case BOOLEAN: return XSDDatatype.XSDboolean.getURI();
+            default: return XSDDatatype.XSDstring.getURI();
+        }
     }
 
     public void printString() {

@@ -31,10 +31,10 @@ public class ODSSource extends Source {
 //        Object obj;
         try{
             switch (cell.getValueType()) {
-                case "boolean" -> {
-                    return cell.getBooleanValue();
-                }
-                case "float" -> {
+                case "boolean":
+                    return
+                            cell.getBooleanValue();
+                case "float":
                     double d = cell.getDoubleValue();
                     // Cast to int if needed
                     if (d % 1 == 0) {
@@ -42,10 +42,8 @@ public class ODSSource extends Source {
                     } else {
                         return d;
                     }
-                }
-                default -> {
+                default:
                     return cell.getStringValue();
-                }
             }
         // TODO don't stringify all types, but retain them
         // needs object comparison in join function
@@ -148,12 +146,12 @@ public class ODSSource extends Source {
         if (cellType == null) {
             return "";
         }
-        return switch (cellType) {
-            case "boolean" -> XSDDatatype.XSDboolean.getURI();
-            case "float" -> XSDDatatype.XSDdouble.getURI();
+        switch (cellType) {
+            case "boolean": return XSDDatatype.XSDboolean.getURI();
+            case "float": return XSDDatatype.XSDdouble.getURI();
 //            case "string":
 //                return XSDDatatype.XSDstring.getURI();
-            default -> XSDDatatype.XSDstring.getURI();
-        };
+            default: return XSDDatatype.XSDstring.getURI();
+        }
     }
 }

@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
-import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.iterators.CSVWSourceIterator;
 import org.junit.Test;

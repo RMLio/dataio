@@ -24,7 +24,7 @@ default:
 
 General:
   stage: unittests
-  image: maven:3.5.0-jdk-8
+  image: maven:3-jdk-11
   retry: 2
   script:
     - 'mvn $MAVEN_CLI_OPTS -Dtest=$TEST test'

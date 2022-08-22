@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
 /**
- * This class is a record factory that creates XML records.
+ * This class is a XMLSourceIterator that allows the iteration of a XML file
  */
 public class XMLSourceIterators extends SourceIterator {
 

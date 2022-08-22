@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * This class is a record factory that creates JSON records.
+ * This class is a JSonSourceiterator that allows the iteration of json data.
  */
 public class JSONSourceIterator extends SourceIterator {
     private Iterator<String> iterator;
@@ -43,35 +43,6 @@ public class JSONSourceIterator extends SourceIterator {
 
         iterator = ((List<String>) JsonPath.using(conf).parse(document).read(escapedIterator)).iterator();
     }
-
-//    /**
-//     * This method returns the records from a JSON document based on an iterator.
-//     * @param document the document from which records need to get.
-//     * @param iterator the used iterator.
-//     * @return a list of records.
-//     */
-//    List<Source> getRecordsFromDocument(Access access, String contentType, String iterator) {
-//
-//        List<Source> records = new ArrayList<>();
-//
-//        Configuration conf = Configuration.builder()
-//                .options(Option.AS_PATH_LIST).build();
-//
-//        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-//        String escapedIterator = iterator.replaceAll(",", "\\\\,");
-//
-//        try {
-//            List<String> pathList = JsonPath.using(conf).parse(document).read(escapedIterator);
-//
-//            for(String p :pathList) {
-//                records.add(new JSONSource(document, p));
-//            }
-//        } catch (JsonPathException e) {
-//            logger.warn("{} for iterator {}", e.getMessage(), iterator, e);
-//        }
-//
-//        return records;
-//    }
 
     /**
      * This method returns a JSON document from an InputStream.

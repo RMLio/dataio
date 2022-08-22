@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class is a record factory that creates HTML records.
+ * This class is a HTMLSourceIterator that creates HTML records.
  */
 public class HTMLSourceIterator extends SourceIterator {
 

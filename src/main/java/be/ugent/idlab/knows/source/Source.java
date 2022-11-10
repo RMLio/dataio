@@ -5,6 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * A representation of a source that can be used for a mapping
+ * Every source contains references to values. This is done differently per Source type.
+ */
 public abstract class Source {
     public static final Logger logger = LoggerFactory.getLogger(Source.class);
 

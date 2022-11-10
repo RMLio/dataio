@@ -16,118 +16,154 @@ import static be.ugent.idlab.knows.utils.Utils.typeToEncoding;
 import static org.apache.commons.compress.utils.FileNameUtils.getExtension;
 
 public class TestCore {
-    private static final Logger logger = LoggerFactory.getLogger(CSVTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
+    public boolean evaluate_0000(Iterator<Source> iterator) {
+        Map<String, Object> expected = Map.of(
+                "ID", "10",
+                "Name", "Venus"
+        );
 
-    private List<SourceIterator> iterators = List.of(new CSVSourceIterator(), new CSVWSourceIterator(),
-            new ExcelSourceIterator(), new HTMLSourceIterator(), new ODSSourceIterator(), new XMLSourceIterators());
-
-    public void evaluate_0000(SourceIterator iterator, boolean numeric){
-        List<String> header = List.of("ID", "Name");
-
-        List<Map<String, Object>> list = List.of(makeMap(header, List.of(List.of(numeric ? 10 : "10"), List.of("Venus"))));
-
-        compareIterator(iterator, list, header);
+        return compareIterator(iterator, List.of(expected));
     }
 
-    public void evaluate_0001(SourceIterator iterator){
-        List<String> header = List.of("name", "description", "address");
+    public boolean evaluate_0001(Iterator<Source> iterator) {
+        Map<String, Object> expectedRecord1 = Map.of(
+                "name", "Trollekelder",
+                "description", "Beer café in the shadows of the St James' church",
+                "address", "Bij Sint-Jacobs 17 9000 Gent Belgium"
+        );
 
-        ArrayList<Map<String, Object>> list = new ArrayList<>();
-        list.add(makeMap(header, List.of(List.of("Trollekelder"),List.of("Beer café in the shadows of the St James' church"),
-                List.of("Bij Sint-Jacobs 17 9000 Gent Belgium"))));
-        list.add(makeMap(header, List.of(List.of("Hot Club Gent"),List.of("Live jazz concerts in an intimate setting"),
-                List.of("Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"))));
-        list.add(makeMap(header,List.of(List.of("Jan van Gent"), List.of("Quirky local pub with a popular summer terrace"),
-                List.of("Annonciadenstraat 1 9000 Gent Belgium"))));
-        compareIterator(iterator, list, header);
+        Map<String, Object> expectedRecord2 = Map.of(
+                "name", "Hot Club Gent",
+                "description", "Live jazz concerts in an intimate setting",
+                "address", "Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"
+        );
+        Map<String, Object> expectedRecord3 = Map.of(
+                "name", "Jan van Gent",
+                "description", "Quirky local pub with a popular summer terrace",
+                "address", "Annonciadenstraat 1 9000 Gent Belgium"
+        );
+
+        return compareIterator(iterator, List.of(expectedRecord1, expectedRecord2, expectedRecord3));
     }
 
-    public void evaluate_1001_header_long(SourceIterator iterator){
-        List<String> header = List.of("name", "description", "address", "extra");
+    public boolean evaluate_1001_header_long(Iterator<Source> iterator) {
+        Map<String, Object> expected1 = Map.of(
+                "name", "Trollekelder",
+                "description", "Beer café in the shadows of the St James' church",
+                "address", "Bij Sint-Jacobs 17 9000 Gent Belgium",
+                "extra", ""
+        );
 
-        ArrayList<Map<String, Object>> list = new ArrayList<>();
-        list.add(makeMap(header, List.of(List.of("Trollekelder"),List.of("Beer café in the shadows of the St James' church"),
-                List.of("Bij Sint-Jacobs 17 9000 Gent Belgium"), List.of())));
-        list.add(makeMap(header, List.of(List.of("Hot Club Gent"),List.of("Live jazz concerts in an intimate setting"),
-                List.of("Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"), List.of())));
-        list.add(makeMap(header,List.of(List.of("Jan van Gent"), List.of("Quirky local pub with a popular summer terrace"),
-                List.of("Annonciadenstraat 1 9000 Gent Belgium"), List.of())));
+        Map<String, Object> expected2 = Map.of(
+                "name", "Hot Club Gent",
+                "description", "Live jazz concerts in an intimate setting",
+                "address", "Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium",
+                "extra", ""
+        );
+        Map<String, Object> expected3 = Map.of(
+                "name", "Jan van Gent",
+                "description", "Quirky local pub with a popular summer terrace",
+                "address", "Annonciadenstraat 1 9000 Gent Belgium",
+                "extra", ""
+        );
 
-        compareIterator(iterator, list, header);
+        return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
 
-    public void evaluate_1001_header_short(SourceIterator iterator){
-        List<String> header = List.of("name", "description");
+    public boolean evaluate_1001_header_short(Iterator<Source> iterator) {
+        Map<String, Object> expected1 = Map.of(
+                "name", "Trollekelder",
+                "description", "Beer café in the shadows of the St James' church"
+        );
+        Map<String, Object> expected2 = Map.of(
+                "name", "Hot Club Gent",
+                "description", "Live jazz concerts in an intimate setting"
+        );
+        Map<String, Object> expected3 = Map.of(
+                "name", "Jan van Gent",
+                "description", "Quirky local pub with a popular summer terrace"
+        );
 
-        ArrayList<Map<String, Object>> list = new ArrayList<>();
-        list.add(makeMap(header, List.of(List.of("Trollekelder"),List.of("Beer café in the shadows of the St James' church"))));
-        list.add(makeMap(header, List.of(List.of("Hot Club Gent"),List.of("Live jazz concerts in an intimate setting"))));
-        list.add(makeMap(header,List.of(List.of("Jan van Gent"), List.of("Quirky local pub with a popular summer terrace"))));
-
-        compareIterator(iterator, list, header);
+        return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
 
 
-
-    public void compareIterator(SourceIterator iterator, Set<Source> expectedSources){
+    public boolean compareIterator(Iterator<Source> iterator, Set<Source> expectedSources) {
         int counter = 0;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             counter++;
-//            Iterator<Source> it = expectedSources.iterator();
-//            Source el1 = it.next();
-//            Source el2= it.next();
-//            Source el3= it.next();
-//            Source el4= it.next();
-//
-//            Source r1 = iterator.next();
-//            Source r2= iterator.next();
-//            Source r3= iterator.next();
-//            Source r4= iterator.next();
-//            System.out.println(el2 +""+ el1);
+            Source source = iterator.next();
+            if (!expectedSources.contains(source)) {
+                return false;
+            }
 
-            assert expectedSources.contains(iterator.next());
         }
-        assert expectedSources.size() == counter;
+        return expectedSources.size() == counter;
     }
 
     public Access makeLocalAccess(String inputFile, String base, String type, String encoding){
         return new LocalFileAccess(getClass().getResource(inputFile).getPath(), base, type, encoding);
     }
 
-    private HashMap<String, Object> makeMap(List<String> header, List<Object> data){
-        HashMap<String, Object> map = new HashMap<>();
-        for(int i = 0; i < header.size(); i++){
-            map.put(header.get(i), data.get(i));
-        }
-        return map;
-    }
-
-    private void compareIterator(SourceIterator iterator, List<Map<String, Object>> list, List<String> header){
+    /**
+     * Compares the iterator with the values in the expected list, according to the expected header
+     *
+     * @param iterator iterator with actual values
+     * @param list     list of expected values
+     */
+    private boolean compareIterator(Iterator<Source> iterator, List<Map<String, Object>> list) {
         int counter = 0;
 
-        while(iterator.hasNext()){
-            counter++;
+        while (iterator.hasNext()) {
             Source source = iterator.next();
-            assert compareList(source, list, header);
+            if (!compareMap(source, list)) {
+                return false; // source doesn't line up with expected values
+            }
+            counter++;
         }
-        assert counter == list.size();
+        return counter == list.size();
     }
 
-    private boolean compareList(Source source, List<Map<String, Object>> checkList, List<String> header){
-        for(Map<String, Object> map: checkList){
-            if(compareMap(source, map, header)) return true;
+    /**
+     * Asserts if the source conforms to a particular map
+     *
+     * @param source    source to be checked
+     * @param checkMaps list of maps to check against
+     * @return true if the source conforms to a map in checkMaps
+     */
+    private boolean compareMap(Source source, List<Map<String, Object>> checkMaps) {
+        for (Map<String, Object> map : checkMaps) {
+            if (compareMapParticular(source, map)) {
+                return true;
+            }
         }
         return false;
     }
 
-    private boolean compareMap(Source source, Map<String, Object> checkMap, List<String> header){
-        for(String value: header){
-            if(! checkMap.containsKey(value)) return false;
+    /**
+     * Asserts if the source conforms to the checkMap
+     *
+     * @param source source to be checked
+     * @param map    map to be compared against
+     * @return true if all the fields in the map appear correctly in source
+     */
+    private boolean compareMapParticular(Source source, Map<String, Object> map) {
+        for (String key : map.keySet()) {
+            List<Object> values = source.get(key);
 
-            if(checkMap.get(value) == null){
-                if(source.get(value) != null) return false;
-            }else if(! checkMap.get(value).equals(source.get(value))) return false;
+            if (values.size() == 0) { // empty list returned, value not in source
+                if(!map.get(key).equals("")) {
+                    return false;
+                }
+            } else {
+                String value = String.valueOf(values.get(0)); // we're evaluating everything as strings
+
+                if (!value.equals(map.get(key))) {
+                    return false;
+                }
+            }
         }
         return true;
     }

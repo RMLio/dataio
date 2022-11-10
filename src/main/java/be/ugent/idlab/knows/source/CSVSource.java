@@ -1,10 +1,5 @@
 package be.ugent.idlab.knows.source;
 
-import be.ugent.idlab.knows.iterators.CSVSourceIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,18 +14,18 @@ public class CSVSource extends Source {
     private Map<String, String> data;
     private Map<String, String> datatypes;
 
-    public CSVSource(String[] header, String[] data, Map<String, String> datatypes){
+    public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
         this.data = new HashMap<>();
-        if(header.length > data.length){
+        if (header.length > data.length) {
             logger.warn("Header has more columns than this row");
         }
-        if(header.length < data.length){
+        if (header.length < data.length) {
             logger.warn("Header has less columns than this row, these extra values will be ignored");
         }
-        for(int i = 0; i < header.length; i += 1){
-            if(i < data.length){
+        for (int i = 0; i < header.length; i += 1) {
+            if (i < data.length) {
                 this.data.put(header[i], data[i]);
-            } else{
+            } else {
                 this.data.put(header[i], "");
             }
         }
@@ -39,6 +34,7 @@ public class CSVSource extends Source {
 
     /**
      * This method returns the datatype of a reference in the record.
+     *
      * @param value the reference for which the datatype needs to be returned.
      * @return the IRI of the datatype.
      */
@@ -64,6 +60,7 @@ public class CSVSource extends Source {
 
     /**
      * This method returns the objects for a column in the CSV record (= CSV row).
+     *
      * @param value the column for which objects need to be returned.
      * @return a list of objects for the column.
      */
@@ -77,7 +74,7 @@ public class CSVSource extends Source {
         } else {
             toDatabaseCase = value;
         }
-        if(!this.data.containsKey(toDatabaseCase)){
+        if (!this.data.containsKey(toDatabaseCase)) {
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
         }
         String obj = this.data.get(toDatabaseCase);
@@ -91,14 +88,14 @@ public class CSVSource extends Source {
     }
 
     @Override
-    public boolean equals(Object object){
+    public boolean equals(Object object) {
 
-        if(object == null) return false;
+        if (object == null) return false;
 
-        if(this == object) return true;
+        if (this == object) return true;
 
 
-        if(getClass() != object.getClass()) return false;
+        if (getClass() != object.getClass()) return false;
 
         CSVSource o = (CSVSource) object;
 

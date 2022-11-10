@@ -35,7 +35,7 @@ public class HTMLSourceIterator extends SourceIterator {
                 headers = this.iterator.next().select("th").stream().map(Element::text).collect(Collectors.toList());
             }
             checkHeader(headers);
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }

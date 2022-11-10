@@ -6,17 +6,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertTrue;
+
 
 public class CSVTest extends TestCore {
-
-    private static final Logger logger = LoggerFactory.getLogger(CSVTest.class);
-
     @Test
     public void evaluate_0000_CSV(){
 
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
         csvSourceIterator.open(makeLocalAccess("/csv/0000.csv", "","csv", "utf-8"));
-        evaluate_0000(csvSourceIterator, false);
+
+        assertTrue(evaluate_0000(csvSourceIterator));
     }
 
     @Test
@@ -24,7 +24,7 @@ public class CSVTest extends TestCore {
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
         csvSourceIterator.open(makeLocalAccess("/csv/0001.csv", "","csv", "utf-8"));
 
-        evaluate_0001(csvSourceIterator);
+        assertTrue(evaluate_0001(csvSourceIterator));
     }
 
     @Test
@@ -37,15 +37,15 @@ public class CSVTest extends TestCore {
     @Test
     public void evaluate_1001_header_long_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
+
         csvSourceIterator.open(makeLocalAccess("/csv/1001_header_long.csv", "","csv", "utf-8"));
-        evaluate_1001_header_long(csvSourceIterator);
+        assertTrue(evaluate_1001_header_long(csvSourceIterator));
     }
 
     @Test
     public void evaluate_1001_header_short_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
         csvSourceIterator.open(makeLocalAccess("/csv/1001_header_short.csv", "","csv", "utf-8"));
-        evaluate_1001_header_short(csvSourceIterator);
+        assertTrue(evaluate_1001_header_short(csvSourceIterator));
     }
-
 }

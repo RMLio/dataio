@@ -3,84 +3,51 @@ package be.ugent.idlab.knows.iterators;
 import be.ugent.idlab.knows.access.Access;
 import be.ugent.idlab.knows.source.JSONSource;
 import be.ugent.idlab.knows.source.Source;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JsonProvider;
+import org.jsfr.json.JsonSurfer;
+import org.jsfr.json.JsonSurferJackson;
+import org.jsfr.json.ResumableParser;
+import org.jsfr.json.SurfingConfiguration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 
 /**
  * This class is a JSonSourceiterator that allows the iteration of json data.
  */
 public class JSONSourceIterator extends SourceIterator {
-    private Iterator<String> iterator;
-    private Object document;
+    private final JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+    private Object currentObject;
+    private String currentPath;
+    private ResumableParser parser;
 
-    public void open(Access access, String string_iterator){
-        Object document = null;
-        try {
-            document = getDocumentFromStream(access.getInputStream(), access.getContentType());
-        } catch (IOException | SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        this.document = document;
-
-
-        Configuration conf = Configuration.builder()
-                .options(Option.AS_PATH_LIST).build();
-
-        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-        String escapedIterator = string_iterator.replaceAll(",", "\\\\,");
-
-        iterator = ((List<String>) JsonPath.using(conf).parse(document).read(escapedIterator)).iterator();
-    }
-
-    /**
-     * This method returns a JSON document from an InputStream.
-     * @param stream the used InputStream.
-     * @return a JSON document.
-     * @throws IOException
-     */
-    Object getDocumentFromStream(InputStream stream) throws IOException {
-        return Configuration.defaultConfiguration().jsonProvider().parse(stream, "utf-8");
-    }
-
-    Object getDocumentFromStream(InputStream stream, String contentType) throws IOException {
-        if(contentType.equalsIgnoreCase("jsonl")){
-            JsonProvider provider = Configuration.defaultConfiguration().jsonProvider();
-            BufferedReader lineReader = new BufferedReader(new InputStreamReader(stream));
-            Object items = provider.createArray();
-            int index = 0;
-            while (lineReader.ready()){
-                provider.setArrayIndex(items, index, provider.parse(lineReader.readLine()));
-                index += 1;
-            }
-            return items;
-        } else {
-            return getDocumentFromStream(stream);
-        }
+    public void open(Access access, String string_iterator) throws SQLException, IOException {
+        SurfingConfiguration config = JsonSurferJackson.INSTANCE
+                .configBuilder()
+                .bind(string_iterator, (value, context) -> {
+                    this.currentObject = value;
+                    this.currentPath = context.getJsonPath();
+                    context.pause();
+                }).build();
+        this.parser = surfer.createResumableParser(access.getInputStream(), config);
+        this.parser.parse();
     }
 
     @Override
     public boolean hasNext() {
-        return iterator.hasNext();
+        return parser.resume();
     }
 
     @Override
     public Source next() {
-        if(iterator.hasNext()){
-            return new JSONSource(document, iterator.next());
-        } else {
-            throw new NoSuchElementException();
-        }
+        ObjectMapper mapper = new ObjectMapper();
+
+        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.currentPath);
     }
 }

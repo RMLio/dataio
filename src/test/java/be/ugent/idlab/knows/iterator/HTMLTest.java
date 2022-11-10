@@ -4,6 +4,8 @@ import be.ugent.idlab.knows.TestCore;
 import be.ugent.idlab.knows.iterators.HTMLSourceIterator;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class HTMLTest extends TestCore {
 
     @Test
@@ -11,7 +13,7 @@ public class HTMLTest extends TestCore {
         HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
         htmlSourceIterator.open(makeLocalAccess("/html/0000.html", "", "html", "utf-8"), "table tbody tr");
 
-        evaluate_0000(htmlSourceIterator, false);
+        assertTrue(evaluate_0000(htmlSourceIterator));
     }
 
     @Test
@@ -19,7 +21,7 @@ public class HTMLTest extends TestCore {
         HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
         htmlSourceIterator.open(makeLocalAccess("/html/0001.html", "", "html", "utf-8"), "table tbody tr");
 
-        evaluate_0001(htmlSourceIterator);
+        assertTrue(evaluate_0001(htmlSourceIterator));
     }
 
     @Test
@@ -33,13 +35,13 @@ public class HTMLTest extends TestCore {
     public void evaluate_1001_header_long_html(){
         HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
         htmlSourceIterator.open(makeLocalAccess("/html/1001_header_long.html", "", "html", "utf-8"), "table tbody tr");
-        evaluate_1001_header_long(htmlSourceIterator);
+        assertTrue(evaluate_1001_header_long(htmlSourceIterator));
     }
 
     @Test
     public void evaluate_1001_header_short_html(){
         HTMLSourceIterator htmlSourceIterator = new HTMLSourceIterator();
         htmlSourceIterator.open(makeLocalAccess("/html/1001_header_short.html", "", "html", "utf-8"), "table tbody tr");
-        evaluate_1001_header_short(htmlSourceIterator);
+        assertTrue(evaluate_1001_header_short(htmlSourceIterator));
     }
 }

@@ -5,10 +5,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is a specific implementation of a Record for Excel.
@@ -16,8 +13,8 @@ import java.util.Map;
  */
 public class ExcelSource extends Source {
 
-    private Map<String, Object> data = new HashMap<>();
-    private Map<String, String> data_types = new HashMap<>();
+    private final Map<String, Object> data = new HashMap<>();
+    private final Map<String, String> data_types = new HashMap<>();
 
     public ExcelSource(Row header, Row row) {
         if(header.getLastCellNum() > row.getLastCellNum()){
@@ -63,10 +60,8 @@ public class ExcelSource extends Source {
 
     @Override
     public int hashCode() {
-        //TODO fix this hashcode as Row.hashcode() doesnt work like expected
-        return 1;
+        return Objects.hash(super.hashCode(), data, data_types);
     }
-
 
     /**
      * This method returns the objects for a column in the Excel record (= Excel row).

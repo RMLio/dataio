@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 /**
  * This class is a XMLSourceIterator that allows the iteration of a XML file
  */
-public class XMLSourceIterators extends SourceIterator {
+public class XMLSourceIterator extends SourceIterator {
 
     private XdmSequenceIterator<net.sf.saxon.s9api.XdmItem> iterator;
     private XPathCompiler compiler;
@@ -39,7 +39,7 @@ public class XMLSourceIterators extends SourceIterator {
             // Execute iterator XPath query
             XdmValue result = compiler.evaluate(string_iterator, document);
             iterator = result.iterator();
-        } catch (SaxonApiException | IOException | SQLException | ClassNotFoundException e) {
+        } catch (SaxonApiException | IOException | SQLException e) {
             e.printStackTrace();
         }
     }

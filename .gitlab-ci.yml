@@ -14,7 +14,7 @@ cache:
 
 # Cancel pipeline if a newer pipeline is running
 default:
-    interruptible: true
+  interruptible: true
 
 ###############################
 #                             #
@@ -30,7 +30,7 @@ General:
     - 'mvn $MAVEN_CLI_OPTS -Dtest=$TEST test'
   parallel:
     matrix:
-      - TEST: [CSVTest, CSVWTest, ExcelTest, HTMLTest, JSONTest, ODSTest, XMLTest, LocalAccessTest]
+      - TEST: [CSVTest, CSVWTest, ExcelTest, HTMLTest, JSONTest, ODSTest, XMLTest, LocalAccessTest, CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest]
   except:
     - master
     - development

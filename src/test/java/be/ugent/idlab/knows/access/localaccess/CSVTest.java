@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CSVTest {
 
     @Test(expected = FileNotFoundException.class)
-    public void expect_error() throws SQLException, IOException, ClassNotFoundException {
+    public void expect_error() throws SQLException, IOException {
         Access access = new LocalFileAccess("", "not_existing_file.csv", "csv", "utf-8");
         access.getInputStream();
     }

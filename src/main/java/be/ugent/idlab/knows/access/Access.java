@@ -15,7 +15,8 @@ public interface Access {
      * @return the InputStream corresponding to the access.
      * @throws IOException
      */
-    InputStream getInputStream() throws IOException, SQLException, ClassNotFoundException;
+
+    InputStream getInputStream() throws IOException, SQLException;
     InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException;
 
     /**
@@ -26,4 +27,9 @@ public interface Access {
     Map<String, String> getDataTypes();
 
     String getContentType();
+
+    /**
+     * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     */
+    String getAccessPath();
 }

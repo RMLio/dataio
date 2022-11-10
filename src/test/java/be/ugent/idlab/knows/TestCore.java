@@ -4,11 +4,16 @@ import be.ugent.idlab.knows.access.Access;
 import be.ugent.idlab.knows.access.LocalFileAccess;
 import be.ugent.idlab.knows.iterator.CSVTest;
 import be.ugent.idlab.knows.iterators.*;
+import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.source.Source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import be.ugent.idlab.knows.utils.Utils.*;
 
 import java.util.*;
+
+import static be.ugent.idlab.knows.utils.Utils.typeToEncoding;
+import static org.apache.commons.compress.utils.FileNameUtils.getExtension;
 
 public class TestCore {
     private static final Logger logger = LoggerFactory.getLogger(CSVTest.class);
@@ -34,7 +39,7 @@ public class TestCore {
         list.add(makeMap(header, List.of(List.of("Hot Club Gent"),List.of("Live jazz concerts in an intimate setting"),
                 List.of("Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"))));
         list.add(makeMap(header,List.of(List.of("Jan van Gent"), List.of("Quirky local pub with a popular summer terrace"),
-                        List.of("Annonciadenstraat 1 9000 Gent Belgium"))));
+                List.of("Annonciadenstraat 1 9000 Gent Belgium"))));
         compareIterator(iterator, list, header);
     }
 
@@ -69,13 +74,25 @@ public class TestCore {
         int counter = 0;
         while(iterator.hasNext()) {
             counter++;
+//            Iterator<Source> it = expectedSources.iterator();
+//            Source el1 = it.next();
+//            Source el2= it.next();
+//            Source el3= it.next();
+//            Source el4= it.next();
+//
+//            Source r1 = iterator.next();
+//            Source r2= iterator.next();
+//            Source r3= iterator.next();
+//            Source r4= iterator.next();
+//            System.out.println(el2 +""+ el1);
+
             assert expectedSources.contains(iterator.next());
         }
         assert expectedSources.size() == counter;
     }
 
-    public Access makeLocalAccess(String inputFile){
-        return new LocalFileAccess(getClass().getResource(inputFile).getPath(), "");
+    public Access makeLocalAccess(String inputFile, String base, String type, String encoding){
+        return new LocalFileAccess(getClass().getResource(inputFile).getPath(), base, type, encoding);
     }
 
     private HashMap<String, Object> makeMap(List<String> header, List<Object> data){

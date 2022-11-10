@@ -28,7 +28,6 @@ public class ODSSource extends Source {
     }
 
     private Object getCellValue(Cell cell){
-//        Object obj;
         try{
             switch (cell.getValueType()) {
                 case "boolean":
@@ -46,10 +45,6 @@ public class ODSSource extends Source {
                     return cell.getStringValue();
             }
         // TODO don't stringify all types, but retain them
-        // needs object comparison in join function
-        // FunctionModel
-        // java.lang.IllegalArgumentException: argument type mismatch
-//        obj = String.valueOf(obj);
     } catch (Exception e) {
         return null;
     }
@@ -62,12 +57,6 @@ public class ODSSource extends Source {
      */
     public String getDataType(String value) {
         return data_types.getOrDefault(value, "");
-//        String cellType = null;
-//
-//        if (header != null && header.get(value) != null) {
-//            cellType = header.get(value).getValueType();
-//        }
-//        return getIRI(cellType);
     }
 
     @Override
@@ -100,40 +89,6 @@ public class ODSSource extends Source {
         Object obj = data.getOrDefault(value, null);
         if(obj == null) return List.of();
         return List.of(obj);
-//        List<Object> result = new ArrayList<>();
-//        Object obj;
-//        try {
-//            int index = header.get(value).getColumnIndex();
-//            Cell cell = row.getCellByIndex(index);
-//            switch (cell.getValueType()) {
-//                case "boolean":
-//                    obj = cell.getBooleanValue();
-//                    break;
-//                case "float":
-//                    double d = cell.getDoubleValue();
-//                    // Cast to int if needed
-//                    if (d % 1 == 0) {
-//                        obj = (int) d;
-//                    } else {
-//                        obj = d;
-//                    }
-//                    break;
-//                case "string":
-//                default:
-//                    obj = cell.getStringValue();
-//                    break;
-//            }
-//            // TODO don't stringify all types, but retain them
-//            // needs object comparison in join function
-//            // FunctionModel
-//            // java.lang.IllegalArgumentException: argument type mismatch
-//            obj = String.valueOf(obj);
-//            result.add(obj);
-//        } catch (Exception e) {
-//            return result;
-//        }
-//
-//        return result;
     }
 
     /**
@@ -149,8 +104,6 @@ public class ODSSource extends Source {
         switch (cellType) {
             case "boolean": return XSDDatatype.XSDboolean.getURI();
             case "float": return XSDDatatype.XSDdouble.getURI();
-//            case "string":
-//                return XSDDatatype.XSDstring.getURI();
             default: return XSDDatatype.XSDstring.getURI();
         }
     }

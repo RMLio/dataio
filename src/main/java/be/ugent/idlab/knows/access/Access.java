@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.access;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -17,6 +16,7 @@ public interface Access {
      * @throws IOException
      */
     InputStream getInputStream() throws IOException, SQLException, ClassNotFoundException;
+    InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException;
 
     /**
      * This method returns a map of datatypes.

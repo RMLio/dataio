@@ -12,10 +12,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -146,6 +143,11 @@ public class RDBAccess implements Access {
         }
 
         return inputStream;
+    }
+
+    @Override
+    public InputStreamReader getInputStreamReader() {
+        return null;
     }
 
     /**

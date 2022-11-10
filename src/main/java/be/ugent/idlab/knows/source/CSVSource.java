@@ -81,7 +81,8 @@ public class CSVSource extends Source {
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
         }
         String obj = this.data.get(toDatabaseCase);
-        if(obj.equals("")) return List.of();
+
+        if(obj == null || obj.equals("")) return List.of();
         return List.of(obj);
     }
 

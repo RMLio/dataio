@@ -9,14 +9,14 @@ public class XMLTest extends TestCore {
     @Test
     public void evaluate_0000_XML(){
         XMLSourceIterators xmlSourceIterators = new XMLSourceIterators();
-        xmlSourceIterators.open(makeLocalAccess("/xml/0000.xml"), "students/student");
+        xmlSourceIterators.open(makeLocalAccess("/xml/0000.xml","", "xml", "utf-8"), "students/student");
         evaluate_0000(xmlSourceIterators, false);
     }
 
     @Test
     public void evaluate_0001_XML(){
         XMLSourceIterators xmlSourceIterators = new XMLSourceIterators();
-        xmlSourceIterators.open(makeLocalAccess("/xml/0001.xml"), "pubs/pub");
+        xmlSourceIterators.open(makeLocalAccess("/xml/0001.xml","", "xml", "utf-8"), "pubs/pub");
         evaluate_0001(xmlSourceIterators);
     }
 

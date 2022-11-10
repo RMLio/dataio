@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class is a specific implementation of a source for JSON.
@@ -34,14 +36,22 @@ public class JSONSource extends Source {
     public List<Object> get(String value) {
         List<Object> results = new ArrayList<>();
 
-        // We put simple values between square brackets to make sure no non-escaped shenanigans happen.
-        if (!value.contains("[") && !value.contains(".") && !value.equals("@")) {
-            value = "['" + value + "']";
-        } else if (value.equals("@")) {
-            value = "" ;
-        } else {
-            value = "." + value;
+        if (value.contains(" ")) {
+            value = String.format("['%s']", value);
         }
+
+        if (!value.contains("$")) {
+            value = String.format("$.%s", value);
+        }
+
+//        // We put simple values between square brackets to make sure no non-escaped shenanigans happen.
+//        if (!value.contains("[") && !value.contains(".") && !value.equals("@")) {
+//            value = "['" + value + "']";
+//        } else if (value.equals("@")) {
+//            value = "" ;
+//        } else {
+//            value = "." + value;
+//        }
 
         // TODO do we need to be smarter that this? Below isn't complete yet, but also doesn't seem necessary
 //        String[] valueParts = value.split("\\.");
@@ -56,11 +66,14 @@ public class JSONSource extends Source {
 //            }
 //        }
 
-        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-        String fullValue = (this.path + value).replaceAll(",", "\\\\,");
+//        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
+//        String fullValue = (this.path + value).replaceAll(",", "\\\\,");
 
         try {
-            Object t = JsonPath.read(document, fullValue);
+            //Object t = JsonPath.read(document, fullValue);
+            Object t = JsonPath.read(this.document, value);
+
+
 
             if (t instanceof JSONArray) {
                 JSONArray array = (JSONArray) t;
@@ -80,13 +93,22 @@ public class JSONSource extends Source {
             }
         } catch (JsonPathException e) {
             logger.warn("{} for path {} ", e.getMessage(), this.path + value, e);
+            return null;
         }
 
         return results;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JSONSource that = (JSONSource) o;
+        return path.equals(that.path) && document.equals(that.document);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), path, document);
     }
 }

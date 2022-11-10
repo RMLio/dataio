@@ -59,18 +59,14 @@ public class RDBAccess implements Access {
      * @throws IOException
      */
     @Override
-    public InputStream getInputStream() throws IOException, SQLException, ClassNotFoundException {
+    public InputStream getInputStream() throws IOException, SQLException {
         // JDBC objects
         Connection connection = null;
         Statement statement = null;
-        String jdbcDriver = databaseType.getDriver();
         String jdbcDSN = "jdbc:" + databaseType.getJDBCPrefix() + "//" + dsn;
-        InputStream inputStream = null;
+        InputStream inputStream;
 
         try {
-            // Register JDBC driver
-            Class.forName(jdbcDriver);
-
             // Open connection
             String connectionString = jdbcDSN;
             boolean alreadySomeQueryParametersPresent = false;
@@ -121,8 +117,6 @@ public class RDBAccess implements Access {
             statement.close();
             connection.close();
 
-        } catch (Exception sqlE) {
-            throw sqlE;
         } finally {
 
             // finally block used to close resources
@@ -435,5 +429,13 @@ public class RDBAccess implements Access {
      */
     public String getContentType() {
         return contentType;
+    }
+
+    /**
+     * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     */
+    @Override
+    public String getAccessPath() {
+        return getDSN();
     }
 }

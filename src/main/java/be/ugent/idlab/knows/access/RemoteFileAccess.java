@@ -23,7 +23,8 @@ public class RemoteFileAccess implements Access {
 
     /**
      * This constructor of RemoteFileAccess taking location and content type as arguments.
-     * @param location the location of the remote file.
+     *
+     * @param location    the location of the remote file.
      * @param contentType the content type of the remote file.
      */
     public RemoteFileAccess(String location, String contentType) {
@@ -44,6 +45,7 @@ public class RemoteFileAccess implements Access {
     /**
      * This method returns the datatypes of the file.
      * This method always returns null, because the datatypes can't be determined from a remote file for the moment.
+     *
      * @return the datatypes of the file.
      */
     @Override
@@ -54,7 +56,7 @@ public class RemoteFileAccess implements Access {
     @Override
     public boolean equals(Object o) {
         if (o instanceof RemoteFileAccess) {
-            RemoteFileAccess access  = (RemoteFileAccess) o;
+            RemoteFileAccess access = (RemoteFileAccess) o;
             return location.equals(access.getLocation()) && contentType.equals(access.getContentType());
         } else {
             return false;
@@ -68,6 +70,7 @@ public class RemoteFileAccess implements Access {
 
     /**
      * The method returns the location of the remote file.
+     *
      * @return the location.
      */
     public String getLocation() {
@@ -76,9 +79,18 @@ public class RemoteFileAccess implements Access {
 
     /**
      * This method returns the content type of the remote file.
+     *
      * @return the content type.
      */
     public String getContentType() {
         return contentType;
+    }
+
+    /**
+     * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     */
+    @Override
+    public String getAccessPath() {
+        return this.location;
     }
 }

@@ -5,6 +5,8 @@ import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.iterators.ODSSourceIterator;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 
 public class ODSTest extends TestCore {
 
@@ -13,14 +15,14 @@ public class ODSTest extends TestCore {
     public void evaluate_0000_ods(){
         ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
         odsSourceIterator.open(makeLocalAccess("/ods/0000.ods","", "ods", "ods"));
-        evaluate_0000(odsSourceIterator, false);
+        assertTrue(evaluate_0000(odsSourceIterator));
     }
 
     @Test
     public void evaluate_0001_ods(){
         ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
         odsSourceIterator.open(makeLocalAccess("/ods/0001.ods","", "ods", "ods"));
-        evaluate_0001(odsSourceIterator);
+        assertTrue(evaluate_0001(odsSourceIterator));
     }
 
     @Test
@@ -34,13 +36,13 @@ public class ODSTest extends TestCore {
     public void evaluate_1001_header_long_CSV(){
         ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
         odsSourceIterator.open(makeLocalAccess("/ods/1001_header_long.ods","", "ods", "ods"));
-        evaluate_1001_header_long(odsSourceIterator);
+        assertTrue(evaluate_1001_header_long(odsSourceIterator));
     }
 
     @Test
-    public void evaluate_1001_header_short_CSV(){
+    public void evaluate_1001_header_short_CSV() {
         ODSSourceIterator odsSourceIterator = new ODSSourceIterator();
-        odsSourceIterator.open(makeLocalAccess("/ods/1001_header_short.ods","", "ods", "ods"));
-        evaluate_1001_header_short(odsSourceIterator);
+        odsSourceIterator.open(makeLocalAccess("/ods/1001_header_short.ods", "", "ods", "ods"));
+        assertTrue(evaluate_1001_header_short(odsSourceIterator));
     }
 }

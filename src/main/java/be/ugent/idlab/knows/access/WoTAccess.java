@@ -27,10 +27,11 @@ public class WoTAccess implements Access {
 
     /**
      * This constructor of WoTAccess taking location and content type as arguments.
-     * @param location the location of the WoT Thing.
+     *
+     * @param location    the location of the WoT Thing.
      * @param contentType the content type of the WoT Thing.
      */
-    public WoTAccess (String location, String contentType, HashMap<String, String> headers, HashMap<String, HashMap<String, String>> auth) {
+    public WoTAccess(String location, String contentType, HashMap<String, String> headers, HashMap<String, HashMap<String, String>> auth) {
         this.location = location;
         this.contentType = contentType;
         this.headers = headers;
@@ -46,12 +47,12 @@ public class WoTAccess implements Access {
     @Override
     public InputStream getInputStream() throws IOException {
         logger.debug("get inputstream");
-        InputStream response ;
+        InputStream response;
 
-        if(auth.get("data").containsKey("refresh")){
-            try{
+        if (auth.get("data").containsKey("refresh")) {
+            try {
                 response = getInputStreamFromAuthURL(new URL(location), contentType, headers);
-            } catch (Exception e){
+            } catch (Exception e) {
                 logger.debug("Refresh token");
                 refreshToken();
                 logger.debug("try again with new token");
@@ -72,6 +73,7 @@ public class WoTAccess implements Access {
     /**
      * This methods returns the datatypes of the WoT Thing.
      * This method always returns null, because the datatypes can't be determined from a WoT Thing for the moment.
+     *
      * @return the datatypes of the file.
      */
     @Override
@@ -82,7 +84,7 @@ public class WoTAccess implements Access {
     @Override
     public boolean equals(Object o) {
         if (o instanceof WoTAccess) {
-            WoTAccess access  = (WoTAccess) o;
+            WoTAccess access = (WoTAccess) o;
             return location.equals(access.getLocation()) && contentType.equals(access.getContentType());
         } else {
             return false;
@@ -96,6 +98,7 @@ public class WoTAccess implements Access {
 
     /**
      * The method returns the location of the remote file.
+     *
      * @return the location.
      */
     public String getLocation() {
@@ -104,17 +107,26 @@ public class WoTAccess implements Access {
 
     /**
      * This method returns the content type of the remote file.
+     *
      * @return the content type.
      */
     public String getContentType() {
         return contentType;
     }
 
+    /**
+     * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     */
+    @Override
+    public String getAccessPath() {
+        return this.location;
+    }
+
     public void refreshToken() throws MalformedURLException {
 
         StringBuilder data = new StringBuilder();
         data.append("{\"grant_type\": \"refresh_token\"");
-        for(String name: auth.get("data").keySet()) {
+        for (String name : auth.get("data").keySet()) {
             data.append(" ,\"").append(name).append("\":\"").append(auth.get("data").get(name)).append("\"");
         }
         data.append("}");
@@ -124,7 +136,7 @@ public class WoTAccess implements Access {
         this.headers.put(auth.get("info").get("name"), "Bearer " + jsonResponse.get("access_token"));
     }
 
-    private InputStream getPostRequestResponse(URL url, String contentType, byte[] auth ){
+    private InputStream getPostRequestResponse(URL url, String contentType, byte[] auth) {
         InputStream inputStream = null;
         HashMap<String, String> headers = new HashMap<>();
         headers.put("charset", "utf-8");
@@ -154,7 +166,7 @@ public class WoTAccess implements Access {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", contentType);
             // Set encoding if not set before
-            if(!headers.containsKey("charset")) {
+            if (!headers.containsKey("charset")) {
                 headers.put("charset", "utf-8");
             }
             // Apply all headers
@@ -164,7 +176,7 @@ public class WoTAccess implements Access {
             });
             logger.debug("trying to connect");
             connection.connect();
-            if(connection.getResponseCode() == 401) throw new Exception("not authenticated");
+            if (connection.getResponseCode() == 401) throw new Exception("not authenticated");
             logger.debug("getting inputstream");
             inputStream = connection.getInputStream();
             logger.debug("got inputstream");

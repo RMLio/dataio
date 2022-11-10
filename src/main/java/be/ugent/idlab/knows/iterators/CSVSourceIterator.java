@@ -11,10 +11,8 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.*;
 
 public class CSVSourceIterator extends SourceIterator {
@@ -42,7 +40,7 @@ public class CSVSourceIterator extends SourceIterator {
         }
     }
 
-    private void checkHeader(String[] header) throws Exception {
+    private void checkHeader(String[] header) {
         for(String cell: header){
             if(cell == null){
                 logger.warn("Header contains null values");

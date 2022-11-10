@@ -4,18 +4,36 @@ import be.ugent.idlab.knows.TestCore;
 import be.ugent.idlab.knows.iterators.JSONSourceIterator;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JSONTest extends TestCore {
     @Test
-    public void evaluate_0000_JSON(){
+    public void evaluate_0000_JSON() {
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator();
-        jsonSourceIterator.open(makeLocalAccess("/json/0000.json","", "json", "utf-8"), "$.students[*]");
-        evaluate_0000(jsonSourceIterator, false);
+        try {
+            jsonSourceIterator.open(makeLocalAccess("/json/0000.json","", "json", "utf-8"), "$.students[*]");
+        } catch (SQLException | IOException e) {
+            logger.error("An exception was thrown during the test!", e);
+            fail();
+        }
+
+        assertTrue(evaluate_0000(jsonSourceIterator));
     }
 
     @Test
-    public void evaluate_0001_JSON(){
+    public void evaluate_0001_JSON() {
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator();
-        jsonSourceIterator.open(makeLocalAccess("/json/0001.json","", "json", "utf-8"), "$.pubs[*]");
-        evaluate_0001(jsonSourceIterator);
+        try {
+            jsonSourceIterator.open(makeLocalAccess("/json/0001.json","", "json", "utf-8"), "$.pubs[*]");
+        } catch (SQLException | IOException e) {
+            logger.error("An exception was thrown during the test!", e);
+            fail();
+        }
+
+        assertTrue(evaluate_0001(jsonSourceIterator));
     }
 }

@@ -31,7 +31,8 @@ public class LocalFileAccess implements Access {
 
     /**
      * This constructor takes the path and the base path of a file.
-     * @param path the relative path of the file.
+     *
+     * @param path     the relative path of the file.
      * @param basePath the used base path.
      */
     public LocalFileAccess(String path, String basePath, String type, String encoding) {
@@ -43,6 +44,7 @@ public class LocalFileAccess implements Access {
 
     /**
      * This method returns the InputStream of the local file.
+     *
      * @return an InputStream.
      * @throws FileNotFoundException
      */
@@ -59,7 +61,7 @@ public class LocalFileAccess implements Access {
             return IOUtils.toInputStream(converted, Charset.defaultCharset());
         }
         else if (Objects.equals("xlsx", this.type))
-            return IOUtils.toInputStream(readExel(file),StandardCharsets.UTF_8);
+            return IOUtils.toInputStream(readExcel(file),StandardCharsets.UTF_8);
 
         return IOUtils.toInputStream(readWithEncoding(file.toPath(), "utf-8"),StandardCharsets.UTF_8);
     }
@@ -85,7 +87,7 @@ public class LocalFileAccess implements Access {
         return data;
     }
 
-    public static String readExel(File file) throws FileNotFoundException {
+    public static String readExcel(File file) throws FileNotFoundException {
         String data = "";
         FileInputStream fis = new FileInputStream(file);
         //creating workbook instance that refers to .xls file
@@ -146,6 +148,7 @@ public class LocalFileAccess implements Access {
     /**
      * This method returns the datatypes of the file.
      * This method always returns null, because the datatypes can't be determined from a local file for the moment.
+     *
      * @return the datatypes of the file.
      */
     @Override
@@ -158,7 +161,7 @@ public class LocalFileAccess implements Access {
     @Override
     public boolean equals(Object o) {
         if (o instanceof LocalFileAccess) {
-            LocalFileAccess access  = (LocalFileAccess) o;
+            LocalFileAccess access = (LocalFileAccess) o;
             return path.equals(access.getPath()) && basePath.equals(access.getBasePath());
         } else {
             return false;
@@ -172,6 +175,7 @@ public class LocalFileAccess implements Access {
 
     /**
      * This method returns the path of the access.
+     *
      * @return the relative path.
      */
     public Path getPath() {
@@ -180,6 +184,7 @@ public class LocalFileAccess implements Access {
 
     /**
      * This method returns the base path of the access.
+     *
      * @return the base path.
      */
     public String getBasePath() {
@@ -194,6 +199,20 @@ public class LocalFileAccess implements Access {
     @Override
     public String getContentType() {
         return getExtension(this.path);
+    }
+
+    /**
+     * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     */
+    @Override
+    public String getAccessPath() {
+        File file = new File(this.path);
+
+        if (!file.isAbsolute()) {
+            file = getFile(this.basePath, this.path);
+        }
+
+        return file.getAbsolutePath();
     }
 
     private String getFullPath(){

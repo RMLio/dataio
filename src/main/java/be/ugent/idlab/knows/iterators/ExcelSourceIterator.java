@@ -1,17 +1,15 @@
 package be.ugent.idlab.knows.iterators;
 
 import be.ugent.idlab.knows.access.Access;
-import be.ugent.idlab.knows.source.ExcelSource;
+import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.source.Source;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.enums.CSVReaderNullFieldIndicator;
+import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -19,31 +17,24 @@ public class ExcelSourceIterator extends SourceIterator {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelSourceIterator.class);
     private java.util.Iterator<org.apache.poi.ss.usermodel.Sheet> workbookIterator;
-    private Iterator<Row> iterator;
-    private Row header;
+    private Iterator<String[]> iterator;
+    private String[] header;
+    private Map<String, String> dataTypes;
+
 
     /**
      * Opens the files using the access object and initiates the workbookIterator, iterator and header.
      * @param access the corresponding access object
      */
     public void open(Access access) {
-        try (InputStream is = access.getInputStream()){
-            workbookIterator = new XSSFWorkbook(is).iterator();
-            if(workbookIterator.hasNext()){
-                iterator = workbookIterator.next().iterator();
-            } else{
-                //TODO exception
-            }
-
-            if(iterator.hasNext()){
-                header = iterator.next();
-            } else{
-                if(updateIterators()){
-                    header = iterator.next();
-                } else{
-                    //TODO exception
-                }
-            }
+        dataTypes = access.getDataTypes();
+        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())){
+            // little hack due to how inputStream works
+            iterator = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .withSkipLines(0)
+                    .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                    .build().iterator();
+            header = iterator.next();
             checkHeader(header);
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,56 +42,33 @@ public class ExcelSourceIterator extends SourceIterator {
 
     }
 
-    public void checkHeader(Row header) {
-        Set<String> set = new HashSet<>();
-        for(Cell cell: header){
-            set.add(cell.getStringCellValue());
-            if(cell.toString() == null || cell.toString().equals("")){
-                logger.warn("Header contains null values");
-            }
-        }
-
-        if (set.size() != header.getLastCellNum()){
-            logger.warn("Header contains duplicates");
-        }
-
-    }
 
     @Override
-    public Source next() {
-        // has next updates the iterators
-        if (iterator.hasNext()){
-            return new ExcelSource(header, iterator.next());
-        }  else{
+    public Source next(){
+        if(iterator.hasNext()){
+            // little hack due to how inputStream works
+            return new CSVSource(header, iterator.next(), dataTypes);
+        } else {
             throw new NoSuchElementException();
         }
     }
 
-    /**
-     * If the iterator of the current workbook is at its end look if there is a next workbook and initiate the new iterator and header
-     * @return true if (new) itererator hasNext()
-     */
-    private boolean updateIterators(){
-        if(! iterator.hasNext()){
-            if(workbookIterator.hasNext()){
-                iterator = workbookIterator.next().iterator();
-                if(iterator.hasNext()){
-                    header = iterator.next();
-                    return true;
-                } else {
-                    return updateIterators();
-                }
-            } else {
-                // both iterator and workbookIterator don't have a next
-                return false;
+
+    private void checkHeader(String[] header) throws Exception {
+        for(String cell: header){
+            if(cell == null){
+                logger.warn("Header contains null values");
             }
         }
-        return true;
+        Set<String> set = new HashSet<>(Arrays.asList(header));
+        if (set.size() != header.length){
+            logger.warn("Header contains duplicates");
+        }
+
     }
-
-
     @Override
     public boolean hasNext() {
-        return iterator.hasNext() || updateIterators();
+        return iterator.hasNext();
     }
+
 }

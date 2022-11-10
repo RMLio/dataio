@@ -15,14 +15,14 @@ public class CSVTest extends TestCore {
     public void evaluate_0000_CSV(){
 
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
-        csvSourceIterator.open(makeLocalAccess("/csv/0000.csv"));
+        csvSourceIterator.open(makeLocalAccess("/csv/0000.csv", "","csv", "utf-8"));
         evaluate_0000(csvSourceIterator, false);
     }
 
     @Test
     public void evaluate_0001_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
-        csvSourceIterator.open(makeLocalAccess("/csv/0001.csv"));
+        csvSourceIterator.open(makeLocalAccess("/csv/0001.csv", "","csv", "utf-8"));
 
         evaluate_0001(csvSourceIterator);
     }
@@ -30,21 +30,21 @@ public class CSVTest extends TestCore {
     @Test
     public void evaluate_1001_header_col_missing_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
-        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_col_missing.csv"));
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_col_missing.csv", "","csv", "utf-8"));
         //TODO should fail, check if it does
     }
 
     @Test
     public void evaluate_1001_header_long_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
-        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_long.csv"));
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_long.csv", "","csv", "utf-8"));
         evaluate_1001_header_long(csvSourceIterator);
     }
 
     @Test
     public void evaluate_1001_header_short_CSV(){
         CSVSourceIterator csvSourceIterator = new CSVSourceIterator();
-        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_short.csv"));
+        csvSourceIterator.open(makeLocalAccess("/csv/1001_header_short.csv", "","csv", "utf-8"));
         evaluate_1001_header_short(csvSourceIterator);
     }
 

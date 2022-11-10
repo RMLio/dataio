@@ -18,6 +18,16 @@ public class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
+    public static final Map<String,String> typeToEncoding = Map.of(
+            "csv", "utf-8",
+            "csvw", "utf-8",
+            "xlsx", "xlsx",
+            "html", "utf-8",
+            "json", "utf-8",
+            "ods", "ods",
+            "xml", "utf-8"
+    );
+
 
     public static InputStream getInputStreamFromFile(File file) throws FileNotFoundException {
         return new FileInputStream(file);

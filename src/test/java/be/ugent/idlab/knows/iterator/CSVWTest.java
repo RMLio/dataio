@@ -1,12 +1,15 @@
 package be.ugent.idlab.knows.iterator;
 
 import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.access.Access;
+import be.ugent.idlab.knows.access.LocalFileAccess;
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.iterators.CSVWSourceIterator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +22,7 @@ public class CSVWTest extends TestCore {
     }
 
     private void defaultOpen(CSVWSourceIterator iterator, String inputFile){
-        iterator.open(makeLocalAccess(inputFile), null, List.of(), false, false);
+        iterator.open(makeLocalAccess(inputFile,"", "csvw", "utf-8"), null, List.of(), false, false);
     }
 
     @Test
@@ -42,27 +45,29 @@ public class CSVWTest extends TestCore {
     @Test
     public void evaluate_0000_trim(){
         CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
-        csvwSourceIterator.open(makeLocalAccess("/csvw/0000_trim.csv"), null, List.of(), false, true);
+        csvwSourceIterator.open(makeLocalAccess("/csvw/0000_trim.csv","", "csvw", "utf-8"), null, List.of(), false, true);
         evaluate_0000(csvwSourceIterator, false);
     }
 
     @Test
     public void evaluate_1000_nulls(){
         CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator();
-        csvwSourceIterator.open(makeLocalAccess("/csvw/1000_nulls.csv"), null, List.of("NULL"), false, false);
+        Access access = makeLocalAccess("/csvw/1000_nulls.csv","", "csvw", "utf-8");
+        csvwSourceIterator.open(access, null, List.of("NULL"), false, false);
 
         String[] header = makeArray(List.of("ID", "Name"));
 
-        CSVSource source1 = new CSVSource(header, makeArray(List.of("10", "Venus")), null);
-        CSVSource source2 = new CSVSource(header, makeArray(List.of("12", "Serena")), null);
-        CSVSource source3 = new CSVSource(header, makeArray(List.of("13", "null")), null);
+
+        CSVSource source1 = new CSVSource(header, makeArray(List.of("10", "Venus")), access.getDataTypes());
+        CSVSource source3 = new CSVSource(header, makeArray(List.of("12", "Serena")), access.getDataTypes());
+        CSVSource source4 = new CSVSource(header, makeArray(List.of("13", "null")), access.getDataTypes());
 
         String[] array = new String[2];
         array[0] = "11";
         array[1] = null;
-        CSVSource source_null = new CSVSource(header, array, null);
+        CSVSource source_null = new CSVSource(header, array, access.getDataTypes());
 
-        compareIterator(csvwSourceIterator, Set.of(source1, source2, source3, source_null));
+        compareIterator(csvwSourceIterator, Set.of(source1, source3, source4, source_null));
     }
 
     @Test

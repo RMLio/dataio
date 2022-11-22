@@ -1,14 +1,13 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.access.cores.TestCore;
-import be.ugent.idlab.knows.access.Access;
-import be.ugent.idlab.knows.source.CSVSource;
-import be.ugent.idlab.knows.iterators.CSVWSourceIterator;
+import be.ugent.idlab.knows.dataio.access.cores.TestCore;
+import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

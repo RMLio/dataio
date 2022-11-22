@@ -1,7 +1,7 @@
 package be.ugent.idlab.knows.stream;
 
-import be.ugent.idlab.knows.access.cores.StreamTestCore;
-import be.ugent.idlab.knows.streams.CSVSourceStream;
+import be.ugent.idlab.knows.dataio.access.cores.StreamTestCore;
+import be.ugent.idlab.knows.dataio.streams.CSVSourceStream;
 import org.junit.Test;
 
 public class CSVStreamTest extends StreamTestCore {

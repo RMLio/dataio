@@ -1,7 +1,7 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.access.cores.TestCore;
-import be.ugent.idlab.knows.iterators.XMLSourceIterator;
+import be.ugent.idlab.knows.dataio.access.cores.TestCore;
+import be.ugent.idlab.knows.dataio.iterators.XMLSourceIterator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

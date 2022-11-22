@@ -1,10 +1,10 @@
 package be.ugent.idlab.knows.stream;
 
-import be.ugent.idlab.knows.access.Access;
-import be.ugent.idlab.knows.access.cores.StreamTestCore;
-import be.ugent.idlab.knows.source.CSVSource;
-import be.ugent.idlab.knows.source.Source;
-import be.ugent.idlab.knows.streams.CSVWSourceStream;
+import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.access.cores.StreamTestCore;
+import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 import org.junit.Test;
 
 import java.io.IOException;

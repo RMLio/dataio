@@ -1,12 +1,12 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.access.cores.TestCore;
 import be.ugent.idlab.knows.iterators.XMLSourceIterator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class XMLTest extends TestCore {
+public class XMLIteratorTest extends TestCore {
 
     @Test
     public void evaluate_0000_XML(){

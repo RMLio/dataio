@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.stream;
 
+import be.ugent.idlab.knows.access.cores.StreamTestCore;
 import be.ugent.idlab.knows.source.Source;
 import be.ugent.idlab.knows.streams.XMLSourceStream;
 import org.junit.Test;

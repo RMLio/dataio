@@ -26,11 +26,33 @@ General:
   stage: unittests
   image: maven:3-jdk-11
   retry: 2
+  services:
+    - name: docker:19.03.12-dind
+        # explicitly disable tls to avoid docker startup interruption
+      command: [ "--tls=false" ]
+  variables:
+    # Instruct Testcontainers to use the daemon of DinD.
+    DOCKER_HOST: "tcp://docker:2375"
+    # Instruct Docker not to start over TLS.
+    DOCKER_TLS_CERTDIR: ""
+    # Improve performance with overlayfs.
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - 'mvn clean'
   script:
     - 'mvn $MAVEN_CLI_OPTS -Dtest=$TEST test'
   parallel:
     matrix:
-      - TEST: [CSVTest, CSVWTest, ExcelTest, HTMLTest, JSONTest, ODSTest, XMLTest, LocalAccessTest, CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest]
+      - TEST: [
+                # iterator
+                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
+                # stream
+                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest,
+                # local access
+                CSVLocalAccessTest, CSVWLocalAccessTest, ExcelLocalAccessTest, HTMLLocalAccessTest, JSONLocalAccessTest, ODSLocalAccessTest, XMLLocalAccessTest,
+                # general access
+                DatabaseTest, SPARQLTest, WoTTest
+      ]
   except:
     - master
     - development

@@ -10,12 +10,12 @@ import java.util.Iterator;
 
 public class NamespaceResolver implements NamespaceContext {
 
+    //Store the source document to retrieve the existing namespaces
+    private Document sourceDocument;
+
     public NamespaceResolver(Document document) {
         sourceDocument = document;
     }
-
-    //Store the source document to retrieve the existing namespaces
-    private Document sourceDocument;
 
     //The lookup for the namespace uris is delegated to the stored document.
     // TODO performance: verify check whether caching this would improve performance
@@ -26,8 +26,7 @@ public class NamespaceResolver implements NamespaceContext {
         // xml: prefix is assumed to be known according to W3C: https://www.w3.org/TR/xml-names/
         else if (prefix.equals(XMLConstants.XML_NS_PREFIX)) {
             return XMLConstants.XML_NS_URI;
-        }
-        else {
+        } else {
             return sourceDocument.lookupNamespaceURI(prefix);
         }
     }

@@ -9,21 +9,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
-import static be.ugent.idlab.knows.utils.Utils.getInputStreamFromURL;
+import static be.ugent.idlab.knows.utils.Utils.*;
+
 
 public class WoTAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(WoTAccess.class);
-    private final HashMap<String, HashMap<String, String>> auth;
-    private String location;
-    private String contentType;
-    private HashMap<String, String> headers;
+    private final Map<String, Map<String, String>> auth;
+    private final String location;
+    private final String contentType;
+    private final Map<String, String> headers;
 
     /**
      * This constructor of WoTAccess taking location and content type as arguments.
@@ -31,7 +32,7 @@ public class WoTAccess implements Access {
      * @param location    the location of the WoT Thing.
      * @param contentType the content type of the WoT Thing.
      */
-    public WoTAccess(String location, String contentType, HashMap<String, String> headers, HashMap<String, HashMap<String, String>> auth) {
+    public WoTAccess(String location, String contentType, Map<String, String> headers, Map<String, Map<String, String>> auth) {
         this.location = location;
         this.contentType = contentType;
         this.headers = headers;
@@ -123,7 +124,6 @@ public class WoTAccess implements Access {
     }
 
     public void refreshToken() throws MalformedURLException {
-
         StringBuilder data = new StringBuilder();
         data.append("{\"grant_type\": \"refresh_token\"");
         for (String name : auth.get("data").keySet()) {
@@ -157,7 +157,7 @@ public class WoTAccess implements Access {
         return inputStream;
     }
 
-    private InputStream getInputStreamFromAuthURL(URL url, String contentType, HashMap<String, String> headers) throws Exception {
+    private InputStream getInputStreamFromAuthURL(URL url, String contentType, Map<String, String> headers) throws Exception {
         InputStream inputStream = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

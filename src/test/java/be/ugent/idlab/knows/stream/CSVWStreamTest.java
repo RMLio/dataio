@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.stream;
 
 import be.ugent.idlab.knows.access.Access;
+import be.ugent.idlab.knows.access.cores.StreamTestCore;
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.source.Source;
 import be.ugent.idlab.knows.streams.CSVWSourceStream;

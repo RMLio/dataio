@@ -22,7 +22,8 @@ public class XMLSourceIterator extends SourceIterator {
     /**
      * This function loads the full file in at once.
      * Opens the files using the access object and initiates the iterator and compiler
-     * @param access the corresponding access object
+     *
+     * @param access          the corresponding access object
      * @param string_iterator string value used in the parser
      */
     public void open(Access access, String string_iterator) {
@@ -45,14 +46,13 @@ public class XMLSourceIterator extends SourceIterator {
     }
 
     /**
-     *
      * @return
      */
     @Override
     public Source next() {
-        if(this.iterator.hasNext()){
+        if (this.iterator.hasNext()) {
             return new XMLSource(iterator.next(), compiler);
-        } else{
+        } else {
             throw new NoSuchElementException();
         }
     }

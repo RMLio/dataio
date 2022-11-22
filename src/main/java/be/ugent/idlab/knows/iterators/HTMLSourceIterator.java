@@ -24,7 +24,8 @@ public class HTMLSourceIterator extends SourceIterator {
 
     /**
      * Opens the files using the access object and initiates the iterator and header
-     * @param access the corresponding access object
+     *
+     * @param access          the corresponding access object
      * @param string_iterator string value used in the parser
      */
     public void open(Access access, String string_iterator) {
@@ -43,23 +44,23 @@ public class HTMLSourceIterator extends SourceIterator {
     public void checkHeader(List<String> header) {
         Set<String> set = new HashSet<>();
 
-        for(String cell: header){
+        for (String cell : header) {
             set.add(cell);
-            if(cell == null){
+            if (cell == null) {
                 logger.warn("Header contains null values");
             }
         }
 
-        if (set.size() != header.size()){
+        if (set.size() != header.size()) {
             logger.warn("Header contains duplicates");
         }
     }
 
     @Override
     public Source next() {
-        if(hasNext()){
+        if (hasNext()) {
             return new HTMLSource(iterator.next(), headers);
-        } else{
+        } else {
             throw new NoSuchElementException();
         }
     }

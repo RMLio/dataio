@@ -1,13 +1,11 @@
 package be.ugent.idlab.knows.iterators;
 
 import be.ugent.idlab.knows.access.Access;
-
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.source.Source;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.apache.commons.io.input.BOMInputStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +22,12 @@ public class CSVSourceIterator extends SourceIterator {
 
     /**
      * Opens the files using the access object and initiates the iterator and header
+     *
      * @param access the corresponding access object
      */
-    public void open(Access access){
+    public void open(Access access) {
         dataTypes = access.getDataTypes();
-        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())){
+        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
             iterator = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                     .withSkipLines(0)
                     .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
@@ -47,7 +46,7 @@ public class CSVSourceIterator extends SourceIterator {
             }
         }
         Set<String> set = new HashSet<>(Arrays.asList(header));
-        if (set.size() != header.length){
+        if (set.size() != header.length) {
             logger.warn("Header contains duplicates");
         }
 
@@ -55,17 +54,18 @@ public class CSVSourceIterator extends SourceIterator {
 
     /**
      * Gets the next value of the iterator and creates a source with this value
+     *
      * @return
      */
-    public Source next(){
-        if(iterator.hasNext()){
+    public Source next() {
+        if (iterator.hasNext()) {
             return new CSVSource(header, iterator.next(), dataTypes);
         } else {
             throw new NoSuchElementException();
         }
     }
 
-    public boolean hasNext(){
+    public boolean hasNext() {
         return iterator.hasNext();
     }
 }

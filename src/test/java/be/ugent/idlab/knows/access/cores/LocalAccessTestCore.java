@@ -1,6 +1,5 @@
-package be.ugent.idlab.knows.access.localaccess;
+package be.ugent.idlab.knows.access.cores;
 
-import be.ugent.idlab.knows.TestCore;
 import be.ugent.idlab.knows.access.Access;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -10,6 +9,7 @@ import org.apache.tika.parser.txt.CharsetDetector;
 import org.apache.tika.parser.txt.CharsetMatch;
 import org.jopendocument.dom.spreadsheet.MutableCell;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -20,34 +20,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LocalAccessTest extends TestCore{
+public class LocalAccessTestCore extends TestCore {
 
 
-    public static String getResultUTF8(Access access, Charset  encoding) throws SQLException, FileNotFoundException, ClassNotFoundException {
+    public String getResultUTF8(Access access, Charset encoding) throws SQLException, FileNotFoundException, ClassNotFoundException {
         InputStream input;
         try {
             input = access.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader (input, encoding));
-        String string_input = "";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input, encoding));
+        StringBuilder string_input = new StringBuilder();
 
         String str;
-        while (true){
+        while (true) {
             try {
                 if ((str = reader.readLine()) == null) break;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            string_input += str + "\n";
+            string_input.append(str).append("\n");
         }
-        return string_input;
+        return string_input.toString();
     }
 
-    public static String getResultInputStream(Access access, Charset  encoding) throws SQLException,  FileNotFoundException, ClassNotFoundException{
+    public String getResultInputStream(Access access, Charset encoding) throws SQLException, FileNotFoundException {
         InputStream input;
-        int data;
         byte[] b;
         try {
             input = access.getInputStream();
@@ -56,27 +55,25 @@ public class LocalAccessTest extends TestCore{
             throw new RuntimeException(e);
         }
 
-        String string_input = "";
+        String string_input;
         string_input = new String(b, StandardCharsets.UTF_8);
         return string_input;
     }
 
-
-
-    public static String readWithUTF8(Path file) {
-        String text = "";
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file.toFile()), "utf-8"))) {
+    public String readWithUTF8(Path file) {
+        StringBuilder text = new StringBuilder();
+        try (BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file.toFile()), StandardCharsets.UTF_8))) {
             String line;
             while ((line = bf.readLine()) != null) {
-                text += line + "\n";
+                text.append(line).append("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return text;
+        return text.toString();
     }
 
-    public static String readExel(File file) throws FileNotFoundException {
+    public String readExcel(File file) throws FileNotFoundException {
         String data = "";
         FileInputStream fis = new FileInputStream(file);
         //creating workbook instance that refers to .xls file
@@ -98,9 +95,9 @@ public class LocalAccessTest extends TestCore{
                         break;
                     case NUMERIC:    //field that represents number cell type
                         double temp = cell.getNumericCellValue();
-                        if(temp % 10 > 0){
+                        if (temp % 10 > 0) {
                             data += temp + ",";
-                        }else {
+                        } else {
                             data += (int) temp + ",";
                         }
                         break;
@@ -115,30 +112,30 @@ public class LocalAccessTest extends TestCore{
         return data;
     }
 
-    public static String readODS(File file) throws IOException {
+    public String readODS(File file) throws IOException {
         SpreadSheet spreadsheet;
         spreadsheet = SpreadSheet.createFromFile(file);
         //Get row count and column count
         int nColCount = spreadsheet.getSheet(0).getColumnCount();
         int nRowCount = spreadsheet.getSheet(0).getRowCount();
 
-        String data = "";
+        StringBuilder data = new StringBuilder();
         //Iterating through each row of the selected sheet
         MutableCell cell;
-        for(int nRowIndex = 0; nRowIndex < nRowCount; nRowIndex++) {
-        //Iterating through each column
-            for(int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
+        for (int nRowIndex = 0; nRowIndex < nRowCount; nRowIndex++) {
+            //Iterating through each column
+            for (int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
                 cell = spreadsheet.getSheet(0).getCellAt(nColIndex, nRowIndex);
                 cell.getTextValue();
-                data += cell.getValue()+ ",";
+                data.append(cell.getValue()).append(",");
             }
-            data = data.replaceAll(",$", "\n");
+            data = new StringBuilder(data.toString().replaceAll(",$", "\n"));
         }
-        return data;
+        return data.toString();
     }
 
 
-    public static boolean mightBeUTF8(InputStream stream) throws FileNotFoundException {
+    public boolean mightBeUTF8(InputStream stream) throws FileNotFoundException {
         byte[] inputBytes;
         try {
             inputBytes = stream.readAllBytes();
@@ -150,7 +147,7 @@ public class LocalAccessTest extends TestCore{
         return Arrays.equals(inputBytes, outputBytes);
     }
 
-    public static boolean isUTF8(InputStream is) throws FileNotFoundException {
+    public boolean isUTF8(InputStream is) throws FileNotFoundException {
         try {
             CharsetMatch[] charsetMatches = new CharsetDetector().setText(is).detectAll();
             List<String> type = Arrays.stream(charsetMatches).map(CharsetMatch::getName).collect(Collectors.toList());
@@ -159,6 +156,4 @@ public class LocalAccessTest extends TestCore{
             throw new RuntimeException(e);
         }
     }
-
-
 }

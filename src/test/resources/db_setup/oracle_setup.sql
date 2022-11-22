@@ -1,0 +1,2 @@
+CREATE TABLE Patient (ID INTEGER, Name VARCHAR(50));
+INSERT INTO Patient VALUES ('10', 'Venus');

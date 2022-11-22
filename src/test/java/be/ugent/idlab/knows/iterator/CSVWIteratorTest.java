@@ -1,8 +1,7 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.access.cores.TestCore;
 import be.ugent.idlab.knows.access.Access;
-import be.ugent.idlab.knows.access.LocalFileAccess;
 import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.iterators.CSVWSourceIterator;
 import org.junit.Test;
@@ -15,9 +14,8 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-public class CSVWTest extends TestCore {
-
-    private static final Logger logger = LoggerFactory.getLogger(CSVTest.class);
+public class CSVWIteratorTest extends TestCore {
+    private static final Logger logger = LoggerFactory.getLogger(CSVIteratorTest.class);
 
     private void defaultOpen(CSVWSourceIterator iterator, String inputFile){
         iterator.open(makeLocalAccess(inputFile,"", "csvw", "utf-8"), null, List.of(), false, false);

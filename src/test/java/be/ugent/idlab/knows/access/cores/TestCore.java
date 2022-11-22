@@ -1,19 +1,12 @@
-package be.ugent.idlab.knows;
+package be.ugent.idlab.knows.access.cores;
 
 import be.ugent.idlab.knows.access.Access;
 import be.ugent.idlab.knows.access.LocalFileAccess;
-import be.ugent.idlab.knows.iterator.CSVTest;
-import be.ugent.idlab.knows.iterators.*;
-import be.ugent.idlab.knows.source.CSVSource;
 import be.ugent.idlab.knows.source.Source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import be.ugent.idlab.knows.utils.Utils.*;
 
 import java.util.*;
-
-import static be.ugent.idlab.knows.utils.Utils.typeToEncoding;
-import static org.apache.commons.compress.utils.FileNameUtils.getExtension;
 
 public class TestCore {
     protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);

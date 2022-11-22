@@ -1,0 +1,3 @@
+[] <http://xmlns.com/foaf/0.1/firstName> "Bob" ;
+   <http://xmlns.com/foaf/0.1/lastName> "Smith" ;
+   <http://example.com/amount> "30" .

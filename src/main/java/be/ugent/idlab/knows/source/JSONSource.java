@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -17,10 +16,9 @@ import java.util.Objects;
  */
 public class JSONSource extends Source {
 
-    protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final String path;
     private final Object document;
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public JSONSource(Object document, String path) {
         this.path = path;
@@ -29,6 +27,7 @@ public class JSONSource extends Source {
 
     /**
      * This method returns the objects for a reference (JSONPath) in the record.
+     *
      * @param value the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
@@ -72,7 +71,6 @@ public class JSONSource extends Source {
         try {
             //Object t = JsonPath.read(document, fullValue);
             Object t = JsonPath.read(this.document, value);
-
 
 
             if (t instanceof JSONArray) {

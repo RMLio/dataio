@@ -1,14 +1,13 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.TestCore;
-import be.ugent.idlab.knows.iterators.CSVSourceIterator;
+import be.ugent.idlab.knows.access.cores.TestCore;
 import be.ugent.idlab.knows.iterators.ODSSourceIterator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 
-public class ODSTest extends TestCore {
+public class ODSIteratorTest extends TestCore {
 
 
     @Test

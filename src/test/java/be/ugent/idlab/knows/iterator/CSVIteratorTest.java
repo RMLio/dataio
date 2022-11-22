@@ -1,15 +1,12 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.access.cores.TestCore;
 import be.ugent.idlab.knows.iterators.CSVSourceIterator;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 
-
-public class CSVTest extends TestCore {
+public class CSVIteratorTest extends TestCore {
     @Test
     public void evaluate_0000_CSV(){
 

@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.access;
 
+import be.ugent.idlab.knows.utils.Utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
-import static be.ugent.idlab.knows.utils.Utils.getURLParamsString;
 
 /**
  * This class represents the access to a SPARQL endpoint.
@@ -68,7 +68,7 @@ public class SPARQLEndpointAccess implements Access {
 
         connection.setDoOutput(true);
         DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(getURLParamsString(urlParams));
+        out.writeBytes(Utils.getURLParamsString(urlParams));
         out.flush();
         out.close();
 

@@ -1,8 +1,6 @@
-package be.ugent.idlab.knows.stream;
+package be.ugent.idlab.knows.access.cores;
 
-import be.ugent.idlab.knows.TestCore;
 import be.ugent.idlab.knows.access.Access;
-import be.ugent.idlab.knows.access.LocalFileAccess;
 import be.ugent.idlab.knows.source.Source;
 import be.ugent.idlab.knows.streams.SourceStream;
 

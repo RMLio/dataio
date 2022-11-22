@@ -16,15 +16,22 @@ import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import static be.ugent.idlab.knows.utils.NAMESPACES.*;
-import static be.ugent.idlab.knows.utils.Utils.getHashOfString;
+import java.util.Objects;
 
 /**
  * This class represents the access to a relational database.
  */
 public class RDBAccess implements Access {
 
+    // Datatype definitions
+    private final static String DOUBLE = "http://www.w3.org/2001/XMLSchema#double";
+    private final static String VARBINARY = "http://www.w3.org/2001/XMLSchema#hexBinary";
+    private final static String DECIMAL = "http://www.w3.org/2001/XMLSchema#decimal";
+    private final static String INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+    private final static String BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
+    private final static String DATE = "http://www.w3.org/2001/XMLSchema#date";
+    private final static String TIME = "http://www.w3.org/2001/XMLSchema#time";
+    private final static String DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     private String dsn;
     private DatabaseType databaseType;
     private String username;
@@ -33,8 +40,9 @@ public class RDBAccess implements Access {
     private String contentType;
     private Map<String, String> datatypes = new HashMap<>();
 
+
     /**
-     * This constructor takes as arguments the dsn, database, username, password, query, and content type.
+     * This constructor takes as arguments the dsn, database, username, password, query, content type
      *
      * @param dsn          the data source name.
      * @param databaseType the database type.
@@ -53,6 +61,36 @@ public class RDBAccess implements Access {
     }
 
     /**
+     * Convert a sequence of bytes to a string representation using uppercase hex symbols
+     *
+     * @param bytes the bytes to convert
+     * @return a string containing the hexadecimal representation of the byte array
+     */
+    private static String bytesToHexString(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            // format: 0 flag for zero-padding, 2 character width, uppercase hexadecimal symbols
+            builder.append(String.format("%02X", b));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Normalize the string representation of a data value given by the RDB.
+     *
+     * @param data     the string representation retrieved from the RDB of the data to be normalized.
+     * @param dataType the intended datatype of the data parameter.
+     * @return Normalized string representation of the data parameter, given the datatype.
+     */
+    private static String normalizeData(String data, String dataType) {
+        if (DOUBLE.equals(dataType)) {
+            // remove trailing decimal points (Quirk from MySQL, see issue 203)
+            return data.replace(".0", "");
+        }
+        return data;
+    }
+
+    /**
      * This method returns an InputStream of the results of the SQL query.
      *
      * @return an InputStream with the results.
@@ -63,54 +101,43 @@ public class RDBAccess implements Access {
         // JDBC objects
         Connection connection = null;
         Statement statement = null;
-        String jdbcDSN = "jdbc:" + databaseType.getJDBCPrefix() + "//" + dsn;
         InputStream inputStream;
 
         try {
             // Open connection
-            String connectionString = jdbcDSN;
-            boolean alreadySomeQueryParametersPresent = false;
+            boolean alreadySomeQueryParametersPresent = dsn.contains("?");
 
-            if (username != null && !username.equals("") && password != null && !password.equals("")) {
-                if (databaseType == DatabaseType.ORACLE) {
-                    connectionString = connectionString.replace(":@", ":" + username + "/" + password + "@");
-                } else if (!connectionString.contains("user=")) {
-                    connectionString += "?user=" + username + "&password=" + password;
-                    alreadySomeQueryParametersPresent = true;
-                }
-            }
 
             if (databaseType == DatabaseType.MYSQL) {
+                StringBuilder parametersSB = new StringBuilder();
+
                 if (alreadySomeQueryParametersPresent) {
-                    connectionString += "&";
+                    parametersSB.append("&");
                 } else {
-                    connectionString += "?";
+                    parametersSB.append("?");
                 }
 
-                connectionString += "serverTimezone=UTC&useSSL=false";
+                parametersSB.append("serverTimezone=UTC&useSSL=false");
+
+                dsn += parametersSB;
             }
 
             if (databaseType == DatabaseType.SQL_SERVER) {
-                connectionString = connectionString.replaceAll("\\?|&", ";");
-
-                if (!connectionString.endsWith(";")) {
-                    connectionString += ";";
-                }
+                dsn = dsn.replaceAll("[?&]", ";");
             }
-            connection = DriverManager.getConnection(connectionString);
+
+            connection = DriverManager.getConnection(dsn, username, password);
 
             // Execute query
             statement = connection.createStatement();
+
             ResultSet rs = statement.executeQuery(query);
 
-            switch (contentType) {
-                case NAMESPACES.QL + "XPath" :
-                    inputStream = getXMLInputStream(rs);
-                    break;
-                default:
-                    inputStream = getCSVInputStream(rs);
+            if ((NAMESPACES.QL + "XPath").equals(contentType)) {
+                inputStream = getXMLInputStream(rs);
+            } else {
+                inputStream = getCSVInputStream(rs);
             }
-
 
             // Clean-up environment
             rs.close();
@@ -257,7 +284,6 @@ public class RDBAccess implements Access {
 
     }
 
-
     /**
      * This method returns the corresponding datatype for a SQL datatype.
      *
@@ -328,34 +354,6 @@ public class RDBAccess implements Access {
         return headers;
     }
 
-    /**
-     * Convert a sequence of bytes to a string representation using uppercase hex symbols
-     * @param bytes the bytes to convert
-     * @return a string containing the hexadecimal representation of the byte array
-     */
-    private static String bytesToHexString(byte[] bytes) {
-        StringBuilder builder = new StringBuilder();
-        for (byte b : bytes) {
-            // format: 0 flag for zero-padding, 2 character width, uppercase hexadecimal symbols
-            builder.append(String.format("%02X", b));
-        }
-        return builder.toString();
-    }
-
-    /**
-     * Normalize the string representation of a data value given by the RDB.
-     * @param data the string representation retrieved from the RDB of the data to be normalized.
-     * @param dataType the intended datatype of the data parameter.
-     * @return Normalized string representation of the data parameter, given the datatype.
-     */
-    private static String normalizeData(String data, String dataType) {
-        if (DOUBLE.equals(dataType)) {
-            // remove trailing decimal points (Quirk from MySQL, see issue 203)
-            return data.replace(".0", "");
-        }
-        return data;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o instanceof RDBAccess) {
@@ -374,7 +372,7 @@ public class RDBAccess implements Access {
 
     @Override
     public int hashCode() {
-        return getHashOfString(getDSN() + getDatabaseType() + getUsername() + getPassword() + getQuery() + getContentType());
+        return Objects.hashCode(getDSN() + getDatabaseType() + getUsername() + getPassword() + getQuery() + getContentType());
     }
 
     /**

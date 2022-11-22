@@ -32,14 +32,15 @@ public class CSVWSourceIterator extends SourceIterator {
 
     /**
      * Opens the files using the access object and initiate the iterator, header, nulls list, csvParser and trim value.
-     * @param access the corresponding access object
-     * @param csvParser parser which is used to parse the file
-     * @param nulls a map which indicates if a certain string value should be seen as a null
+     *
+     * @param access     the corresponding access object
+     * @param csvParser  parser which is used to parse the file
+     * @param nulls      a map which indicates if a certain string value should be seen as a null
      * @param skipHeader indicates if the first record should be skipped or not
-     * @param trim indicates if the values should be String.trim()
+     * @param trim       indicates if the values should be String.trim()
      */
-    public void open(Access access, com.opencsv.CSVParserBuilder csvParser, List<String> nulls, boolean skipHeader, boolean trim){
-        if(csvParser != null){
+    public void open(Access access, com.opencsv.CSVParserBuilder csvParser, List<String> nulls, boolean skipHeader, boolean trim) {
+        if (csvParser != null) {
             this.csvParser = csvParser;
         }
         this.nulls = nulls;
@@ -54,8 +55,8 @@ public class CSVWSourceIterator extends SourceIterator {
                     .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                     .build().iterator();
 
-            if(iterator.hasNext()){
-                header =  iterator.next();
+            if (iterator.hasNext()) {
+                header = iterator.next();
                 checkHeader(header);
             } else {
                 //TODO exception
@@ -69,13 +70,13 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void checkHeader(String[] header) throws Exception {
-        for(String cell: header){
-            if(cell == null){
+        for (String cell : header) {
+            if (cell == null) {
                 logger.warn("Header contains null values");
             }
         }
         Set<String> set = new HashSet<>(Arrays.asList(header));
-        if (set.size() != header.length){
+        if (set.size() != header.length) {
             logger.warn("Header contains duplicates");
         }
 
@@ -83,10 +84,11 @@ public class CSVWSourceIterator extends SourceIterator {
 
     /**
      * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
+     *
      * @param record
      * @return
      */
-    public CSVSource replaceNulls(CSVSource record){
+    public CSVSource replaceNulls(CSVSource record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
             if (this.nulls.contains(value)) {
@@ -98,18 +100,18 @@ public class CSVWSourceIterator extends SourceIterator {
 
     @Override
     public Source next() {
-        if(iterator.hasNext()){
+        if (iterator.hasNext()) {
             String[] item = iterator.next();
             // legacy code that should throw empty rows away
             if (item.length == 0 || (item.length == 1 && item[0] == null)) return next();
 
-            if(trim) {
+            if (trim) {
                 item = Arrays.stream(item)
                         .map(String::trim)
                         .toArray(String[]::new);
             }
             return replaceNulls(new CSVSource(header, item, dataTypes));
-        } else{
+        } else {
             throw new NoSuchElementException();
         }
     }

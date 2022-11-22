@@ -24,11 +24,12 @@ public class ExcelSourceIterator extends SourceIterator {
 
     /**
      * Opens the files using the access object and initiates the workbookIterator, iterator and header.
+     *
      * @param access the corresponding access object
      */
     public void open(Access access) {
         dataTypes = access.getDataTypes();
-        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())){
+        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
             // little hack due to how inputStream works
             iterator = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                     .withSkipLines(0)
@@ -42,10 +43,9 @@ public class ExcelSourceIterator extends SourceIterator {
 
     }
 
-
     @Override
-    public Source next(){
-        if(iterator.hasNext()){
+    public Source next() {
+        if (iterator.hasNext()) {
             // little hack due to how inputStream works
             return new CSVSource(header, iterator.next(), dataTypes);
         } else {
@@ -55,17 +55,18 @@ public class ExcelSourceIterator extends SourceIterator {
 
 
     private void checkHeader(String[] header) throws Exception {
-        for(String cell: header){
-            if(cell == null){
+        for (String cell : header) {
+            if (cell == null) {
                 logger.warn("Header contains null values");
             }
         }
         Set<String> set = new HashSet<>(Arrays.asList(header));
-        if (set.size() != header.length){
+        if (set.size() != header.length) {
             logger.warn("Header contains duplicates");
         }
 
     }
+
     @Override
     public boolean hasNext() {
         return iterator.hasNext();

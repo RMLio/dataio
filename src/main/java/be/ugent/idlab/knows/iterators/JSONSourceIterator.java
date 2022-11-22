@@ -27,6 +27,17 @@ public class JSONSourceIterator extends SourceIterator {
     private String currentPath;
     private ResumableParser parser;
 
+    /**
+     * This method returns a JSON document from an InputStream.
+     *
+     * @param stream the used InputStream.
+     * @return a JSON document.
+     * @throws IOException
+     */
+    public static Object getDocumentFromStream(InputStream stream) throws IOException {
+        return Configuration.defaultConfiguration().jsonProvider().parse(stream, "utf-8");
+    }
+
     public void open(Access access, String string_iterator) throws SQLException, IOException {
         SurfingConfiguration config = JsonSurferJackson.INSTANCE
                 .configBuilder()
@@ -37,6 +48,22 @@ public class JSONSourceIterator extends SourceIterator {
                 }).build();
         this.parser = surfer.createResumableParser(access.getInputStream(), config);
         this.parser.parse();
+    }
+
+    Object getDocumentFromStream(InputStream stream, String contentType) throws IOException {
+        if (contentType.equalsIgnoreCase("jsonl")) {
+            JsonProvider provider = Configuration.defaultConfiguration().jsonProvider();
+            BufferedReader lineReader = new BufferedReader(new InputStreamReader(stream));
+            Object items = provider.createArray();
+            int index = 0;
+            while (lineReader.ready()) {
+                provider.setArrayIndex(items, index, provider.parse(lineReader.readLine()));
+                index += 1;
+            }
+            return items;
+        } else {
+            return getDocumentFromStream(stream);
+        }
     }
 
     @Override

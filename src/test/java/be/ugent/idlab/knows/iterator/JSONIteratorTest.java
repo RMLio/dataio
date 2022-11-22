@@ -1,6 +1,6 @@
 package be.ugent.idlab.knows.iterator;
 
-import be.ugent.idlab.knows.TestCore;
+import be.ugent.idlab.knows.access.cores.TestCore;
 import be.ugent.idlab.knows.iterators.JSONSourceIterator;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JSONTest extends TestCore {
+public class JSONIteratorTest extends TestCore {
     @Test
     public void evaluate_0000_JSON() {
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator();

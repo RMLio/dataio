@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.access.cores;
+package be.ugent.idlab.knows.dataio.cores;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
@@ -6,7 +6,10 @@ import be.ugent.idlab.knows.dataio.source.Source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TestCore {
     protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
@@ -40,6 +43,29 @@ public class TestCore {
 
         return compareIterator(iterator, List.of(expectedRecord1, expectedRecord2, expectedRecord3));
     }
+
+    public boolean evaluate_0002_BOM(Iterator<Source> iterator) {
+        Map<String, Object> r1 = Map.of(
+                "Id", "1",
+                "Name", "Sasha",
+                "Translation", "Саша"
+        );
+
+        Map<String, Object> r2 = Map.of(
+                "Id", "2",
+                "Name", "Michael",
+                "Translation", "Миша"
+        );
+
+        Map<String, Object> r3 = Map.of(
+                "Id", "3",
+                "Name", "David",
+                "Translation", "Давид"
+        );
+
+        return compareIterator(iterator, List.of(r1, r2, r3));
+    }
+
 
     public boolean evaluate_1001_header_long(Iterator<Source> iterator) {
         Map<String, Object> expected1 = Map.of(
@@ -96,7 +122,7 @@ public class TestCore {
         return expectedSources.size() == counter;
     }
 
-    public Access makeLocalAccess(String inputFile, String base, String type, String encoding){
+    public Access makeLocalAccess(String inputFile, String base, String type, String encoding) {
         return new LocalFileAccess(getClass().getResource(inputFile).getPath(), base, type, encoding);
     }
 
@@ -147,7 +173,7 @@ public class TestCore {
             List<Object> values = source.get(key);
 
             if (values.size() == 0) { // empty list returned, value not in source
-                if(!map.get(key).equals("")) {
+                if (!map.get(key).equals("")) { // no value expected here
                     return false;
                 }
             } else {

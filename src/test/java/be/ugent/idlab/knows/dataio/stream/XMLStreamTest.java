@@ -1,6 +1,6 @@
-package be.ugent.idlab.knows.stream;
+package be.ugent.idlab.knows.dataio.stream;
 
-import be.ugent.idlab.knows.dataio.access.cores.StreamTestCore;
+import be.ugent.idlab.knows.dataio.cores.StreamTestCore;
 import be.ugent.idlab.knows.dataio.source.Source;
 import be.ugent.idlab.knows.dataio.streams.XMLSourceStream;
 import org.junit.Test;

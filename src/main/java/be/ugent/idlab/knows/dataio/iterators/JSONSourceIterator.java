@@ -32,9 +32,8 @@ public class JSONSourceIterator extends SourceIterator {
      *
      * @param stream the used InputStream.
      * @return a JSON document.
-     * @throws IOException
      */
-    public static Object getDocumentFromStream(InputStream stream) throws IOException {
+    public static Object getDocumentFromStream(InputStream stream) {
         return Configuration.defaultConfiguration().jsonProvider().parse(stream, "utf-8");
     }
 

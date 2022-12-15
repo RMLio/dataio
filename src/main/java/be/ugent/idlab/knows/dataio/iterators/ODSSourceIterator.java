@@ -1,26 +1,22 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.iterators.ods.ODSFileParser;
+import be.ugent.idlab.knows.dataio.source.ODSSource;
 import be.ugent.idlab.knows.dataio.source.Source;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
-import org.apache.commons.io.input.BOMInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Map;
 
 public class ODSSourceIterator extends SourceIterator {
-
-    private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
-    private Iterator<String[]> iterator;
-
-    //    private Row header;
     private String[] header;
+    private String[] data;
     private Map<String, String> dataTypes;
+    private ODSFileParser parser;
+
 
     /**
      * This function partly loads the full file in at once (to read the tables).
@@ -29,46 +25,42 @@ public class ODSSourceIterator extends SourceIterator {
      * @param access the corresponding access object
      */
     public void open(Access access) {
-        dataTypes = access.getDataTypes();
-        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
-            // little hack due to how inputStream works
-            iterator = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                    .withSkipLines(0)
-                    .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                    .build().iterator();
-            header = iterator.next();
-            checkHeader(header);
-        } catch (Exception e) {
-            e.printStackTrace();
+        this.dataTypes = access.getDataTypes();
+
+        try {
+            this.parser = ODSFileParser.newInstance(access.getInputStream());
+        } catch (XMLStreamException | IOException | SQLException e) {
+            throw new RuntimeException(e);
         }
+
+        this.header = this.parser.getHeader();
+
+        // read initial data
+        readData();
     }
 
-    private void checkHeader(String[] header) {
-        for (String cell : header) {
-            if (cell == null) {
-                logger.warn("Header contains null values");
+    private void readData() {
+        if (this.parser.canReadNextRow()) {
+            this.data = this.parser.readNextRow();
+
+            if (this.data.length != this.header.length) {
+                throw new RuntimeException(String.format("The row read does not match the header.\nHeader: %s\nRow: %s", Arrays.toString(this.header), Arrays.toString(this.data)));
             }
-        }
-        Set<String> set = new HashSet<>(Arrays.asList(header));
-        if (set.size() != header.length) {
-            logger.warn("Header contains duplicates");
-        }
 
-    }
-
-    @Override
-    public Source next() {
-        // has next updates the iterators
-        if (iterator.hasNext()) {
-            // little hack due to how inputStream works
-            return new CSVSource(header, iterator.next(), dataTypes);
         } else {
-            throw new NoSuchElementException();
+            this.data = null;
         }
     }
 
     @Override
     public boolean hasNext() {
-        return iterator.hasNext();
+        return this.data != null;
+    }
+
+    @Override
+    public Source next() {
+        String[] temp = this.data;
+        readData();
+        return new ODSSource(this.header, temp, this.dataTypes);
     }
 }

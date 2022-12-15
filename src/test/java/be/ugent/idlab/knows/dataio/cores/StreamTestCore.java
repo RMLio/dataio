@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.access.cores;
+package be.ugent.idlab.knows.dataio.cores;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.source.Source;
@@ -61,5 +61,17 @@ public class StreamTestCore extends TestCore {
      */
     protected interface Evaluator {
         boolean evaluate(Iterator<Source> iterator);
+    }
+
+    /**
+     * Prints out the statistics of memory usage of the code run.
+     */
+    protected void printMemoryStatistics() {
+        Runtime runtime = Runtime.getRuntime();
+        int mb = 1024 * 1024;
+        System.out.println("Used memory: " + ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " MB");
+        System.out.println("Free memory: " + runtime.freeMemory() / mb + " MB");
+        System.out.println("Total memory: " + runtime.totalMemory() / mb + " MB");
+        System.out.println("Max memory: " + runtime.maxMemory() / mb + " MB");
     }
 }

@@ -15,7 +15,19 @@ import java.util.Map;
 public class ODSSource extends Source {
     private Row row;
     private Map<String, String> data_types = new HashMap<>();
-    private Map<String, Object> data = new HashMap<>();
+    private final Map<String, Object> data = new HashMap<>();
+
+    public ODSSource(String[] header, String[] data, Map<String, String> datatypes) {
+        this.data_types = datatypes;
+
+        for(int i = 0; i < header.length; i++) {
+            if (header[i].equals("")) {
+                throw new RuntimeException("Empty header field!");
+            }
+
+            this.data.put(header[i], data[i]);
+        }
+    }
 
     public ODSSource(Row header, Row row) {
         for (int i = 0; i < header.getCellCount(); i++) {

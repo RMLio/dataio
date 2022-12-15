@@ -21,4 +21,8 @@ public interface SourceStream {
      * @return a Stream object
      */
     Stream<Source> getStream();
+
+    default Stream<Source> getParallelStream() {
+        return this.getStream().parallel();
+    }
 }

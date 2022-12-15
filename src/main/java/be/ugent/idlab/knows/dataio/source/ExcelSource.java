@@ -25,6 +25,9 @@ public class ExcelSource extends Source {
         }
         for (int i = 0; i < header.getLastCellNum(); i++) {
             if(i < row.getLastCellNum()){
+                if (header.getCell(i) == null) {
+                    continue;
+                }
                 data.put(header.getCell(i).getStringCellValue(), getCellValue(row.getCell(i)));
                 data_types.put(header.getCell(i).getStringCellValue(), getIRI(row.getCell(i)));
             } else {

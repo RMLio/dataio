@@ -1,6 +1,6 @@
-package be.ugent.idlab.knows.iterator;
+package be.ugent.idlab.knows.dataio.iterator;
 
-import be.ugent.idlab.knows.dataio.access.cores.TestCore;
+import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
 import org.junit.Test;
 

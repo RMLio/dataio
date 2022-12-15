@@ -288,7 +288,7 @@
                   <dependency>
                       <groupId>org.junit.jupiter</groupId>
                       <artifactId>junit-jupiter-engine</artifactId>
-                      <version>5.2.0-M1</version>
+                      <version>${junit.version}</version>
                   </dependency>
               </dependencies>
           </plugin>

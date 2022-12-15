@@ -72,7 +72,6 @@ public class JSONSource extends Source {
             //Object t = JsonPath.read(document, fullValue);
             Object t = JsonPath.read(this.document, value);
 
-
             if (t instanceof JSONArray) {
                 JSONArray array = (JSONArray) t;
                 ArrayList<String> tempList = new ArrayList<>();

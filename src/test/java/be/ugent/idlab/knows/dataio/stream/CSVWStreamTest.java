@@ -1,7 +1,7 @@
-package be.ugent.idlab.knows.stream;
+package be.ugent.idlab.knows.dataio.stream;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.access.cores.StreamTestCore;
+import be.ugent.idlab.knows.dataio.cores.StreamTestCore;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
 import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;

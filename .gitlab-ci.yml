@@ -44,14 +44,14 @@ General:
   parallel:
     matrix:
       - TEST: [
+                # utility
+                ODSFileParserTest,
                 # iterator
                 CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream
-                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest,
-                # local access
-                CSVLocalAccessTest, CSVWLocalAccessTest, ExcelLocalAccessTest, HTMLLocalAccessTest, JSONLocalAccessTest, ODSLocalAccessTest, XMLLocalAccessTest,
+                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
                 # general access
-                DatabaseTest, SPARQLTest, WoTTest
+                DatabaseTest, LocalAccessTest, SPARQLTest, WoTTest
       ]
   except:
     - master

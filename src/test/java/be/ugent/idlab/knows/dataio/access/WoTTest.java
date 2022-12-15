@@ -35,7 +35,7 @@ public class WoTTest {
             String target = String.format("http://localhost:%d/%s", server.getAddress().getPort(), entrypoint);
 
             Access wot = new WoTAccess(target, "application/json", headers, auth);
-            Access local = new LocalFileAccess("", inputFile, "json", "application/json");
+            Access local = new LocalFileAccess("", inputFile, "json", "utf-8");
 
             List<Source> expected = getJsonSources(local, iterator);
             List<Source> actual = getJsonSources(wot, iterator);

@@ -11,10 +11,7 @@ import org.jsfr.json.compiler.JsonPathCompiler;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -23,6 +20,8 @@ public class JSONSourceStream implements SourceStream {
     private final String jsonPath;
 
     private Iterator<Object> iterator;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public JSONSourceStream(String jsonPath) {
         this.jsonPath = jsonPath;
@@ -35,8 +34,7 @@ public class JSONSourceStream implements SourceStream {
 
     @Override
     public Stream<Source> getStream() {
-        ObjectMapper mapper = new ObjectMapper();
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED), true)
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, 0), false)
                 .map(obj -> (ObjectNode) obj)
                 .map(objectNode -> mapper.convertValue(objectNode, Map.class))
                 .map(map -> new JSONSource(map, jsonPath));

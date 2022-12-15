@@ -1,19 +1,18 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jopendocument.dom.spreadsheet.MutableCell;
-import org.jopendocument.dom.spreadsheet.SpreadSheet;
+import org.apache.commons.io.input.BOMInputStream;
+import org.apache.tika.parser.txt.CharsetDetector;
+import org.apache.tika.parser.txt.CharsetMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 import static org.apache.commons.io.FileUtils.getFile;
@@ -24,22 +23,36 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
  */
 public class LocalFileAccess implements Access {
 
-    private String path;
-    private String basePath;
-    private String type;
-    private String encoding;
+    private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
+
+    private final String path;
+    private final String base;
+    private final String type;
+    private final Charset encoding;
+    private static final int CONFIDENCE_LIMIT = 90;
 
     /**
      * This constructor takes the path and the base path of a file.
+     * When using the relative path for the file, put it in base and leave path empty
      *
      * @param path     the relative path of the file.
-     * @param basePath the used base path.
+     * @param base     base for the path. If path is not absolute, path is used relative to base to find the file
+     * @param type     type of the file
+     * @param encoding encoding of the file
      */
-    public LocalFileAccess(String path, String basePath, String type, String encoding) {
+    public LocalFileAccess(String path, String base, String type, String encoding) {
         this.path = path;
-        this.basePath = basePath;
-        this.encoding = encoding;
+        this.base = base;
+
+        if (!Charset.isSupported(encoding)) {
+            throw new IllegalArgumentException("Passed encoding not supported.");
+        }
+        this.encoding = Charset.forName(encoding);
         this.type = type;
+    }
+
+    public LocalFileAccess(String path, String basePath, String type) {
+        this(path, basePath, type, "utf-8");
     }
 
     /**
@@ -49,99 +62,49 @@ public class LocalFileAccess implements Access {
      * @throws FileNotFoundException
      */
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws FileNotFoundException {
         File file = new File(this.path);
 
         if (!file.isAbsolute()) {
-            file = getFile(this.basePath, this.path);
+            file = getFile(this.base, this.path);
         }
 
-        if(Objects.equals("ods", this.type)) {
-            String converted = new String(readODS(file).getBytes(), StandardCharsets.UTF_8);
-            return IOUtils.toInputStream(converted, Charset.defaultCharset());
-        }
-        else if (Objects.equals("xlsx", this.type))
-            return IOUtils.toInputStream(readExcel(file),StandardCharsets.UTF_8);
+        encodingCheck(file);
 
-        return IOUtils.toInputStream(readWithEncoding(file.toPath(), "utf-8"),StandardCharsets.UTF_8);
+        return new BOMInputStream(new FileInputStream(file));
     }
 
-    public static String readODS(File file) throws IOException {
-        SpreadSheet spreadsheet;
-        spreadsheet = SpreadSheet.createFromFile(file);
-        //Get row count and column count
-        int nColCount = spreadsheet.getSheet(0).getColumnCount();
-        int nRowCount = spreadsheet.getSheet(0).getRowCount();
-
-        String data = "";
-        //Iterating through each row of the selected sheet
-        MutableCell cell;
-        for(int nRowIndex = 0; nRowIndex < nRowCount; nRowIndex++) {
-            //Iterating through each column
-            for(int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
-                cell = spreadsheet.getSheet(0).getCellAt(nColIndex, nRowIndex);
-                data += cell.getValue()+ ",";
-            }
-            data = data.replaceAll(",$", "\n");
-        }
-        return data;
-    }
-
-    public static String readExcel(File file) throws FileNotFoundException {
-        String data = "";
-        FileInputStream fis = new FileInputStream(file);
-        //creating workbook instance that refers to .xls file
-        XSSFWorkbook wb = null;
+    private void encodingCheck(File file) throws FileNotFoundException {
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        List<CharsetMatch> matches;
         try {
-            wb = new XSSFWorkbook(fis);
+            matches = Arrays.stream(new CharsetDetector().setText(in).detectAll())
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        //creating a Sheet object to retrieve object
-        XSSFSheet sheet = wb.getSheetAt(0);
-        for (Row row : sheet) {
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                switch (cell.getCellType()) {
-                    case STRING:    //field that represents string cell type
-                        data += cell.getStringCellValue() + ",";
-                        break;
-                    case NUMERIC:    //field that represents number cell type
-                        double temp = cell.getNumericCellValue();
-                        if(temp % 10 > 0){
-                            data += temp + ",";
-                        }else {
-                            data += (int) temp + ",";
-                        }
-                        break;
-                    case BOOLEAN:
-                        data += cell.getBooleanCellValue() + ",";
-                    default:
-                        break;
-                }
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ignored) {
             }
-            data = data.replaceAll(",$", "\n");
         }
-        return data;
-    }
 
-    public static String readWithEncoding(Path file, String encoding) throws FileNotFoundException {
-        String text = "";
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file.toFile()), encoding))) {
-            String line;
-            while ((line = bf.readLine()) != null) {
-                text += line + "\n";
+        List<String> matchesNames = matches.stream().map(CharsetMatch::getName).collect(Collectors.toList());
+
+        if (!matchesNames.contains(this.encoding.name())) {
+
+            // only warn if high confidence
+            if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
+                // matches are sorted based on confidence
+                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0), this.encoding.name());
+                logger.warn(message);
             }
-        } catch (IOException e) {
-            throw new FileNotFoundException(e.getMessage());
         }
-        return text;
     }
 
     @Override
     public InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException {
-        return null;
+        return new FileReader(new File(this.base, this.path));
     }
 
 
@@ -162,7 +125,7 @@ public class LocalFileAccess implements Access {
     public boolean equals(Object o) {
         if (o instanceof LocalFileAccess) {
             LocalFileAccess access = (LocalFileAccess) o;
-            return path.equals(access.getPath()) && basePath.equals(access.getBasePath());
+            return path.equals(access.path) && base.equals(access.getBase()) && type.equals(access.type) && encoding.equals(access.encoding);
         } else {
             return false;
         }
@@ -187,8 +150,8 @@ public class LocalFileAccess implements Access {
      *
      * @return the base path.
      */
-    public String getBasePath() {
-        return basePath;
+    public String getBase() {
+        return base;
     }
 
     @Override
@@ -209,18 +172,22 @@ public class LocalFileAccess implements Access {
         File file = new File(this.path);
 
         if (!file.isAbsolute()) {
-            file = getFile(this.basePath, this.path);
+            file = getFile(this.base, this.path);
         }
 
         return file.getAbsolutePath();
     }
 
-    private String getFullPath(){
+    private String getFullPath() {
         File file = new File(this.path);
         String fullPath = this.path;
         if (!file.isAbsolute()) {
-            fullPath = this.basePath + this.path;
+            fullPath = this.base + this.path;
         }
         return fullPath;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
     }
 }

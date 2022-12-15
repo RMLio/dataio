@@ -86,7 +86,6 @@ public class WoT_Handlers {
             List<String> newLocation = new ArrayList<>();
             String response = "Redirected to /stations";
             newLocation.add("http://" + t.getLocalAddress().getHostName() + ":" + t.getLocalAddress().getPort() + "/stations");
-            System.out.println(newLocation);
             t.getResponseHeaders().put("Location", newLocation);
             t.sendResponseHeaders(302, response.length());
         }

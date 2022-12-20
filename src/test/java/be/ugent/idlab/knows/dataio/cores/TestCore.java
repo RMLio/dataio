@@ -13,13 +13,6 @@ import java.util.Set;
 
 public class TestCore {
 
-    /**
-     * Functional interface for evaluator functions
-     */
-    protected interface Evaluator {
-        boolean evaluate(Iterator<Source> iterator);
-    }
-
     protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
     public boolean evaluate_0000(Iterator<Source> iterator) {
@@ -74,7 +67,6 @@ public class TestCore {
         return compareIterator(iterator, List.of(r1, r2, r3));
     }
 
-
     public boolean evaluate_1001_header_long(Iterator<Source> iterator) {
         Map<String, Object> expected1 = Map.of(
                 "name", "Trollekelder",
@@ -115,7 +107,6 @@ public class TestCore {
 
         return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
-
 
     public boolean compareIterator(Iterator<Source> iterator, Set<Source> expectedSources) {
         int counter = 0;
@@ -193,5 +184,24 @@ public class TestCore {
             }
         }
         return true;
+    }
+
+    /**
+     * Prints out the statistics of memory usage of the code run.
+     */
+    protected void printMemoryStatistics() {
+        Runtime runtime = Runtime.getRuntime();
+        int mb = 1024 * 1024;
+        System.out.println("Used memory: " + ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " MB");
+        System.out.println("Free memory: " + runtime.freeMemory() / mb + " MB");
+        System.out.println("Total memory: " + runtime.totalMemory() / mb + " MB");
+        System.out.println("Max memory: " + runtime.maxMemory() / mb + " MB");
+    }
+
+    /**
+     * Functional interface for evaluator functions
+     */
+    protected interface Evaluator {
+        boolean evaluate(Iterator<Source> iterator);
     }
 }

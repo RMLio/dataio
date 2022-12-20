@@ -62,15 +62,13 @@ public class CSVWSourceIterator extends SourceIterator {
             } else {
                 //TODO exception
             }
-        } catch (SQLException | ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private void checkHeader(String[] header) throws Exception {
+    private void checkHeader(String[] header) {
         for (String cell : header) {
             if (cell == null) {
                 logger.warn("Header contains null values");

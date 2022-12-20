@@ -12,6 +12,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class TestCore {
+
+    /**
+     * Functional interface for evaluator functions
+     */
+    protected interface Evaluator {
+        boolean evaluate(Iterator<Source> iterator);
+    }
+
     protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
     public boolean evaluate_0000(Iterator<Source> iterator) {

@@ -57,13 +57,6 @@ public class StreamTestCore extends TestCore {
     }
 
     /**
-     * Functional interface for evaluator functions
-     */
-    protected interface Evaluator {
-        boolean evaluate(Iterator<Source> iterator);
-    }
-
-    /**
      * Prints out the statistics of memory usage of the code run.
      */
     protected void printMemoryStatistics() {

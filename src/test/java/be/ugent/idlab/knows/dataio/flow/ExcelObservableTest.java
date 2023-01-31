@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 public class ExcelObservableTest extends ObservableTestCore {
 
-    private void runExcelTest(String path, Evaluator evaluator) {
+    private synchronized void runExcelTest(String path, Evaluator evaluator) {
         Access access = new LocalFileAccess("", path, "xlsx");
         SourceObservable<ExcelSource> o = new ExcelObservable(access);
         runTest(o, evaluator);

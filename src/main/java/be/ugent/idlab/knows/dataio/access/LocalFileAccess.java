@@ -24,12 +24,11 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
-
+    private static final int CONFIDENCE_LIMIT = 90;
     private final String path;
     private final String base;
     private final String type;
     private final Charset encoding;
-    private static final int CONFIDENCE_LIMIT = 90;
 
     /**
      * This constructor takes the path and the base path of a file.
@@ -104,7 +103,7 @@ public class LocalFileAccess implements Access {
             // only warn if high confidence
             if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
                 // matches are sorted based on confidence
-                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0), this.encoding.name());
+                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0).getName(), this.encoding.name());
                 logger.warn(message);
             }
         }

@@ -1,84 +1,82 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
-import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
-import org.apache.commons.io.input.BOMInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
-
-    private static final Logger logger = LoggerFactory.getLogger(CSVWSourceIterator.class);
-
-    private com.opencsv.CSVParserBuilder csvParser = new CSVParserBuilder().withIgnoreLeadingWhiteSpace(true);
-    private Charset csvCharset = StandardCharsets.UTF_8;
-
-    private List<String> nulls;
-    private Iterator<String[]> iterator;
-    private String[] header;
     private Map<String, String> dataTypes;
-    private boolean trim;
+    private CSVWConfiguration config;
+    private Iterator<String[]> records;
+    private String[] header;
+    private String[] next;
 
-    /**
-     * Opens the files using the access object and initiate the iterator, header, nulls list, csvParser and trim value.
-     *
-     * @param access     the corresponding access object
-     * @param csvParser  parser which is used to parse the file
-     * @param nulls      a map which indicates if a certain string value should be seen as a null
-     * @param skipHeader indicates if the first record should be skipped or not
-     * @param trim       indicates if the values should be String.trim()
-     */
-    public void open(Access access, com.opencsv.CSVParserBuilder csvParser, List<String> nulls, boolean skipHeader, boolean trim) {
-        if (csvParser != null) {
-            this.csvParser = csvParser;
-        }
-        this.nulls = nulls;
-        dataTypes = access.getDataTypes();
-        this.trim = trim;
-        int skipLines = skipHeader ? 1 : 0;
+    public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
+        this.config = config;
+        this.dataTypes = access.getDataTypes();
+        this.records = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
+                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                .withCSVParser(this.config.getParser())
+                .withSkipLines(config.isSkipHeader() ? 1 : 0)
+                .build().iterator();
 
-        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
-            iterator = new CSVReaderBuilder(new InputStreamReader(inputStream, csvCharset))
-                    .withCSVParser(this.csvParser.build())
-                    .withSkipLines(skipLines)
-                    .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                    .build().iterator();
+        // read the header
+        if (config.isSkipHeader()) {
+            this.header = config.getHeader().toArray(new String[0]);
+        } else { // the first parsed record is the header
+            this.header = readLine();
 
-            if (iterator.hasNext()) {
-                header = iterator.next();
-                checkHeader(header);
-            } else {
-                //TODO exception
+            if (header == null) {
+                throw new IllegalStateException("No header could be read from the file");
             }
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
         }
 
+        // read in the next record
+        this.next = readLine();
+
+        if (this.next == null) {
+            // TODO: discuss the necessity of this
+            throw new IllegalStateException("No data could be read from file");
+        }
     }
 
-    private void checkHeader(String[] header) {
-        for (String cell : header) {
-            if (cell == null) {
-                logger.warn("Header contains null values");
+    private String[] readLine() {
+        String[] line;
+        do {
+            line = this.records.next();
+            if (line == null) { // next returned a null
+                return null;
             }
-        }
-        Set<String> set = new HashSet<>(Arrays.asList(header));
-        if (set.size() != header.length) {
-            logger.warn("Header contains duplicates");
+
+        } while ((line.length == 0 || invalidLine(line)) && this.records.hasNext());
+
+        if (invalidLine(line)) { // no more records can be read
+            return null;
         }
 
+        return line;
+    }
+
+    /**
+     * Checks if the passed line corresponds to the filters set
+     *
+     * @param line line to be checked
+     * @return true if the line passes all checks
+     */
+    private boolean invalidLine(String[] line) {
+        return line.length == 0 ||  // line is empty
+                line[0].startsWith(this.config.getCommentPrefix()); // line does starts with a comment prefix
     }
 
     /**
@@ -90,33 +88,52 @@ public class CSVWSourceIterator extends SourceIterator {
     public CSVSource replaceNulls(CSVSource record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (this.nulls.contains(value)) {
+            if (this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });
         return record;
     }
 
-    @Override
-    public Source next() {
-        if (iterator.hasNext()) {
-            String[] item = iterator.next();
-            // legacy code that should throw empty rows away
-            if (item.length == 0 || (item.length == 1 && item[0] == null)) return next();
+    public String[] applyTrimArray(String[] arr, String trim) {
+        return Arrays.stream(arr)
+                .map(item -> applyTrim(item, trim))
+                .toArray(String[]::new);
+    }
 
-            if (trim) {
-                item = Arrays.stream(item)
-                        .map(String::trim)
-                        .toArray(String[]::new);
-            }
-            return replaceNulls(new CSVSource(header, item, dataTypes));
-        } else {
-            throw new NoSuchElementException();
+    public String applyTrim(String item, String trim) {
+        switch (trim) {
+            case "true":
+                return item.trim();
+            case "false":
+                return item;
+            case "start":
+                return item.stripLeading();
+            case "end":
+                return item.stripTrailing();
+            default:
+                throw new IllegalArgumentException("Unrecognized value for flag \"trim\"");
         }
     }
 
     @Override
+    public Source next() {
+        if (this.next == null) {
+            throw new NoSuchElementException();
+        }
+
+        String[] line = this.next;
+        this.next = readLine();
+
+        if (!config.getTrim().equals("false")) {
+            line = applyTrimArray(line, config.getTrim());
+        }
+
+        return replaceNulls(new CSVSource(header, line, dataTypes));
+    }
+
+    @Override
     public boolean hasNext() {
-        return iterator.hasNext();
+        return this.next != null;
     }
 }

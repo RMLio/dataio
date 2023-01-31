@@ -79,7 +79,7 @@ public class CSVSource extends Source {
         }
         String obj = this.data.get(toDatabaseCase);
 
-        if(obj == null || obj.equals("")) return List.of();
+        if (obj == null || obj.equals("")) return List.of();
         return List.of(obj);
     }
 

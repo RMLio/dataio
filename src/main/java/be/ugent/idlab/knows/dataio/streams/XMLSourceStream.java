@@ -39,6 +39,6 @@ public class XMLSourceStream implements SourceStream {
     public Stream<Source> getStream() {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED),
-                true);
+                false);
     }
 }

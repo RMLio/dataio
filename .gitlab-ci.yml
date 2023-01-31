@@ -51,7 +51,9 @@ General:
                 # stream
                 CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
                 # general access
-                DatabaseTest, LocalAccessTest, SPARQLTest, WoTTest
+                DatabaseTest, LocalAccessTest, SPARQLTest, WoTTest,
+                # Flow
+                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
       ]
   except:
     - master

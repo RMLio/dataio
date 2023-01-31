@@ -15,6 +15,10 @@ import static org.junit.Assert.fail;
 
 public class StreamTestCore extends TestCore {
 
+    protected static Iterator<Source> getIterator(SourceStream stream) {
+        return stream.getStream().iterator();
+    }
+
     protected void runTest(String path, String basePath, String fileType, String encoding, Class<? extends SourceStream> classObj, Evaluator evaluator) {
         try {
             Iterator<Source> iterator = prepareIterator(path, basePath, fileType, encoding, classObj);
@@ -23,9 +27,6 @@ public class StreamTestCore extends TestCore {
             logger.error("An unexpected exception was thrown during the test!", e);
             fail();
         }
-    }
-    protected static Iterator<Source> getIterator(SourceStream stream) {
-        return stream.getStream().iterator();
     }
 
     protected Iterator<Source> prepareIterator(String path, String basePath, String filetype, String encoding, Class<? extends SourceStream> streamClass, Object... initArgs) throws SQLException, IOException {
@@ -54,24 +55,5 @@ public class StreamTestCore extends TestCore {
         } catch (ClassCastException e) {
             throw new RuntimeException("Class provided as argument cannot be cast to instance of SourceStream!", e);
         }
-    }
-
-    /**
-     * Functional interface for evaluator functions
-     */
-    protected interface Evaluator {
-        boolean evaluate(Iterator<Source> iterator);
-    }
-
-    /**
-     * Prints out the statistics of memory usage of the code run.
-     */
-    protected void printMemoryStatistics() {
-        Runtime runtime = Runtime.getRuntime();
-        int mb = 1024 * 1024;
-        System.out.println("Used memory: " + ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " MB");
-        System.out.println("Free memory: " + runtime.freeMemory() / mb + " MB");
-        System.out.println("Total memory: " + runtime.totalMemory() / mb + " MB");
-        System.out.println("Max memory: " + runtime.maxMemory() / mb + " MB");
     }
 }

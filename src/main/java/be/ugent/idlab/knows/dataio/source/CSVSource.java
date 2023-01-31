@@ -94,7 +94,6 @@ public class CSVSource extends Source {
 
         if (this == object) return true;
 
-
         if (getClass() != object.getClass()) return false;
 
         CSVSource o = (CSVSource) object;

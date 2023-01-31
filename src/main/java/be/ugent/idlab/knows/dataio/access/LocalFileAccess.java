@@ -62,7 +62,7 @@ public class LocalFileAccess implements Access {
      * @throws FileNotFoundException
      */
     @Override
-    public InputStream getInputStream() throws FileNotFoundException {
+    public InputStream getInputStream() throws IOException {
         File file = new File(this.path);
 
         if (!file.isAbsolute()) {
@@ -71,7 +71,15 @@ public class LocalFileAccess implements Access {
 
         encodingCheck(file);
 
-        return new BOMInputStream(new FileInputStream(file));
+        BOMInputStream is = new BOMInputStream(new FileInputStream(file));
+
+        // remove all BOM marks
+        for(int i = 0; is.getBOM() != null && i < is.getBOM().length(); i++) {
+            //noinspection ResultOfMethodCallIgnored
+            is.read();
+        }
+
+        return is;
     }
 
     private void encodingCheck(File file) throws FileNotFoundException {
@@ -103,7 +111,7 @@ public class LocalFileAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException {
+    public InputStreamReader getInputStreamReader() throws FileNotFoundException {
         return new FileReader(new File(this.base, this.path));
     }
 

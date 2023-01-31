@@ -1,6 +1,6 @@
 # DataIO
 
-The dataIO library opens the given files and allows to read them using a Source iterator.
+The DataIO library opens the given files and allows to read them using an Iterator, a Stream or an RxJava's Observable.
 This library doesn't load the full file in memory (this is not the case for XML files).
 
 ## Setup
@@ -26,8 +26,13 @@ References to values are mapped to their datatypes, if available.
 getContentType: gives the content type of the access object.
 
 ### SourceIterator
-
 Interface which is an implementation of an Iterator<Source>, which overrides the remove and forEachRemaining as these function are trivial for each implementation.
+
+### SourceStream
+Interface and implementations of the Stream interface.
+
+## Flow
+Implementation of the Flow interface, using RxJava under the hood. Implementations of RxJava's ``Observable`` for the different sources are provided.
 
 #### Functions
 

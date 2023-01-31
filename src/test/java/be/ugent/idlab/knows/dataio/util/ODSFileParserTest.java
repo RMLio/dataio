@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio;
+package be.ugent.idlab.knows.dataio.util;
 
 import be.ugent.idlab.knows.dataio.iterators.ods.ODSFileParser;
 import org.junit.jupiter.api.Assertions;

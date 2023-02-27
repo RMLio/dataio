@@ -20,13 +20,18 @@ public class ODSSource extends Source {
     public ODSSource(String[] header, String[] data, Map<String, String> datatypes) {
         this.data_types = datatypes;
 
-        for(int i = 0; i < header.length; i++) {
+        for (int i = 0; i < header.length; i++) {
             if (header[i].equals("")) {
                 throw new RuntimeException("Empty header field!");
             }
 
             this.data.put(header[i], data[i]);
         }
+    }
+
+    @Override
+    public Map<String, String> getDataTypes() {
+        return this.data_types;
     }
 
     public ODSSource(Row header, Row row) {
@@ -38,8 +43,8 @@ public class ODSSource extends Source {
         this.row = row;
     }
 
-    private Object getCellValue(Cell cell){
-        try{
+    private Object getCellValue(Cell cell) {
+        try {
             switch (cell.getValueType()) {
                 case "boolean":
                     return
@@ -55,14 +60,15 @@ public class ODSSource extends Source {
                 default:
                     return cell.getStringValue();
             }
-        // TODO don't stringify all types, but retain them
-    } catch (Exception e) {
-        return null;
+            // TODO don't stringify all types, but retain them
+        } catch (Exception e) {
+            return null;
+        }
     }
- }
 
     /**
      * This method returns the datatype of a reference in the record.
+     *
      * @param value the reference for which the datatype needs to be returned.
      * @return the IRI of the datatype.
      */
@@ -72,13 +78,13 @@ public class ODSSource extends Source {
 
     @Override
     public boolean equals(Object obj) {
-        if(this.getClass() != obj.getClass()) return false;
+        if (this.getClass() != obj.getClass()) return false;
 
         //TODO other object could have more columns in row then this.row and this would still return true
         ODSSource odsSource = (ODSSource) obj;
-        for(String value: this.data.keySet()){
+        for (String value : this.data.keySet()) {
 
-            if(! this.get(value).equals(odsSource.get(value)))
+            if (!this.get(value).equals(odsSource.get(value)))
                 return false;
         }
         return true;
@@ -92,18 +98,20 @@ public class ODSSource extends Source {
 
     /**
      * This method returns the objects for a column in the ODS record (= ODS row).
+     *
      * @param value the column for which objects need to be returned.
      * @return a list of objects for the column.
      */
     @Override
     public List<Object> get(String value) {
         Object obj = data.getOrDefault(value, null);
-        if(obj == null) return List.of();
+        if (obj == null) return List.of();
         return List.of(obj);
     }
 
     /**
      * Convert a cell type to a XSD datatype URI
+     *
      * @param cellType
      * @return
      */
@@ -113,9 +121,12 @@ public class ODSSource extends Source {
             return "";
         }
         switch (cellType) {
-            case "boolean": return XSDDatatype.XSDboolean.getURI();
-            case "float": return XSDDatatype.XSDdouble.getURI();
-            default: return XSDDatatype.XSDstring.getURI();
+            case "boolean":
+                return XSDDatatype.XSDboolean.getURI();
+            case "float":
+                return XSDDatatype.XSDdouble.getURI();
+            default:
+                return XSDDatatype.XSDstring.getURI();
         }
     }
 }

@@ -81,6 +81,8 @@ public class DatabaseTest {
         }
     }
 
+    // Due to the use of JUnit5 Testcontainers bindings, different test cases are separated into nested classes,
+    //  in order to only start the required container
     @Nested
     class PostgreSQLTest {
         @Container

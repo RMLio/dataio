@@ -40,7 +40,7 @@ General:
   before_script:
     - 'mvn clean'
   script:
-    - 'echo "$TEST" && mvn $MAVEN_CLI_OPTS -Dtest="$TEST" test'
+    - 'mvn $MAVEN_CLI_OPTS -Dtest="$TEST" test'
   parallel:
     matrix:
       - TEST: [

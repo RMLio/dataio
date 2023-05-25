@@ -8,7 +8,7 @@ import java.util.Map;
  * This interface represents the access to a data source.
  * For example, a local file, a remote file, a relational database, and so on.
  */
-public interface Access {
+public interface Access extends Serializable {
 
     /**
      * This method returns an InputStream for the access.

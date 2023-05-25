@@ -27,7 +27,7 @@ General:
   image: maven:3-jdk-11
   retry: 2
   services:
-    - name: docker:19.03.12-dind
+    - name: docker:23.0.5-dind
         # explicitly disable tls to avoid docker startup interruption
       command: [ "--tls=false" ]
   variables:
@@ -40,7 +40,7 @@ General:
   before_script:
     - 'mvn clean'
   script:
-    - 'mvn $MAVEN_CLI_OPTS -Dtest=$TEST test'
+    - 'mvn $MAVEN_CLI_OPTS -Dtest="$TEST" test'
   parallel:
     matrix:
       - TEST: [
@@ -51,10 +51,10 @@ General:
                 # stream
                 CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
                 # general access
-                DatabaseTest, LocalAccessTest, SPARQLTest, WoTTest,
+                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest,
                 # Flow
                 CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
-      ]
+        ]
   except:
     - master
     - development

@@ -5,9 +5,6 @@ import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
-import com.opencsv.CSVParserBuilder;
-
-import java.util.List;
 
 public class CSVWObservable extends SourceObservable<CSVSource> {
 

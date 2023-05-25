@@ -58,6 +58,11 @@ public class CSVSource extends Source {
         return datatype;
     }
 
+    @Override
+    public Map<String, String> getDataTypes() {
+        return this.datatypes;
+    }
+
     /**
      * This method returns the objects for a column in the CSV record (= CSV row).
      *

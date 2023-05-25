@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 public class CSVWSourceIterator extends SourceIterator {
     private Map<String, String> dataTypes;
     private CSVWConfiguration config;
-    transient private Iterator<String[]> records;
+    private Iterator<String[]> records;
     private String[] header;
     private String[] next;
 

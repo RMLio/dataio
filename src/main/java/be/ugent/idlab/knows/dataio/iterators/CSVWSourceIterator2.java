@@ -5,30 +5,47 @@ import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
 import com.opencsv.CSVIterator;
+import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
+import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 
-public class CSVWSourceIterator extends SourceIterator implements Serializable {
+public class CSVWSourceIterator2 extends SourceIterator implements Serializable {
     private HashMap<String, String> dataTypes;
-    private transient CSVWConfiguration config;
-    private transient Iterator<String[]> records;
+    private CSVWConfiguration config;
     private String[] header;
     private String[] next;
 
-    public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
-        this.config = config;
-        this.dataTypes = access.getDataTypes();
-        this.records = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
+    private Access access;
+
+    private transient CSVReader reader;
+
+    public CSVWSourceIterator2(Access access) {
+        this.access = access;
+    }
+
+    private void constructReader() throws SQLException, IOException {
+        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
                 .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                 .withCSVParser(this.config.getParser())
                 .withSkipLines(config.isSkipHeader() ? 1 : 0)
-                .build().iterator();
+                .build();
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+        inputStream.defaultReadObject();
+        constructReader();
+    }
+
+    public void open(Access access, CSVWConfiguration config) throws SQLException, IOException, CsvValidationException {
+        this.config = config;
+        this.dataTypes = access.getDataTypes();
+        constructReader();
+        reader.peek();
 
         // read the header
         if (config.isSkipHeader()) {
@@ -50,15 +67,15 @@ public class CSVWSourceIterator extends SourceIterator implements Serializable {
         }
     }
 
-    private String[] readLine() {
+    private String[] readLine() throws CsvValidationException, IOException {
         String[] line;
         do {
-            line = this.records.next();
+            line = this.reader.readNext();
             if (line == null) { // next returned a null
                 return null;
             }
 
-        } while ((line.length == 0 || invalidLine(line)) && this.records.hasNext());
+        } while ((line.length == 0 || invalidLine(line)) && this.reader.peek() != null);
 
         if (invalidLine(line)) { // no more records can be read
             return null;
@@ -130,7 +147,11 @@ public class CSVWSourceIterator extends SourceIterator implements Serializable {
         }
 
         String[] line = this.next;
-        this.next = readLine();
+        try {
+            this.next = readLine();
+        } catch (CsvValidationException | IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (!config.getTrim().equals("false")) {
             line = applyTrimArray(line, config.getTrim());

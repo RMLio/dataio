@@ -3,6 +3,7 @@ package be.ugent.idlab.knows.dataio.iterators.csvw;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ import java.util.List;
  * <li> a list of null fields: by default empty </li>
  * </ul>
  */
-public final class CSVWConfiguration {
+public final class CSVWConfiguration implements Serializable {
     public static CSVWConfiguration DEFAULT = CSVWConfiguration.builder().build();
     private final char delimiter;
     private final char escapeCharacter;

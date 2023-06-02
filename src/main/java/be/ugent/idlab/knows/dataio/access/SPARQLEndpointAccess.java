@@ -105,7 +105,7 @@ public class SPARQLEndpointAccess implements Access {
      * @return the datatypes of the results of the SPARQL query.
      */
     @Override
-    public Map<String, String> getDataTypes() {
+    public HashMap<String, String> getDataTypes() {
         return null;
     }
 

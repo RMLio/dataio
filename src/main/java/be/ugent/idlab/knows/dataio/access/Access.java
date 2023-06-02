@@ -2,6 +2,7 @@ package be.ugent.idlab.knows.dataio.access;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public interface Access extends Serializable {
      * References to values are mapped to their datatypes, if available.
      * @return map of datatypes.
      */
-    Map<String, String> getDataTypes();
+    HashMap<String, String> getDataTypes();
 
     String getContentType();
 

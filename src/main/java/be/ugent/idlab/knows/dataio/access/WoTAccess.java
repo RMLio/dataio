@@ -78,7 +78,7 @@ public class WoTAccess implements Access {
      * @return the datatypes of the file.
      */
     @Override
-    public Map<String, String> getDataTypes() {
+    public HashMap<String, String> getDataTypes() {
         return null;
     }
 

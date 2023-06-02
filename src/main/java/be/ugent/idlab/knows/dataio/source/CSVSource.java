@@ -12,9 +12,9 @@ public class CSVSource extends Source {
 
     // The CSV record that is provided by the Apache CSVParser.
     private Map<String, String> data;
-    private Map<String, String> datatypes;
+    private HashMap<String, String> datatypes;
 
-    public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
+    public CSVSource(String[] header, String[] data, HashMap<String, String> datatypes) {
         this.data = new HashMap<>();
         if (header.length > data.length) {
             logger.warn("Header has more columns than this row");

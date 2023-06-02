@@ -45,7 +45,9 @@ public class LocalAccessTestCore extends TestCore {
             throw new RuntimeException(e);
         }
 
-        return new String(b, ((LocalFileAccess) access).getEncoding());
+        Charset charset = Charset.forName(((LocalFileAccess) access).getEncoding());
+
+        return new String(b, charset);
     }
 
     public String getInput(Path path, Charset encoding) throws IOException {

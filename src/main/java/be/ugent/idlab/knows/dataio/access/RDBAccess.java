@@ -38,7 +38,7 @@ public class RDBAccess implements Access {
     private String password;
     private String query;
     private String contentType;
-    private Map<String, String> datatypes = new HashMap<>();
+    private HashMap<String, String> datatypes = new HashMap<>();
 
 
     /**
@@ -177,7 +177,7 @@ public class RDBAccess implements Access {
      * @return a map of column names and their datatypes.
      */
     @Override
-    public Map<String, String> getDataTypes() {
+    public HashMap<String, String> getDataTypes() {
         return datatypes;
     }
 

@@ -3,7 +3,6 @@ package be.ugent.idlab.knows.dataio.iterators.csvw;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -31,9 +30,9 @@ public final class CSVWConfiguration {
     private final String commentPrefix;
     private final List<String> header;
     private final List<String> nulls;
-    private final Charset encoding;
+    private final String encoding;
 
-    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, List<String> nulls, Charset encoding) {
+    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, List<String> nulls, String encoding) {
         // opencsv parser options
         this.delimiter = delimiter;
         this.escapeCharacter = escapeCharacter;
@@ -84,7 +83,7 @@ public final class CSVWConfiguration {
         return this.nulls;
     }
 
-    public Charset getEncoding() {
+    public String getEncoding() {
         return encoding;
     }
 

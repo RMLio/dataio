@@ -6,7 +6,6 @@ import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
-import be.ugent.idlab.knows.dataio.source.Source;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 
@@ -177,7 +175,7 @@ public class CSVWIteratorTest extends TestCore {
     @Test
     public void test_00002a_encoding() throws SQLException, IOException {
         Access access = new LocalFileAccess("", "src/test/resources/csvw/mapper/encoding.csv", "csv", "utf-16be");
-        CSVWConfiguration config = CSVWConfiguration.builder().withEncoding(StandardCharsets.UTF_16).build();
+        CSVWConfiguration config = CSVWConfiguration.builder().withEncoding(StandardCharsets.UTF_16.toString()).build();
 
         runMapperTest(access, config);
     }

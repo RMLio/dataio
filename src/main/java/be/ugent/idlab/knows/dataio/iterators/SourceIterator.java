@@ -2,10 +2,11 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.source.Source;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-public abstract class SourceIterator implements Iterator<Source> {
+public abstract class SourceIterator implements Iterator<Source>, Serializable {
     @Override
     public void remove() {
         throw new UnsupportedOperationException();

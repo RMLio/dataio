@@ -1,0 +1,167 @@
+package be.ugent.idlab.knows.dataio.iterators;
+
+import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
+import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.source.Source;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.enums.CSVReaderNullFieldIndicator;
+import com.opencsv.exceptions.CsvValidationException;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+public class CSVWSourceIterator3 extends SourceIterator {
+
+    private Access access;
+    private CSVWConfiguration config;
+    private HashMap<String, String> dataTypes;
+
+    private transient String[] header;
+    private transient String[] next;
+    private transient CSVReader reader;
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+        inputStream.defaultReadObject();
+        this.open(this.access, this.config); // reopen the iterator with the deserialized values
+    }
+
+    public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
+        this.access = access;
+        this.dataTypes = access.getDataTypes();
+        this.config = config;
+
+        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
+                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                .withCSVParser(this.config.getParser())
+                .withSkipLines(this.config.isSkipHeader() ? 1 : 0)
+                .build();
+
+        if (this.config.isSkipHeader()) {
+            this.header = config.getHeader().toArray(new String[0]);
+        } else {
+            this.header = readLine();
+
+            if (header == null) {
+                throw new IllegalStateException("Unable to read the file!");
+            }
+        }
+
+        this.next = readLine();
+
+        if (this.next == null) {
+            throw new IllegalStateException("No further data could be read from the file!");
+        }
+    }
+
+    private String[] readLine() throws IOException {
+        String[] line;
+        do {
+            try {
+                // this can throw a null
+                line = this.reader.readNext();
+
+                if (line == null) {
+                    return null;
+                }
+            } catch (CsvValidationException e) {
+                throw new IllegalArgumentException(String.format("File does not conform to configuration! Offending line: %s", Arrays.toString(this.reader.peek())));
+            }
+        } while ((line.length == 0 || invalidLine(line)) && this.reader.peek() != null);
+
+        if (invalidLine(line)) { // no more records could be read
+            return null;
+        }
+
+        return line;
+    }
+
+    /**
+     * Checks if the passed line corresponds to the filters set
+     *
+     * @param line line to be checked
+     * @return true if the line passes all checks
+     */
+    private boolean invalidLine(String[] line) {
+        return line.length == 0 ||  // line is empty
+                line[0].startsWith(this.config.getCommentPrefix()); // line starts with a comment prefix
+    }
+
+    /**
+     * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
+     *
+     * @param record
+     * @return
+     */
+    public CSVSource replaceNulls(CSVSource record) {
+        Map<String, String> data = record.getData();
+        data.forEach((key, value) -> {
+            if (this.config.getNulls().contains(value)) {
+                data.put(key, null);
+            }
+        });
+        return record;
+    }
+
+    public String[] applyTrimArray(String[] arr, String trim) {
+        return Arrays.stream(arr)
+                .map(item -> applyTrim(item, trim))
+                .toArray(String[]::new);
+    }
+
+    public String applyTrim(String item, boolean trim) {
+        if (trim) {
+            return item.trim();
+        }
+
+        return item;
+    }
+
+    public String applyTrim(String item, String trim) {
+        switch (trim) {
+            case "true":
+                return item.trim();
+            case "false":
+                return item;
+            case "start":
+                return item.stripLeading();
+            case "end":
+                return item.stripTrailing();
+            default:
+                throw new IllegalArgumentException("Unrecognized value for flag \"trim\"");
+        }
+    }
+
+    @Override
+    public Source next() {
+        if (this.next == null) {
+            throw new NoSuchElementException();
+        }
+
+        String[] line = this.next;
+        try {
+            this.next = readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (!config.getTrim().equals("false")) {
+            line = applyTrimArray(line, config.getTrim());
+        }
+
+        return replaceNulls(new CSVSource(header, line, dataTypes));
+    }
+
+    @Override
+    public boolean hasNext() {
+        return this.next != null;
+    }
+}
+

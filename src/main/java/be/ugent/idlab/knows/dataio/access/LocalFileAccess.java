@@ -71,15 +71,7 @@ public class LocalFileAccess implements Access {
 
         encodingCheck(file);
 
-        BOMInputStream is = new BOMInputStream(new FileInputStream(file));
-
-        // remove all BOM marks
-        for (int i = 0; is.getBOM() != null && i < is.getBOM().length(); i++) {
-            //noinspection ResultOfMethodCallIgnored
-            is.read();
-        }
-
-        return is;
+        return new BOMInputStream(new FileInputStream(file), false);
     }
 
     private void encodingCheck(File file) throws FileNotFoundException {

@@ -2,7 +2,6 @@ package be.ugent.idlab.knows.dataio.access;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,19 +12,22 @@ public interface Access extends Serializable {
 
     /**
      * This method returns an InputStream for the access.
+     *
      * @return the InputStream corresponding to the access.
      * @throws IOException
      */
 
     InputStream getInputStream() throws IOException, SQLException;
+
     InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException;
 
     /**
      * This method returns a map of datatypes.
      * References to values are mapped to their datatypes, if available.
+     *
      * @return map of datatypes.
      */
-    HashMap<String, String> getDataTypes();
+    Map<String, String> getDataTypes();
 
     String getContentType();
 

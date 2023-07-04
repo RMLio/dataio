@@ -25,7 +25,7 @@ public class CSVSourceIterator extends SourceIterator {
      * @param access the corresponding access object
      */
     public void open(Access access) {
-        dataTypes = access.getDataTypes();
+        dataTypes = new HashMap<>(access.getDataTypes());
         try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
             iterator = new CSVReaderBuilder(new InputStreamReader(inputStream))
                     .withSkipLines(0)

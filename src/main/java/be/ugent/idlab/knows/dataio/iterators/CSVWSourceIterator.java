@@ -35,7 +35,7 @@ public class CSVWSourceIterator extends SourceIterator {
 
     public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
         this.access = access;
-        this.dataTypes = access.getDataTypes();
+        this.dataTypes = new HashMap<>(access.getDataTypes());
         this.config = config;
 
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))

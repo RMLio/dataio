@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import be.ugent.idlab.knows.dataio.utils.Utils;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,7 +106,7 @@ public class SPARQLEndpointAccess implements Access {
      * @return the datatypes of the results of the SPARQL query.
      */
     @Override
-    public HashMap<String, String> getDataTypes() {
+    public Map<String, String> getDataTypes() {
         return null;
     }
 

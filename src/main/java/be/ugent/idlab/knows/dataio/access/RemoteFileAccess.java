@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
@@ -50,7 +49,7 @@ public class RemoteFileAccess implements Access {
      * @return the datatypes of the file.
      */
     @Override
-    public HashMap<String, String> getDataTypes() {
+    public Map<String, String> getDataTypes() {
         return null;
     }
 

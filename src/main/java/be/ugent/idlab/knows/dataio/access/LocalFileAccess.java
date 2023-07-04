@@ -10,7 +10,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -115,10 +115,8 @@ public class LocalFileAccess implements Access {
      * @return the datatypes of the file.
      */
     @Override
-    public HashMap<String, String> getDataTypes() {
-
-        return new HashMap<>(Map.of(
-                getFullPath(), this.type));
+    public Map<String, String> getDataTypes() {
+        return Collections.singletonMap(getFullPath(), this.type);
     }
 
 

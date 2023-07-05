@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class LocalFileAccess implements Access {
     private final String path;
     private final String base;
     private final String type;
-    private final Charset encoding;
+    private final String encoding;
 
     /**
      * This constructor takes the path and the base path of a file.
@@ -46,7 +47,7 @@ public class LocalFileAccess implements Access {
         if (!Charset.isSupported(encoding)) {
             throw new IllegalArgumentException("Passed encoding not supported.");
         }
-        this.encoding = Charset.forName(encoding);
+        this.encoding = encoding;
         this.type = type;
     }
 
@@ -70,15 +71,7 @@ public class LocalFileAccess implements Access {
 
         encodingCheck(file);
 
-        BOMInputStream is = new BOMInputStream(new FileInputStream(file));
-
-        // remove all BOM marks
-        for(int i = 0; is.getBOM() != null && i < is.getBOM().length(); i++) {
-            //noinspection ResultOfMethodCallIgnored
-            is.read();
-        }
-
-        return is;
+        return new BOMInputStream(new FileInputStream(file), false);
     }
 
     private void encodingCheck(File file) throws FileNotFoundException {
@@ -98,12 +91,12 @@ public class LocalFileAccess implements Access {
 
         List<String> matchesNames = matches.stream().map(CharsetMatch::getName).collect(Collectors.toList());
 
-        if (!matchesNames.contains(this.encoding.name())) {
+        if (!matchesNames.contains(this.encoding)) {
 
             // only warn if high confidence
             if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
                 // matches are sorted based on confidence
-                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0).getName(), this.encoding.name());
+                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0).getName(), this.encoding);
                 logger.warn(message);
             }
         }
@@ -123,8 +116,7 @@ public class LocalFileAccess implements Access {
      */
     @Override
     public Map<String, String> getDataTypes() {
-
-        return Map.of(getFullPath(), this.type);
+        return Collections.singletonMap(getFullPath(), this.type);
     }
 
 
@@ -194,7 +186,7 @@ public class LocalFileAccess implements Access {
         return fullPath;
     }
 
-    public Charset getEncoding() {
+    public String getEncoding() {
         return encoding;
     }
 }

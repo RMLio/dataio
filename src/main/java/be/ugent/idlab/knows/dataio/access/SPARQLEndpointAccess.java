@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import be.ugent.idlab.knows.dataio.utils.Utils;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

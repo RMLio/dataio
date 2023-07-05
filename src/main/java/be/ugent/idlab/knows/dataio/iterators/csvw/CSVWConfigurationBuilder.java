@@ -14,14 +14,14 @@ public class CSVWConfigurationBuilder {
     private List<String> header = List.of();
     private List<String> nulls = List.of();
 
-    private Charset encoding = StandardCharsets.UTF_8;
+    private String encoding = StandardCharsets.UTF_8.toString();
 
     public CSVWConfigurationBuilder withDelimiter(char delimiter) {
         this.delimiter = delimiter;
         return this;
     }
 
-    public CSVWConfigurationBuilder withEncoding(Charset encoding) {
+    public CSVWConfigurationBuilder withEncoding(String encoding) {
         this.encoding = encoding;
         return this;
     }

@@ -11,8 +11,8 @@ import java.util.Map;
 public class CSVSource extends Source {
 
     // The CSV record that is provided by the Apache CSVParser.
-    private Map<String, String> data;
-    private Map<String, String> datatypes;
+    private final Map<String, String> data;
+    private final Map<String, String> datatypes;
 
     public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
         this.data = new HashMap<>();

@@ -4,66 +4,76 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
+import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
+import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
-    private Map<String, String> dataTypes;
+
+    private Access access;
     private CSVWConfiguration config;
-    private Iterator<String[]> records;
-    private String[] header;
-    private String[] next;
+    private HashMap<String, String> dataTypes;
+
+    private transient String[] header;
+    private transient String[] next;
+    private transient CSVReader reader;
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+        inputStream.defaultReadObject();
+        this.open(this.access, this.config); // reopen the iterator with the deserialized values
+    }
 
     public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
+        this.access = access;
+        this.dataTypes = new HashMap<>(access.getDataTypes());
         this.config = config;
-        this.dataTypes = access.getDataTypes();
-        this.records = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
+
+        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
                 .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                 .withCSVParser(this.config.getParser())
-                .withSkipLines(config.isSkipHeader() ? 1 : 0)
-                .build().iterator();
+                .withSkipLines(this.config.isSkipHeader() ? 1 : 0)
+                .build();
 
-        // read the header
-        if (config.isSkipHeader()) {
+        if (this.config.isSkipHeader()) {
             this.header = config.getHeader().toArray(new String[0]);
-        } else { // the first parsed record is the header
+        } else {
             this.header = readLine();
 
             if (header == null) {
-                throw new IllegalStateException("No header could be read from the file");
+                throw new IllegalStateException("Unable to read the file!");
             }
         }
 
-        // read in the next record
         this.next = readLine();
 
         if (this.next == null) {
-            // TODO: discuss the necessity of this
-            throw new IllegalStateException("No data could be read from file");
+            throw new IllegalStateException("No further data could be read from the file!");
         }
     }
 
-    private String[] readLine() {
+    private String[] readLine() throws IOException {
         String[] line;
         do {
-            line = this.records.next();
-            if (line == null) { // next returned a null
-                return null;
+            try {
+                line = this.reader.readNext();
+
+                if (line == null) {
+                    return null;
+                }
+            } catch (CsvValidationException e) {
+                throw new IllegalArgumentException(String.format("File does not conform to configuration! Offending line: %s", Arrays.toString(this.reader.peek())));
             }
-
-        } while ((line.length == 0 || invalidLine(line)) && this.records.hasNext());
-
-        if (invalidLine(line)) { // no more records can be read
-            return null;
-        }
+        } while (invalidLine(line));
 
         return line;
     }
@@ -75,8 +85,8 @@ public class CSVWSourceIterator extends SourceIterator {
      * @return true if the line passes all checks
      */
     private boolean invalidLine(String[] line) {
-        return line.length == 0 ||  // line is empty
-                line[0].startsWith(this.config.getCommentPrefix()); // line does starts with a comment prefix
+        return Arrays.stream(line).allMatch(s -> s.length() == 0) || // all of the parts are not empty strings
+                line[0].startsWith(this.config.getCommentPrefix()); // line does not start with a comment prefix
     }
 
     /**
@@ -101,6 +111,14 @@ public class CSVWSourceIterator extends SourceIterator {
                 .toArray(String[]::new);
     }
 
+    public String applyTrim(String item, boolean trim) {
+        if (trim) {
+            return item.trim();
+        }
+
+        return item;
+    }
+
     public String applyTrim(String item, String trim) {
         switch (trim) {
             case "true":
@@ -123,7 +141,11 @@ public class CSVWSourceIterator extends SourceIterator {
         }
 
         String[] line = this.next;
-        this.next = readLine();
+        try {
+            this.next = readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (!config.getTrim().equals("false")) {
             line = applyTrimArray(line, config.getTrim());

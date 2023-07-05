@@ -17,7 +17,7 @@ public class CSVSourceIterator extends SourceIterator {
     private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
     private Iterator<String[]> iterator;
     private String[] header;
-    private Map<String, String> dataTypes;
+    private HashMap<String, String> dataTypes;
 
     /**
      * Opens the files using the access object and initiates the iterator and header
@@ -25,7 +25,7 @@ public class CSVSourceIterator extends SourceIterator {
      * @param access the corresponding access object
      */
     public void open(Access access) {
-        dataTypes = access.getDataTypes();
+        dataTypes = new HashMap<>(access.getDataTypes());
         try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
             iterator = new CSVReaderBuilder(new InputStreamReader(inputStream))
                     .withSkipLines(0)

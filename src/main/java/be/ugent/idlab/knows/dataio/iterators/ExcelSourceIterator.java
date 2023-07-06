@@ -15,14 +15,10 @@ import java.util.List;
 
 
 public class ExcelSourceIterator extends SourceIterator {
-    private Iterator<ExcelSource> iterator;
+    private final Iterator<ExcelSource> iterator;
 
-    /**
-     * Opens the files using the access object and initiates the workbookIterator, iterator and header.
-     *
-     * @param access the corresponding access object
-     */
-    public void open(Access access) {
+
+    public ExcelSourceIterator(Access access) throws IOException {
         XSSFWorkbook wb;
         try {
             wb = new XSSFWorkbook(access.getInputStream());
@@ -45,6 +41,8 @@ public class ExcelSourceIterator extends SourceIterator {
         }
 
         this.iterator = sources.iterator();
+
+        wb.close(); // entire workbook is consumed, this can be safely closed
     }
 
     @Override
@@ -58,7 +56,6 @@ public class ExcelSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
     }
 }

@@ -3,21 +3,41 @@ package be.ugent.idlab.knows.dataio.iterators;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
+import com.opencsv.CSVIterator;
+import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.*;
 
-public class CSVSourceIterator extends SourceIterator {
+public class CSVSourceIterator extends SourceIterator implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
+    private final Access access;
+
+    private final CSVReader reader;
+
     private Iterator<String[]> iterator;
     private String[] header;
-    private HashMap<String, String> dataTypes;
+
+    public CSVSourceIterator(Access access) throws SQLException, IOException {
+        this.access = access;
+
+        try (BOMInputStream in = new BOMInputStream(access.getInputStream())) {
+            this.reader = new CSVReaderBuilder(new InputStreamReader(in))
+                    .withSkipLines(0)
+                    .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                    .build();
+            this.iterator = this.reader.iterator();
+            this.header = iterator.next();
+        }
+    }
 
     /**
      * Opens the files using the access object and initiates the iterator and header
@@ -25,7 +45,6 @@ public class CSVSourceIterator extends SourceIterator {
      * @param access the corresponding access object
      */
     public void open(Access access) {
-        dataTypes = new HashMap<>(access.getDataTypes());
         try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream())) {
             iterator = new CSVReaderBuilder(new InputStreamReader(inputStream))
                     .withSkipLines(0)
@@ -58,7 +77,7 @@ public class CSVSourceIterator extends SourceIterator {
      */
     public Source next() {
         if (iterator.hasNext()) {
-            return new CSVSource(header, iterator.next(), dataTypes);
+            return new CSVSource(header, iterator.next(), this.access.getDataTypes());
         } else {
             throw new NoSuchElementException();
         }
@@ -66,5 +85,10 @@ public class CSVSourceIterator extends SourceIterator {
 
     public boolean hasNext() {
         return iterator.hasNext();
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.reader.close();
     }
 }

@@ -76,4 +76,9 @@ public class JSONSourceIterator extends SourceIterator {
 
         return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.currentPath);
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

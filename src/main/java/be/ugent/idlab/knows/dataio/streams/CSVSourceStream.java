@@ -19,7 +19,6 @@ public class CSVSourceStream implements SourceStream {
     private String[] header;
     private Access access;
 
-    @Override
     public void open(Access access) throws SQLException, IOException {
         this.access = access;
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream()))
@@ -38,6 +37,11 @@ public class CSVSourceStream implements SourceStream {
     public Stream<Source> getStream() {
         return StreamSupport.stream(this.reader.spliterator(), false)
                 .map(data -> new CSVSource(header, data, this.access.getDataTypes()));
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }
 

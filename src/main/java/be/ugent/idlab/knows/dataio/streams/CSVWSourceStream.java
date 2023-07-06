@@ -13,22 +13,24 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class CSVWSourceStream implements SourceStream {
-    private final CSVWConfiguration config;
     private final CSVWSourceIterator iterator;
 
-    public CSVWSourceStream(CSVWConfiguration config) {
-        this.config = config;
-        this.iterator = new CSVWSourceIterator();
+    public CSVWSourceStream(Access access, CSVWConfiguration config) throws SQLException, IOException {
+        this.iterator = new CSVWSourceIterator(access, config);
     }
 
-    @Override
     public void open(Access access) throws SQLException, IOException {
-        this.iterator.open(access, this.config);
+
     }
 
     @Override
     public Stream<Source> getStream() {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED), false);
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

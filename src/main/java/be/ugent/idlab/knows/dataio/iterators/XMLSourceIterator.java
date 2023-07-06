@@ -62,4 +62,8 @@ public class XMLSourceIterator extends SourceIterator {
         return iterator.hasNext();
     }
 
+    @Override
+    public void close() throws Exception {
+
+    }
 }

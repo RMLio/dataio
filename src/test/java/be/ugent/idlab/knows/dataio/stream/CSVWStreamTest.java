@@ -51,13 +51,13 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_1000_nulls() {
+    public void eval_1000_nulls() throws SQLException, IOException {
         // this test is CSVW specific, can't standardize
+        Access access = makeLocalAccess("/csvw/1000_nulls.csv", "", "csvw", "utf-8");
         CSVWConfiguration config = CSVWConfiguration.builder()
                 .withNulls(List.of("NULL"))
                 .build();
-        CSVWSourceStream stream = new CSVWSourceStream(config);
-        Access access = makeLocalAccess("/csvw/1000_nulls.csv", "", "csvw", "utf-8");
+        CSVWSourceStream stream = new CSVWSourceStream(access, config);
 
         try {
             stream.open(access);

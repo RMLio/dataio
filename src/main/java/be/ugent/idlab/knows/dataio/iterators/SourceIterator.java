@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-public abstract class SourceIterator implements Iterator<Source>, Serializable {
+public abstract class SourceIterator implements Iterator<Source>, Serializable, AutoCloseable {
     @Override
     public void remove() {
         throw new UnsupportedOperationException();

@@ -20,24 +20,24 @@ import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
 
-    private Access access;
-    private CSVWConfiguration config;
-    private HashMap<String, String> dataTypes;
-
+    private final Access access;
+    private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
     private transient CSVReader reader;
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
-        inputStream.defaultReadObject();
-        this.open(this.access, this.config); // reopen the iterator with the deserialized values
+    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException {
+        this.access = access;
+        this.config = config;
+        this.bootstrap();
     }
 
-    public void open(Access access, CSVWConfiguration config) throws SQLException, IOException {
-        this.access = access;
-        this.dataTypes = new HashMap<>(access.getDataTypes());
-        this.config = config;
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+        inputStream.defaultReadObject();
+        this.bootstrap();
+    }
 
+    private void bootstrap() throws SQLException, IOException {
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
                 .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                 .withCSVParser(this.config.getParser())
@@ -151,11 +151,16 @@ public class CSVWSourceIterator extends SourceIterator {
             line = applyTrimArray(line, config.getTrim());
         }
 
-        return replaceNulls(new CSVSource(header, line, dataTypes));
+        return replaceNulls(new CSVSource(header, line, this.access.getDataTypes()));
     }
 
     @Override
     public boolean hasNext() {
         return this.next != null;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.reader.close();
     }
 }

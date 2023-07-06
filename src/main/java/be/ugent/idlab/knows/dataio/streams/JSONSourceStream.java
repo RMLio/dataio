@@ -27,7 +27,6 @@ public class JSONSourceStream implements SourceStream {
         this.jsonPath = jsonPath;
     }
 
-    @Override
     public void open(Access access) throws SQLException, IOException {
         this.iterator = surfer.iterator(access.getInputStream(), JsonPathCompiler.compile(this.jsonPath));
     }
@@ -38,5 +37,10 @@ public class JSONSourceStream implements SourceStream {
                 .map(obj -> (ObjectNode) obj)
                 .map(objectNode -> mapper.convertValue(objectNode, Map.class))
                 .map(map -> new JSONSource(map, jsonPath));
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

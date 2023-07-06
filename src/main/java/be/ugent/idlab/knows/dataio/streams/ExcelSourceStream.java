@@ -28,7 +28,6 @@ public class ExcelSourceStream implements SourceStream {
      *
      * @param access access to the file
      */
-    @Override
     public void open(Access access) throws SQLException, IOException {
         InputStream is;
         if(access instanceof LocalFileAccess) { // local Excel files are not read byte-wise
@@ -60,5 +59,10 @@ public class ExcelSourceStream implements SourceStream {
 
     private Stream<Row> getRowStreamFromSheet(Sheet sheet) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(sheet.rowIterator(), Spliterator.ORDERED), true);
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

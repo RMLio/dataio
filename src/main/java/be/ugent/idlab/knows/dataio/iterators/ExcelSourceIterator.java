@@ -56,4 +56,9 @@ public class ExcelSourceIterator extends SourceIterator {
     public boolean hasNext() {
         return this.iterator.hasNext();
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

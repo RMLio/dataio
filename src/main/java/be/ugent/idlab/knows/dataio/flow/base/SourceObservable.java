@@ -33,14 +33,6 @@ public abstract class SourceObservable<T extends Source> extends Observable<T> {
     @Override
     @SuppressWarnings("unchecked")
     protected void subscribeActual(@NonNull Observer<? super T> observer) {
-        try {
-            stream.open(this.access);
-        } catch (SQLException | IOException e) {
-            observer.onError(e);
-            throw new RuntimeException(e);
-        }
-
-
         stream.getStream().forEach(e -> observer.onNext((T) e));
         observer.onComplete();
     }

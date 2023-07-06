@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.*;
 
-public class CSVSourceIterator extends SourceIterator implements AutoCloseable {
+public class CSVSourceIterator extends SourceIterator {
 
     private static final Logger logger = LoggerFactory.getLogger(CSVSourceIterator.class);
     private final Access access;

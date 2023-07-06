@@ -25,7 +25,6 @@ public class XMLSourceStream implements SourceStream {
      *
      * @param access access to the file
      */
-    @Override
     public void open(Access access) throws SQLException, IOException {
         this.iterator.open(access, xpath);
     }
@@ -40,5 +39,10 @@ public class XMLSourceStream implements SourceStream {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED),
                 false);
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

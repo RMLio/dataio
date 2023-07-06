@@ -23,7 +23,6 @@ public class ODSSourceStream implements SourceStream {
      *
      * @param access access to the file
      */
-    @Override
     public void open(Access access) throws SQLException, IOException {
         this.iterator = new ODSSourceIterator();
         this.iterator.open(access);
@@ -38,5 +37,10 @@ public class ODSSourceStream implements SourceStream {
     public Stream<Source> getStream() {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

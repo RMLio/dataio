@@ -69,4 +69,9 @@ public class HTMLSourceIterator extends SourceIterator {
     public boolean hasNext() {
         return iterator.hasNext();
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

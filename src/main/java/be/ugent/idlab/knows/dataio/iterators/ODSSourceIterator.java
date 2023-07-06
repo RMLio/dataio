@@ -63,4 +63,9 @@ public class ODSSourceIterator extends SourceIterator {
         readData();
         return new ODSSource(this.header, temp, this.dataTypes);
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

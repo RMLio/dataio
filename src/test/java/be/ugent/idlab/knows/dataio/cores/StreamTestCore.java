@@ -43,7 +43,6 @@ public class StreamTestCore extends TestCore {
             }
 
             SourceStream s = streamClass.cast(streamClass.getConstructors()[0].newInstance(initArgs));
-            s.open(access);
             return getIterator(s);
 
         } catch (InstantiationException ie) {

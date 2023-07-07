@@ -78,7 +78,7 @@ public class JSONSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
+        // nothing to close
     }
 }

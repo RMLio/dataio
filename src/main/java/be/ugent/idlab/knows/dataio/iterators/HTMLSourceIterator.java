@@ -22,16 +22,10 @@ public class HTMLSourceIterator extends SourceIterator {
     private Iterator<Element> iterator;
     private List<String> headers;
 
-    /**
-     * Opens the files using the access object and initiates the iterator and header
-     *
-     * @param access          the corresponding access object
-     * @param string_iterator string value used in the parser
-     */
-    public void open(Access access, String string_iterator) {
+    public HTMLSourceIterator(Access access, String stringIterator) {
         try {
             this.iterator = Jsoup.parse(access.getInputStream(), "UTF-8", "http://example.com/")
-                    .select(string_iterator).iterator();
+                    .select(stringIterator).iterator();
             if (this.iterator.hasNext()) {
                 headers = this.iterator.next().select("th").stream().map(Element::text).collect(Collectors.toList());
             }
@@ -71,7 +65,7 @@ public class HTMLSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
+        // nothing to close
     }
 }

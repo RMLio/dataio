@@ -48,9 +48,9 @@ public class SPARQLTest {
         // set up the expected object, bottom up
         Map<String, String>
                 bob = new LinkedHashMap<>() {{
-                    put("type", "literal");
-                    put("value", "Bob");
-                }},
+            put("type", "literal");
+            put("value", "Bob");
+        }},
                 smith = new LinkedHashMap<>() {{
                     put("type", "literal");
                     put("value", "Smith");

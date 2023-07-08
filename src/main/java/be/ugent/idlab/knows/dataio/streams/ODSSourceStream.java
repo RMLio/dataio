@@ -4,6 +4,7 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
 import be.ugent.idlab.knows.dataio.source.Source;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Spliterator;
@@ -16,16 +17,10 @@ import java.util.stream.StreamSupport;
  * Internally, this implementation relies on the ODSSourceIterator, which already reads the files the streaming way
  */
 public class ODSSourceStream implements SourceStream {
-    private ODSSourceIterator iterator;
+    private final ODSSourceIterator iterator;
 
-    /**
-     * Opens the source and prepares for streaming
-     *
-     * @param access access to the file
-     */
-    public void open(Access access) throws SQLException, IOException {
-        this.iterator = new ODSSourceIterator();
-        this.iterator.open(access);
+    public ODSSourceStream(Access access) throws XMLStreamException, SQLException, IOException {
+        this.iterator = new ODSSourceIterator(access);
     }
 
     /**
@@ -40,7 +35,7 @@ public class ODSSourceStream implements SourceStream {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
+        this.iterator.close();
     }
 }

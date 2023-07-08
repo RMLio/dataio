@@ -19,13 +19,26 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * This class is a JSonSourceiterator that allows the iteration of json data.
+ * This class is a JSONSourceIterator that allows the iteration of JSON data.
  */
 public class JSONSourceIterator extends SourceIterator {
-    private final JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+    private final ResumableParser parser;
     private Object currentObject;
     private String currentPath;
-    private ResumableParser parser;
+
+    public JSONSourceIterator(Access access, String string_iterator) throws SQLException, IOException {
+        SurfingConfiguration config = JsonSurferJackson.INSTANCE
+                .configBuilder()
+                .bind(string_iterator, (value, context) -> {
+                    this.currentObject = value;
+                    this.currentPath = context.getJsonPath();
+                    context.pause();
+                }).build();
+
+        JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+        this.parser = surfer.createResumableParser(access.getInputStream(), config);
+        this.parser.parse();
+    }
 
     /**
      * This method returns a JSON document from an InputStream.
@@ -35,18 +48,6 @@ public class JSONSourceIterator extends SourceIterator {
      */
     public static Object getDocumentFromStream(InputStream stream) {
         return Configuration.defaultConfiguration().jsonProvider().parse(stream, "utf-8");
-    }
-
-    public void open(Access access, String string_iterator) throws SQLException, IOException {
-        SurfingConfiguration config = JsonSurferJackson.INSTANCE
-                .configBuilder()
-                .bind(string_iterator, (value, context) -> {
-                    this.currentObject = value;
-                    this.currentPath = context.getJsonPath();
-                    context.pause();
-                }).build();
-        this.parser = surfer.createResumableParser(access.getInputStream(), config);
-        this.parser.parse();
     }
 
     Object getDocumentFromStream(InputStream stream, String contentType) throws IOException {

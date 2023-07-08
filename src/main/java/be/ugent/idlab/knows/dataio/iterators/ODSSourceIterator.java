@@ -9,30 +9,16 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Map;
 
 public class ODSSourceIterator extends SourceIterator {
-    private String[] header;
+    private final String[] header;
+    private final Access access;
+    private final ODSFileParser parser;
     private String[] data;
-    private Map<String, String> dataTypes;
-    private ODSFileParser parser;
 
-
-    /**
-     * This function partly loads the full file in at once (to read the tables).
-     * Opens the files using the access object and initiates the tableIterator, iterator and header.
-     *
-     * @param access the corresponding access object
-     */
-    public void open(Access access) {
-        this.dataTypes = access.getDataTypes();
-
-        try {
-            this.parser = ODSFileParser.newInstance(access.getInputStream());
-        } catch (XMLStreamException | IOException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+    public ODSSourceIterator(Access access) throws SQLException, IOException, XMLStreamException {
+        this.access = access;
+        this.parser = ODSFileParser.newInstance(access.getInputStream());
         this.header = this.parser.getHeader();
 
         // read initial data
@@ -61,11 +47,11 @@ public class ODSSourceIterator extends SourceIterator {
     public Source next() {
         String[] temp = this.data;
         readData();
-        return new ODSSource(this.header, temp, this.dataTypes);
+        return new ODSSource(this.header, temp, this.access.getDataTypes());
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
+        // nothing to close
     }
 }

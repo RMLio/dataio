@@ -19,10 +19,6 @@ public class CSVWSourceStream implements SourceStream {
         this.iterator = new CSVWSourceIterator(access, config);
     }
 
-    public void open(Access access) throws SQLException, IOException {
-
-    }
-
     @Override
     public Stream<Source> getStream() {
         return StreamSupport.stream(
@@ -30,7 +26,7 @@ public class CSVWSourceStream implements SourceStream {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() throws IOException {
+        this.iterator.close();
     }
 }

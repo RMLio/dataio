@@ -8,6 +8,6 @@ import io.reactivex.rxjava3.core.Observable;
 
 public class ODSObservable extends SourceObservable<ODSSource> {
     public ODSObservable(Access access) {
-        super(access, ODSSourceStream::new);
+        super(access, () -> new ODSSourceStream(access));
     }
 }

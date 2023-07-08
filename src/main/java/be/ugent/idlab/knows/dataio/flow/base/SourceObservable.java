@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
  * Implementation of RxJava's Observables for the sources we support. Relies on SourceStream to produce values for the subscribers.
  * @param <T> parameter subclassing Source
  */
-public abstract class SourceObservable<T extends Source> extends Observable<T> {
+public abstract class SourceObservable<T extends Source> extends Observable<T> implements AutoCloseable {
     protected Access access;
     protected SourceStream stream;
 
@@ -35,5 +35,10 @@ public abstract class SourceObservable<T extends Source> extends Observable<T> {
     protected void subscribeActual(@NonNull Observer<? super T> observer) {
         stream.getStream().forEach(e -> observer.onNext((T) e));
         observer.onComplete();
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.stream.close();
     }
 }

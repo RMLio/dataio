@@ -16,38 +16,24 @@ import java.util.NoSuchElementException;
  */
 public class XMLSourceIterator extends SourceIterator {
 
-    private XdmSequenceIterator<net.sf.saxon.s9api.XdmItem> iterator;
-    private XPathCompiler compiler;
+    private final XdmSequenceIterator<XdmItem> iterator;
+    private final XPathCompiler compiler;
 
-    /**
-     * This function loads the full file in at once.
-     * Opens the files using the access object and initiates the iterator and compiler
-     *
-     * @param access          the corresponding access object
-     * @param string_iterator string value used in the parser
-     */
-    public void open(Access access, String string_iterator) {
+    public XMLSourceIterator(Access access, String stringIterator) throws SQLException, IOException, SaxonApiException {
         // Saxon processor to be reused across XPath query evaluations
         Processor saxProcessor = new Processor(false);
-        try {
-            DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
-            XdmNode document = docBuilder.build(new StreamSource(access.getInputStream()));
-            compiler = saxProcessor.newXPathCompiler();
-            // Enable expression caching
-            compiler.setCaching(true);
-            // Extract and register existing source namespaces into the XPath compiler
-            SaxNamespaceResolver.registerNamespaces(compiler, document);
-            // Execute iterator XPath query
-            XdmValue result = compiler.evaluate(string_iterator, document);
-            iterator = result.iterator();
-        } catch (SaxonApiException | IOException | SQLException e) {
-            e.printStackTrace();
-        }
+        DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
+        XdmNode document = docBuilder.build(new StreamSource(access.getInputStream()));
+        this.compiler = saxProcessor.newXPathCompiler();
+        // Enable expression caching
+        this.compiler.setCaching(true);
+        // Extract and register existing source namespaces into the XPath compiler
+        SaxNamespaceResolver.registerNamespaces(this.compiler, document);
+        // Execute iterator XPath query
+        XdmValue result = compiler.evaluate(stringIterator, document);
+        this.iterator = result.iterator();
     }
 
-    /**
-     * @return
-     */
     @Override
     public Source next() {
         if (this.iterator.hasNext()) {
@@ -63,7 +49,7 @@ public class XMLSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() throws Exception {
-
+    public void close() {
+        this.iterator.close();
     }
 }

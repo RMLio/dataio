@@ -16,15 +16,10 @@ import java.util.List;
 
 public class ExcelSourceIterator extends SourceIterator {
     private final Iterator<ExcelSource> iterator;
+    private final XSSFWorkbook wb;
 
-
-    public ExcelSourceIterator(Access access) throws IOException {
-        XSSFWorkbook wb;
-        try {
-            wb = new XSSFWorkbook(access.getInputStream());
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public ExcelSourceIterator(Access access) throws IOException, SQLException {
+        this.wb = new XSSFWorkbook(access.getInputStream());
 
         List<ExcelSource> sources = new ArrayList<>();
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
@@ -41,8 +36,6 @@ public class ExcelSourceIterator extends SourceIterator {
         }
 
         this.iterator = sources.iterator();
-
-        wb.close(); // entire workbook is consumed, this can be safely closed
     }
 
     @Override
@@ -56,6 +49,7 @@ public class ExcelSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
+        this.wb.close();
     }
 }

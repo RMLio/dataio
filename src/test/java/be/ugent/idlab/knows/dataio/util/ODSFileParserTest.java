@@ -1,8 +1,10 @@
 package be.ugent.idlab.knows.dataio.util;
 
 import be.ugent.idlab.knows.dataio.iterators.ods.ODSFileParser;
+import be.ugent.idlab.knows.dataio.iterators.ods.StdODSFileParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.stream.XMLStreamException;
@@ -54,24 +56,23 @@ public class ODSFileParserTest {
         Assertions.assertArrayEquals(expected, this.parser.getHeader());
     }
 
-    static class MapperTests {
-
-        ODSFileParser parser;
+    @Nested
+    class MapperTests {
 
         @Test
         public void onlyHeaderNoRows() throws XMLStreamException, IOException {
-            this.parser = ODSFileParser.newInstance("src/test/resources/ods/mapper_tests/ODS-0000.ods");
+            try (StdODSFileParser parser = (StdODSFileParser) ODSFileParser.newInstance("src/test/resources/ods/mapper_tests/ODS-0000.ods")) {
+                String[] header = new String[]{"Name"};
+                Assertions.assertArrayEquals(header, parser.getHeader());
 
-            String[] header = new String[]{"Name"};
-            Assertions.assertArrayEquals(header, this.parser.getHeader());
+                String[] row = parser.readNextRow();
 
-            String[] row = this.parser.readNextRow();
+                Assertions.assertNull(row);
 
-            Assertions.assertNull(row);
-
-            // second attempt
-            row = this.parser.readNextRow();
-            Assertions.assertNull(row);
+                // second attempt
+                row = parser.readNextRow();
+                Assertions.assertNull(row);
+            }
         }
     }
 }

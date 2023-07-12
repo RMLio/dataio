@@ -45,7 +45,7 @@ General:
     matrix:
       - TEST: [
                 # utility
-                ODSFileParserTest,
+                ODSFileParserTest$$*,
                 # iterator
                 CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream

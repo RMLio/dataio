@@ -11,24 +11,20 @@ import org.jsfr.json.compiler.JsonPathCompiler;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JSONSourceStream implements SourceStream {
-    private final JsonSurfer surfer = JsonSurferJackson.INSTANCE;
     private final String jsonPath;
-
-    private Iterator<Object> iterator;
-
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Iterator<Object> iterator;
 
-    public JSONSourceStream(String jsonPath) {
+    public JSONSourceStream(Access access, String jsonPath) throws SQLException, IOException {
         this.jsonPath = jsonPath;
-    }
-
-    @Override
-    public void open(Access access) throws SQLException, IOException {
+        JsonSurfer surfer = JsonSurferJackson.INSTANCE;
         this.iterator = surfer.iterator(access.getInputStream(), JsonPathCompiler.compile(this.jsonPath));
     }
 
@@ -38,5 +34,10 @@ public class JSONSourceStream implements SourceStream {
                 .map(obj -> (ObjectNode) obj)
                 .map(objectNode -> mapper.convertValue(objectNode, Map.class))
                 .map(map -> new JSONSource(map, jsonPath));
+    }
+
+    @Override
+    public void close() {
+        // nothing to close
     }
 }

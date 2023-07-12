@@ -7,6 +7,7 @@ import be.ugent.idlab.knows.dataio.source.Source;
 import com.github.pjfanning.xlsx.StreamingReader;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,28 +21,23 @@ import java.util.stream.StreamSupport;
 
 public class ExcelSourceStream implements SourceStream {
 
-    private Iterator<Sheet> iterator;
+    private final Iterator<Sheet> iterator;
+    private final Workbook wb;
     private Row header;
 
-    /**
-     * Opens the source and prepares for streaming
-     *
-     * @param access access to the file
-     */
-    @Override
-    public void open(Access access) throws SQLException, IOException {
-        InputStream is;
-        if(access instanceof LocalFileAccess) { // local Excel files are not read byte-wise
-            is = new FileInputStream(access.getAccessPath());
+    public ExcelSourceStream(Access access) throws IOException, SQLException {
+        InputStream in;
+        if (access instanceof LocalFileAccess) { // local Excel files are not read byte-wise
+            in = new FileInputStream(access.getAccessPath());
         } else {
-            is = access.getInputStream();
+            in = access.getInputStream();
         }
 
-        this.iterator = StreamingReader.builder()
+        this.wb = StreamingReader.builder()
                 .rowCacheSize(100)
                 .bufferSize(4096)
-                .open(is)
-                .iterator();
+                .open(in);
+        this.iterator = this.wb.iterator();
     }
 
     /**
@@ -60,5 +56,10 @@ public class ExcelSourceStream implements SourceStream {
 
     private Stream<Row> getRowStreamFromSheet(Sheet sheet) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(sheet.rowIterator(), Spliterator.ORDERED), true);
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.wb.close();
     }
 }

@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +60,6 @@ public final class StdODSFileParser implements ODSFileParser {
 
     public void readHeader() throws XMLStreamException {
         this.parser.forwardToStartElement("table", "table-row");
-
         this.header = readRow();
     }
 

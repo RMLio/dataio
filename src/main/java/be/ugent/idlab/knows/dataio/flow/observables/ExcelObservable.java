@@ -7,6 +7,6 @@ import be.ugent.idlab.knows.dataio.streams.ExcelSourceStream;
 
 public class ExcelObservable extends SourceObservable<ExcelSource> {
     public ExcelObservable(Access access) {
-        super(access, ExcelSourceStream::new);
+        super(access, () -> new ExcelSourceStream(access));
     }
 }

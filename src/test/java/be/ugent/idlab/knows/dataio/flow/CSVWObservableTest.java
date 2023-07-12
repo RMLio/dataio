@@ -14,33 +14,33 @@ import java.util.List;
 import java.util.Set;
 
 public class CSVWObservableTest extends ObservableTestCore {
-    private void runCSVWTest(String path, Evaluator evaluator, CSVWConfiguration config) {
+    private void runCSVWTest(String path, Evaluator evaluator, CSVWConfiguration config) throws Exception {
         Access access = new LocalFileAccess("", path, "csv");
-        SourceObservable<CSVSource> o = new CSVWObservable(access, config);
-        runTest(o, evaluator);
+        try (SourceObservable<CSVSource> o = new CSVWObservable(access, config)) {
+            runTest(o, evaluator);
+        }
     }
 
     @Test
-    public void test_0000() {
+    public void test_0000() throws Exception {
         runCSVWTest("src/test/resources/csv/0000.csv", this::evaluate_0000, CSVWConfiguration.DEFAULT);
     }
 
     @Test
-    public void test_0001() {
+    public void test_0001() throws Exception {
         runCSVWTest("src/test/resources/csv/0001.csv", this::evaluate_0001, CSVWConfiguration.DEFAULT);
     }
 
     @Test
-    public void test_0000_trim() {
+    public void test_0000_trim() throws Exception {
         CSVWConfiguration config = CSVWConfiguration.builder().withTrim(true).build();
         runCSVWTest("src/test/resources/csvw/0000_trim.csv", this::evaluate_0000, config);
     }
 
     @Test
-    public void test_1000_nulls() { // CSVW specific test
+    public void test_1000_nulls() throws Exception { // CSVW specific test
         Access access = new LocalFileAccess("", "src/test/resources/csvw/1000_nulls.csv", "csv");
         CSVWConfiguration config = CSVWConfiguration.builder().withNulls(List.of("NULL")).build();
-        SourceObservable<CSVSource> o = new CSVWObservable(access, config);
 
         String[] header = new String[]{"ID", "Name"};
         CSVSource s1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes()),
@@ -48,16 +48,19 @@ public class CSVWObservableTest extends ObservableTestCore {
                 s3 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes()),
                 s_null = new CSVSource(header, new String[]{"11", null}, access.getDataTypes());
 
-        Assertions.assertTrue(compareIterator(getIteratorFromObservable(o), Set.of(s1, s2, s3, s_null)));
+
+        try (SourceObservable<CSVSource> o = new CSVWObservable(access, config)) {
+            Assertions.assertTrue(compareIterator(getIteratorFromObservable(o), Set.of(s1, s2, s3, s_null)));
+        }
     }
 
     @Test
-    public void test_1001_header_long() {
+    public void test_1001_header_long() throws Exception {
         runCSVWTest("src/test/resources/csv/1001_header_long.csv", this::evaluate_1001_header_long, CSVWConfiguration.DEFAULT);
     }
 
     @Test
-    public void test_1001_header_short() {
+    public void test_1001_header_short() throws Exception {
         runCSVWTest("src/test/resources/csv/1001_header_short.csv", this::evaluate_1001_header_short, CSVWConfiguration.DEFAULT);
     }
 }

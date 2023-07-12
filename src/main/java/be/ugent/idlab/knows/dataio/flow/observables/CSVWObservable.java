@@ -9,6 +9,6 @@ import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 public class CSVWObservable extends SourceObservable<CSVSource> {
 
     public CSVWObservable(Access access, CSVWConfiguration config) {
-        super(access, () -> new CSVWSourceStream(config));
+        super(access, () -> new CSVWSourceStream(access, config));
     }
 }

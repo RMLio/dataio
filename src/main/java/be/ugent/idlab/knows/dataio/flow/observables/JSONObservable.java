@@ -7,6 +7,6 @@ import be.ugent.idlab.knows.dataio.streams.JSONSourceStream;
 
 public class JSONObservable extends SourceObservable<JSONSource> {
     public JSONObservable(Access access, String jsonPath) {
-        super(access, () -> new JSONSourceStream(jsonPath));
+        super(access, () -> new JSONSourceStream(access, jsonPath));
     }
 }

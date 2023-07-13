@@ -23,11 +23,22 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
     private final FusekiServer server;
     private final String contentType;
 
-    public SPARQLLocalFileAccess(String pathToFile, String query, String contentType) {
+    /**
+     * Construct the access by starting a local Fuseki server on a free port.
+     * This port is only used internally and will be released once the Access is closed.
+     *
+     * @param pathToFile path to the file to run SPARQL query against.
+     * @param query SPARQL query to run against the file
+     * @param contentType content type for the expected response
+     * @throws IOException will be thrown if it occurs during opening or closing the socket.
+     */
+    public SPARQLLocalFileAccess(String pathToFile, String query, String contentType) throws IOException {
         this.query = query;
         this.contentType = contentType;
+        int port = Utils.getFreePortNumber();
 
         this.server = FusekiServer.create()
+                .port(port)
                 .add("data", RDFDataMgr.loadDataset(pathToFile))
                 .build();
         this.server.start();

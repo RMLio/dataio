@@ -8,6 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,15 +16,21 @@ import java.util.List;
 
 
 public class ExcelSourceIterator extends SourceIterator {
-    private final Iterator<ExcelSource> iterator;
-    private final XSSFWorkbook wb;
+    private final Access access;
+    private transient Iterator<ExcelSource> iterator;
+    private transient XSSFWorkbook wb;
 
     public ExcelSourceIterator(Access access) throws IOException, SQLException {
-        this.wb = new XSSFWorkbook(access.getInputStream());
+        this.access = access;
+        this.boostrap();
+    }
+
+    private void boostrap() throws SQLException, IOException {
+        this.wb = new XSSFWorkbook(this.access.getInputStream());
 
         List<ExcelSource> sources = new ArrayList<>();
-        for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-            XSSFSheet sheet = wb.getSheetAt(i);
+        for (int i = 0; i < this.wb.getNumberOfSheets(); i++) {
+            XSSFSheet sheet = this.wb.getSheetAt(i);
 
             Iterator<Row> iterator = sheet.iterator();
 
@@ -36,6 +43,11 @@ public class ExcelSourceIterator extends SourceIterator {
         }
 
         this.iterator = sources.iterator();
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws SQLException, IOException, ClassNotFoundException {
+        inputStream.defaultReadObject();
+        boostrap();
     }
 
     @Override

@@ -7,17 +7,27 @@ import be.ugent.idlab.knows.dataio.source.Source;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 
 public class ODSSourceIterator extends SourceIterator {
-    private final String[] header;
     private final Access access;
-    private final ODSFileParser parser;
-    private String[] data;
+    private transient String[] header;
+    private transient ODSFileParser parser;
+    private transient String[] data;
 
     public ODSSourceIterator(Access access) throws SQLException, IOException, XMLStreamException {
         this.access = access;
+        bootstrap();
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, XMLStreamException, SQLException {
+        inputStream.defaultReadObject();
+        this.bootstrap();
+    }
+
+    private void bootstrap() throws SQLException, IOException, XMLStreamException {
         this.parser = ODSFileParser.newInstance(access.getInputStream());
         this.header = this.parser.getHeader();
 

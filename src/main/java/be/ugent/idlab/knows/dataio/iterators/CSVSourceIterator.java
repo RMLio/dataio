@@ -10,27 +10,34 @@ import org.apache.commons.io.input.BOMInputStream;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class CSVSourceIterator extends SourceIterator {
     private final Access access;
-    private final CSVReader reader;
-    private final Iterator<String[]> iterator;
-    private final String[] header;
+    private transient CSVReader reader;
+    private transient Iterator<String[]> iterator;
+    private transient String[] header;
 
     public CSVSourceIterator(Access access) throws SQLException, IOException {
         this.access = access;
+        this.bootstrap();
+    }
 
-        try (BOMInputStream in = new BOMInputStream(access.getInputStream())) {
-            this.reader = new CSVReaderBuilder(new InputStreamReader(in))
-                    .withSkipLines(0)
-                    .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                    .build();
-            this.iterator = this.reader.iterator();
-            this.header = iterator.next();
-        }
+    private void bootstrap() throws SQLException, IOException {
+        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream()))
+                .withSkipLines(0)
+                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                .build();
+        this.iterator = this.reader.iterator();
+        this.header = iterator.next();
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+        inputStream.defaultReadObject();
+        this.bootstrap();
     }
 
     public Source next() {

@@ -55,7 +55,7 @@ General:
                 # Flow
                 CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
                 # Serializability
-                IteratorSerializabilityTest, StreamSerializabilityTest
+                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
         ]
   except:
     - master

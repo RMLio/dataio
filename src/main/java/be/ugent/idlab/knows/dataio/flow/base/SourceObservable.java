@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
@@ -17,7 +18,7 @@ import java.util.concurrent.Callable;
  * Implementation of RxJava's Observables for the sources we support. Relies on SourceStream to produce values for the subscribers.
  * @param <T> parameter subclassing Source
  */
-public abstract class SourceObservable<T extends Source> extends Observable<T> implements AutoCloseable {
+public abstract class SourceObservable<T extends Source> extends Observable<T> implements AutoCloseable, Serializable {
     protected Access access;
     protected SourceStream stream;
 

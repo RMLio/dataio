@@ -5,94 +5,72 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
-import net.sf.saxon.s9api.SaxonApiException;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IteratorSerializabilityTest extends TestCore {
+
+    private void runSerializabilityTest(SourceIterator iterator) throws Exception { // exception arises from AutoClosable interface
+        try (SourceIterator i2 = simulateSerialization(iterator)) {
+            assertTrue(evaluate_0001(i2));
+        }
+    }
+
     @Test
-    public void testCSVIterator() throws SQLException, IOException {
+    public void testCSVIterator() throws Exception {
         Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv");
         try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
-            CSVSourceIterator i2 = simulateSerialization(iterator);
-
-            assertTrue(evaluate_0001(i2));
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testCSVWIterator() throws SQLException, IOException {
-        Access access = new LocalFileAccess("csvw/mapper/delimiter.csv", "src/test/resources", "csv");
-        CSVWConfiguration config = CSVWConfiguration.builder().withDelimiter(';').build();
+    public void testCSVWIterator() throws Exception {
+        Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv");
+        CSVWConfiguration config = CSVWConfiguration.DEFAULT;
         try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
-            CSVWSourceIterator i2 = simulateSerialization(iterator);
-
-            CSVSource expected = new CSVSource(new String[]{"ID", "Name"}, new String[]{"10", "Venus"}, access.getDataTypes());
-            assertEquals(expected, i2.next());
-
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testExcelIterator() throws SQLException, IOException {
-        Access access = makeLocalAccess("/excel/0001.xlsx", "", "xlsx", "utf-8");
+    public void testExcelIterator() throws Exception {
+        Access access = new LocalFileAccess("excel/0001.xlsx", "src/test/resources", "xlsx", "utf-8");
         try (ExcelSourceIterator iterator = new ExcelSourceIterator(access)) {
-            ExcelSourceIterator i2 = simulateSerialization(iterator);
-
-            assertTrue(evaluate_0001(i2));
-
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testHTMLIterator() throws SQLException, IOException {
-        Access access = makeLocalAccess("/html/0001.html", "", "html", "utf-8");
+    public void testHTMLIterator() throws Exception {
+        Access access = new LocalFileAccess("html/0001.html", "src/test/resources", "html", "utf-8");
         try (HTMLSourceIterator iterator = new HTMLSourceIterator(access, "table tbody tr")) {
-            HTMLSourceIterator i2 = simulateSerialization(iterator);
-
-            assertTrue(evaluate_0001(i2));
-
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testJSONIterator() throws SQLException, IOException {
-        Access access = makeLocalAccess("/json/0001.json", "", "json", "utf-8");
+    public void testJSONIterator() throws Exception {
+        Access access = new LocalFileAccess("json/0001.json", "src/test/resources", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.pubs[*]")) {
-            JSONSourceIterator i2 = simulateSerialization(iterator);
-            assertTrue(evaluate_0001(i2));
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testODSIterator() throws XMLStreamException, SQLException, IOException {
-        Access access = makeLocalAccess("/ods/0001.ods", "", "ods", "utf-8");
+    public void testODSIterator() throws Exception {
+        Access access = new LocalFileAccess("ods/0001.ods", "src/test/resources", "ods", "utf-8");
         try (ODSSourceIterator iterator = new ODSSourceIterator(access)) {
-            ODSSourceIterator i2 = simulateSerialization(iterator);
-            assertTrue(evaluate_0001(i2));
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 
     @Test
-    public void testXMLIterator() throws SQLException, IOException, SaxonApiException {
-        Access access = makeLocalAccess("/xml/0001.xml", "", "xml", "utf-8");
+    public void testXMLIterator() throws Exception {
+        Access access = new LocalFileAccess("xml/0001.xml", "src/test/resources", "xml", "utf-8");
         try (XMLSourceIterator iterator = new XMLSourceIterator(access, "pubs/pub")) {
-            XMLSourceIterator i2 = simulateSerialization(iterator);
-            assertTrue(evaluate_0001(i2));
-            i2.close();
+            runSerializabilityTest(iterator);
         }
     }
 }

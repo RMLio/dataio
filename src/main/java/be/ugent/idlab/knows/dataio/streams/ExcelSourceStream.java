@@ -12,6 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -21,23 +22,27 @@ import java.util.stream.StreamSupport;
 
 public class ExcelSourceStream implements SourceStream {
 
-    private final Iterator<Sheet> iterator;
-    private final Workbook wb;
+    private transient Iterator<Sheet> iterator;
+    private transient Workbook wb;
+    private transient InputStream in;
+    private final Access access;
     private Row header;
 
     public ExcelSourceStream(Access access) throws IOException, SQLException {
-        InputStream in;
-        if (access instanceof LocalFileAccess) { // local Excel files are not read byte-wise
-            in = new FileInputStream(access.getAccessPath());
-        } else {
-            in = access.getInputStream();
-        }
+        this.access = access;
+        this.bootstrap();
+    }
 
+    private void bootstrap() throws SQLException, IOException {
+        this.in = this.access.getInputStream();
         this.wb = StreamingReader.builder()
-                .rowCacheSize(100)
-                .bufferSize(4096)
                 .open(in);
         this.iterator = this.wb.iterator();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, SQLException {
+        in.defaultReadObject();
+        this.bootstrap();
     }
 
     /**
@@ -61,5 +66,6 @@ public class ExcelSourceStream implements SourceStream {
     @Override
     public void close() throws IOException {
         this.wb.close();
+        this.in.close();
     }
 }

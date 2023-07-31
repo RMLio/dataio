@@ -22,6 +22,7 @@ import java.util.stream.StreamSupport;
 
 public class ExcelSourceStream implements SourceStream {
 
+    private static final long serialVersionUID = -5883688877961394710L;
     private transient Iterator<Sheet> iterator;
     private transient Workbook wb;
     private transient InputStream in;

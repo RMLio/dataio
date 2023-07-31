@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
  * This class is a XMLSourceIterator that allows the iteration of a XML file
  */
 public class XMLSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = 5027462468699419883L;
     private final Access access;
     private final String stringIterator;
 

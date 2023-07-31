@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class CSVWSourceStream implements SourceStream {
+    private static final long serialVersionUID = -9054328656428580251L;
     private final CSVWSourceIterator iterator;
 
     public CSVWSourceStream(Access access, CSVWConfiguration config) throws SQLException, IOException {

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 public class ODSSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = 4036007304900261485L;
     private final Access access;
     private transient String[] header;
     private transient ODSFileParser parser;

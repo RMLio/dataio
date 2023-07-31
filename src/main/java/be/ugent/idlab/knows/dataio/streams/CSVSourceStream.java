@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class CSVSourceStream implements SourceStream {
+    private static final long serialVersionUID = 7550892039319544071L;
     private final CSVSourceIterator iterator;
 
     public CSVSourceStream(Access access) throws SQLException, IOException {

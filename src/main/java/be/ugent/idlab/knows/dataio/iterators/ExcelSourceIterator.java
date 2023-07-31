@@ -16,6 +16,7 @@ import java.util.List;
 
 
 public class ExcelSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = 5223150147849184514L;
     private final Access access;
     private transient Iterator<ExcelSource> iterator;
     private transient XSSFWorkbook wb;

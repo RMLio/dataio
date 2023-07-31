@@ -12,6 +12,7 @@ import java.sql.SQLException;
  * Implementation relies on CSVWSourceIterator, as regular CSV is just a special case of CSVW.
  */
 public class CSVSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = -352163251763906563L;
     private final CSVWSourceIterator iterator;
 
     public CSVSourceIterator(Access access) throws SQLException, IOException {

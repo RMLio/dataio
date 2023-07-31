@@ -19,6 +19,7 @@ import java.util.Map;
  * This class is a JSONSourceIterator that allows the iteration of JSON data.
  */
 public class JSONSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = 5727357114356164542L;
     private final Access access;
     private final String iterationPath;
     private transient ResumableParser parser;

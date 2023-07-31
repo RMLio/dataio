@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  * This class is a HTMLSourceIterator that creates HTML records.
  */
 public class HTMLSourceIterator extends SourceIterator {
+    private static final long serialVersionUID = -79397539726939643L;
     private final Access access;
     private final String stringIterator;
     private transient Iterator<Element> iterator;

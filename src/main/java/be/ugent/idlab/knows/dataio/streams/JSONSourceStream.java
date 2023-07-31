@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JSONSourceStream implements SourceStream {
+    private static final long serialVersionUID = -4481189880575751432L;
     private final JSONSourceIterator iterator;
 
     public JSONSourceStream(Access access, String jsonPath) throws SQLException, IOException {

@@ -8,6 +8,8 @@ import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 
 public class CSVWObservable extends SourceObservable<CSVSource> {
 
+    private static final long serialVersionUID = -612391630872334478L;
+
     public CSVWObservable(Access access, CSVWConfiguration config) {
         super(access, () -> new CSVWSourceStream(access, config));
     }

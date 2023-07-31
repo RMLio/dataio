@@ -7,6 +7,8 @@ import be.ugent.idlab.knows.dataio.streams.XMLSourceStream;
 import io.reactivex.rxjava3.core.Observable;
 
 public class XMLObservable extends SourceObservable<XMLSource> {
+    private static final long serialVersionUID = 6893733526728143212L;
+
     public XMLObservable(Access access, String xpath) {
         super(access, () -> new XMLSourceStream(access, xpath));
     }

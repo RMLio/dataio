@@ -55,10 +55,6 @@ public class CSVWSourceIterator extends SourceIterator {
         }
 
         this.next = readLine();
-
-        if (this.next == null) {
-            throw new IllegalStateException("No further data could be read from the file!");
-        }
     }
 
     private String[] readLine() throws IOException {
@@ -85,7 +81,7 @@ public class CSVWSourceIterator extends SourceIterator {
      * @return true if the line passes all checks
      */
     private boolean invalidLine(String[] line) {
-        return Arrays.stream(line).allMatch(s -> s.length() == 0) || // all of the parts are not empty strings
+        return Arrays.stream(line).allMatch(String::isEmpty) || // all of the parts are not empty strings
                 line[0].startsWith(this.config.getCommentPrefix()); // line does not start with a comment prefix
     }
 

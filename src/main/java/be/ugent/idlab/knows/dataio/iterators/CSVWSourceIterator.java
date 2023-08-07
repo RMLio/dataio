@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
 
+    private static final long serialVersionUID = -5824558388620967495L;
     private final Access access;
     private final CSVWConfiguration config;
     private transient String[] header;

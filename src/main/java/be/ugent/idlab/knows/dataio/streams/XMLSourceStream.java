@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class XMLSourceStream implements SourceStream {
+    private static final long serialVersionUID = -5444782156545294885L;
     private final XMLSourceIterator iterator;
 
     public XMLSourceStream(Access access, String xpath) throws SQLException, IOException, SaxonApiException {

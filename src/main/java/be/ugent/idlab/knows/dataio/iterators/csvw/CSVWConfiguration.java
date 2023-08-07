@@ -20,6 +20,7 @@ import java.util.List;
  * <li> custom header, by default an empty list </li>
  * <li> a list of null fields: by default empty </li>
  * </ul>
+ * As such, the default configuration parses regular CSV files.
  */
 public final class CSVWConfiguration implements Serializable {
     public static CSVWConfiguration DEFAULT = CSVWConfiguration.builder().build();

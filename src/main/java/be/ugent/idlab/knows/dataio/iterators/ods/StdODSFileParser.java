@@ -7,13 +7,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class StdODSFileParser implements ODSFileParser {
+public final class StdODSFileParser implements ODSFileParser, AutoCloseable {
     private final StAXParser parser;
     private String[] header;
 
@@ -166,6 +167,11 @@ public final class StdODSFileParser implements ODSFileParser {
         // advance to </table:table-cell>
         advance();
         return sb.toString();
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.parser.close();
     }
 }
 

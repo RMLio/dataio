@@ -31,26 +31,25 @@ public interface ODSFileParser {
      * @throws XMLStreamException when parser was unable to position itself within the file
      * @throws IOException        when unable to read the filestream
      */
-    static ODSFileParser newInstance(InputStream inputStream) throws XMLStreamException, IOException {
+    static ODSFileParser newInstance(InputStream inputStream) throws IOException, XMLStreamException {
         // ODS file is nothing more than a glorified ZIP file
-        try (ZipInputStream zip = new ZipInputStream(inputStream)) {
-            // linear search for the file within the zip stream with values
-            ZipEntry e = zip.getNextEntry();
+        ZipInputStream zip = new ZipInputStream(inputStream);
+        // linear search for the file within the zip stream with values
+        ZipEntry e = zip.getNextEntry();
 
-            if (e == null) {
-                throw new IllegalArgumentException("The passed file is empty or not a valid ODS file!");
-            }
-
-            while (!(e == null || e.getName().equals("content.xml"))) {
-                e = zip.getNextEntry();
-            }
-
-            if (e == null) {
-                throw new IllegalArgumentException("File is not a valid ODS file: does not contain contents.xml!");
-            }
-
-            return new StdODSFileParser(zip);
+        if (e == null) {
+            throw new IllegalArgumentException("The passed file is empty or not a valid ODS file!");
         }
+
+        while (!(e == null || e.getName().equals("content.xml"))) {
+            e = zip.getNextEntry();
+        }
+
+        if (e == null) {
+            throw new IllegalArgumentException("File is not a valid ODS file: does not contain contents.xml!");
+        }
+
+        return new StdODSFileParser(zip);
     }
 
 

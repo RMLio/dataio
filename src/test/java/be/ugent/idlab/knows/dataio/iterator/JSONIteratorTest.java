@@ -10,8 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class JSONIteratorTest extends TestCore {
     @Test
@@ -31,7 +30,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void testPathMagicProperty() throws SQLException, IOException {
+    public void testMagicPropertyPath() throws SQLException, IOException {
         Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
             assertTrue(iterator.hasNext());
@@ -43,6 +42,7 @@ public class JSONIteratorTest extends TestCore {
             assertEquals("[0,people]", source.get("_PATH").get(0));
             // index the path
             assertEquals("people", source.get("_PATH[1]").get(0));
+            assertFalse(iterator.hasNext());
         }
     }
 }

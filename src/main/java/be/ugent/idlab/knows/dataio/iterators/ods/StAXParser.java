@@ -6,14 +6,17 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.IOException;
 import java.io.InputStream;
 
-public class StAXParser {
+public class StAXParser implements AutoCloseable {
     public XMLEvent cursor;
     XMLInputFactory factory = XMLInputFactory.newInstance();
     XMLEventReader reader;
+    private final InputStream inputStream;
 
     public StAXParser(InputStream inputStream) throws XMLStreamException {
+        this.inputStream = inputStream;
         this.reader = factory.createXMLEventReader(inputStream);
         advance();
     }
@@ -49,5 +52,10 @@ public class StAXParser {
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.inputStream.close();
     }
 }

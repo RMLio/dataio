@@ -3,9 +3,11 @@ package be.ugent.idlab.knows.dataio.cores;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.source.Source;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +191,7 @@ public class TestCore {
     /**
      * Prints out the statistics of memory usage of the code run.
      */
-    protected void printMemoryStatistics() {
+    public static void printMemoryStatistics() {
         Runtime runtime = Runtime.getRuntime();
         int mb = 1024 * 1024;
 
@@ -209,5 +211,18 @@ public class TestCore {
      */
     protected interface Evaluator {
         boolean evaluate(Iterator<Source> iterator);
+    }
+
+    /**
+     * Generic method that simulates serialization of the object.
+     * Returns a new instance of the passed object that should be exactly the same as argument
+     * @param object object to be serialized
+     * @return a new instance of the argument, deserialized
+     * @param <T> Type of object
+     */
+    public <T extends Serializable> T simulateSerialization(T object) {
+        byte[] bytes = SerializationUtils.serialize(object);
+
+        return SerializationUtils.deserialize(bytes);
     }
 }

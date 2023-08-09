@@ -45,7 +45,7 @@ General:
     matrix:
       - TEST: [
                 # utility
-                ODSFileParserTest,
+                ODSFileParserTest$$*,
                 # iterator
                 CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream
@@ -54,6 +54,8 @@ General:
                 DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest,
                 # Flow
                 CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
+                # Serializability
+                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
         ]
   except:
     - master

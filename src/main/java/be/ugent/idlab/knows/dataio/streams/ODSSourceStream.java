@@ -17,6 +17,7 @@ import java.util.stream.StreamSupport;
  * Internally, this implementation relies on the ODSSourceIterator, which already reads the files the streaming way
  */
 public class ODSSourceStream implements SourceStream {
+    private static final long serialVersionUID = -8550401945125763790L;
     private final ODSSourceIterator iterator;
 
     public ODSSourceStream(Access access) throws XMLStreamException, SQLException, IOException {

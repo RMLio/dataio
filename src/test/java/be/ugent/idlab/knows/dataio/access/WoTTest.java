@@ -167,8 +167,7 @@ public class WoTTest {
             Object document = conf.jsonProvider().parse(access.getInputStream(), "utf-8");
             List<String> pathList = JsonPath.using(conf).parse(document).read(iterator);
 
-            // TODO: replace
-            pathList.forEach(path -> sources.add(new JSONSource(document, "", path)));
+            pathList.forEach(path -> sources.add(new JSONSource(document, path)));
 
             return sources;
         } catch (SQLException | IOException e) {

@@ -168,6 +168,7 @@ public class JSONSource extends Source {
      */
     private void compilePath() {
         org.jsfr.json.path.JsonPath jsonPath = JsonPathCompiler.compile(this.path);
+        System.out.println(jsonPath.derivePath(jsonPath.pathDepth()));
 
         this.compiledPath = new ArrayList<>();
 

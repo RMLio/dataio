@@ -1,13 +1,16 @@
 package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
+import be.ugent.idlab.knows.dataio.source.JSONSource;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JSONIteratorTest extends TestCore {
@@ -25,5 +28,21 @@ public class JSONIteratorTest extends TestCore {
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.pubs[*]");
 
         assertTrue(evaluate_0001(jsonSourceIterator));
+    }
+
+    @Test
+    public void testPathMagicProperty() throws SQLException, IOException {
+        Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
+        try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
+            assertTrue(iterator.hasNext());
+            JSONSource source = (JSONSource) iterator.next();
+            // sanity check
+            assertEquals("John", source.get("firstName").get(0));
+
+            // grab the whole path
+            assertEquals("[0,people]", source.get("_PATH").get(0));
+            // index the path
+            assertEquals("people", source.get("_PATH[1]").get(0));
+        }
     }
 }

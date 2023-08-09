@@ -13,10 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -170,7 +167,8 @@ public class WoTTest {
             Object document = conf.jsonProvider().parse(access.getInputStream(), "utf-8");
             List<String> pathList = JsonPath.using(conf).parse(document).read(iterator);
 
-            pathList.forEach(path -> sources.add(new JSONSource(document, path)));
+            // TODO: replace
+            pathList.forEach(path -> sources.add(new JSONSource(document, "", path)));
 
             return sources;
         } catch (SQLException | IOException e) {

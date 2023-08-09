@@ -25,8 +25,10 @@ public class JSONSourceIterator extends SourceIterator {
     private final ResumableParser parser;
     private Object currentObject;
     private String currentPath;
+    private final String iterator;
 
     public JSONSourceIterator(Access access, String string_iterator) throws SQLException, IOException {
+        this.iterator = string_iterator;
         SurfingConfiguration config = JsonSurferJackson.INSTANCE
                 .configBuilder()
                 .bind(string_iterator, (value, context) -> {
@@ -75,7 +77,7 @@ public class JSONSourceIterator extends SourceIterator {
     public Source next() {
         ObjectMapper mapper = new ObjectMapper();
 
-        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.currentPath);
+        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.iterator, this.currentPath);
     }
 
     @Override

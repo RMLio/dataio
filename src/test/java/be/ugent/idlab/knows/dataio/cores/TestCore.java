@@ -171,7 +171,7 @@ public class TestCore {
         for (String key : map.keySet()) {
             List<Object> values = source.get(key);
 
-            if (values.size() == 0) { // empty list returned, value not in source
+            if (values.isEmpty()) { // empty list returned, value not in source
                 if (!map.get(key).equals("")) { // no value expected here
                     return false;
                 }
@@ -192,6 +192,12 @@ public class TestCore {
     protected void printMemoryStatistics() {
         Runtime runtime = Runtime.getRuntime();
         int mb = 1024 * 1024;
+
+        // Suggest garbage collector to clean up
+        for (int i = 0; i < 10; i++) {
+            System.gc();
+        }
+
         System.out.println("Used memory: " + ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " MB");
         System.out.println("Free memory: " + runtime.freeMemory() / mb + " MB");
         System.out.println("Total memory: " + runtime.totalMemory() / mb + " MB");

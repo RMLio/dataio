@@ -33,7 +33,7 @@ public class JSONSourceStream implements SourceStream {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, 0), false)
                 .map(obj -> (ObjectNode) obj)
                 .map(objectNode -> mapper.convertValue(objectNode, Map.class))
-                .map(map -> new JSONSource(map, jsonPath));
+                .map(map -> new JSONSource(map, "", jsonPath));
     }
 
     @Override

@@ -183,6 +183,11 @@ public class JSONSource extends Source {
         }
     }
 
+    /**
+     * Processes _PATH property with a specific index
+     * @param index index in path
+     * @return the element at _PATH[index]
+     */
     private List<Object> processPathIndex(int index) {
         return List.of(this.compiledPath.get(index));
     }

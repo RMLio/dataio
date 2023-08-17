@@ -4,7 +4,7 @@
   <groupId>be.ugent.idlab.knows</groupId>
   <artifactId>dataio</artifactId>
   <packaging>jar</packaging>
-  <version>v0.1.1</version>
+  <version>v0.1.2</version>
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <junit.version>5.9.1</junit.version>

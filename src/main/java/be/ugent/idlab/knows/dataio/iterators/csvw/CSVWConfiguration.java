@@ -2,6 +2,7 @@ package be.ugent.idlab.knows.dataio.iterators.csvw;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
+import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
 import java.io.Serializable;
 import java.util.List;
@@ -94,6 +95,7 @@ public final class CSVWConfiguration implements Serializable {
                 .withSeparator(this.delimiter)
                 .withEscapeChar(this.escapeCharacter)
                 .withQuoteChar(this.quoteCharacter)
+                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                 .build();
     }
 }

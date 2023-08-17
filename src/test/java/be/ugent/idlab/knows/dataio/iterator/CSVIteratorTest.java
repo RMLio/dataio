@@ -1,15 +1,19 @@
 package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
-import org.junit.Test;
+import be.ugent.idlab.knows.dataio.source.CSVSource;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CSVIteratorTest extends TestCore {
     @Test
@@ -58,6 +62,29 @@ public class CSVIteratorTest extends TestCore {
         Access access = makeLocalAccess("/csv/0002_BOM.csv", "", "csv", "utf-8");
         try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
             assertTrue(evaluate_0002_BOM(iterator));
+        }
+    }
+
+    /**
+     * Tests correct reading of empty CSV values into null values.
+     */
+    @Test
+    public void test_missing_values() throws SQLException, IOException {
+        Access access = new LocalFileAccess("csv/null_value.csv", "src/test/resources", "csv");
+
+        String[] header = new String[]{"ID", "Name", "Age"};
+        // must be able to recognise missing value at the beginning
+        List<CSVSource> expectedValues = List.of(
+                new CSVSource(header, new String[]{"1", "Foo", ""}, access.getDataTypes()), // empty string is accepted
+                new CSVSource(header, new String[]{"2", null, "2"}, access.getDataTypes()), // empty value in the middle is recognised as null
+                new CSVSource(header, new String[]{null, "Bar", "3"}, access.getDataTypes()) // empty value in the beginning is also accepted
+        );
+
+        try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
+            for (CSVSource expected : expectedValues) {
+                CSVSource actual = (CSVSource) iterator.next();
+                assertEquals(expected.getData(), actual.getData());
+            }
         }
     }
 }

@@ -5,12 +5,13 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
 import be.ugent.idlab.knows.dataio.source.JSONSource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class JSONIteratorTest extends TestCore {
     @Test
@@ -29,8 +30,11 @@ public class JSONIteratorTest extends TestCore {
         assertTrue(evaluate_0001(jsonSourceIterator));
     }
 
+    /**
+     * Tests the magic property path indexing
+     */
     @Test
-    public void testMagicPropertyPath() throws SQLException, IOException {
+    public void testMagicPropertyPathIndexing() throws SQLException, IOException {
         Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
             assertTrue(iterator.hasNext());
@@ -43,6 +47,23 @@ public class JSONIteratorTest extends TestCore {
             // index the path
             assertEquals("people", source.get("_PATH[1]").get(0));
             assertFalse(iterator.hasNext());
+        }
+    }
+
+    /**
+     * Tests referencing the real _PATH reference.
+     * To obtain the real property, the _ must be escaped
+     */
+    @Test
+    public void testMagicPropertyEscapedPath() throws SQLException, IOException {
+        Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
+        try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
+            assertTrue(iterator.hasNext());
+            JSONSource source = (JSONSource) iterator.next();
+            // real property
+            assertEquals("foo", source.get("\\_PATH").get(0));
+            // magic property
+            assertEquals("[0,people]", source.get("_PATH").get(0));
         }
     }
 }

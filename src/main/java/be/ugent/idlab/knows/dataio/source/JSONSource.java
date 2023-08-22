@@ -47,6 +47,11 @@ public class JSONSource extends Source {
             return processMagicProperty(value);
         }
 
+        // unescape the value, as it's now a real property
+        if (value.startsWith("\\_")) {
+            value = value.replaceFirst("\\\\", "");
+        }
+
         List<Object> results = new ArrayList<>();
 
         if (value.contains(" ")) {
@@ -122,6 +127,7 @@ public class JSONSource extends Source {
      * Processes the magic property _PATH.
      * This property is the reverse path taken to arrive at the Source.
      * Referencing _PATH returns whole path, indexing (e.g. _PATH[0]) will return a specific index.
+     *
      * @param reference reference of form _PATH[{index}]
      * @return the specific path, possibly indexed.
      */
@@ -146,6 +152,7 @@ public class JSONSource extends Source {
 
     /**
      * Constructs the path in the "[{reverse path}] format.
+     *
      * @return magic property _PATH in required format.
      */
     private List<Object> constructPath() {
@@ -168,8 +175,6 @@ public class JSONSource extends Source {
      */
     private void compilePath() {
         org.jsfr.json.path.JsonPath jsonPath = JsonPathCompiler.compile(this.path);
-        System.out.println(jsonPath.derivePath(jsonPath.pathDepth()));
-
         this.compiledPath = new ArrayList<>();
 
         for (int i = jsonPath.pathDepth() - 1; i >= 0; i--) {
@@ -186,6 +191,7 @@ public class JSONSource extends Source {
 
     /**
      * Processes _PATH property with a specific index
+     *
      * @param index index in path
      * @return the element at _PATH[index]
      */

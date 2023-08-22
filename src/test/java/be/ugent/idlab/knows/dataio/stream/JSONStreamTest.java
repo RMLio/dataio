@@ -44,10 +44,10 @@ public class JSONStreamTest extends StreamTestCore {
             JSONSource source = (JSONSource) iterator.next();
 
             // whole path
-            assertEquals("[0,people]", source.get("_PATH").get(0));
+            assertEquals("[0,people]", source.get("\\_PATH").get(0));
 
             // indexed
-            assertEquals("people", source.get("_PATH[1]").get(0));
+            assertEquals("people", source.get("\\_PATH[1]").get(0));
 
             assertFalse(iterator.hasNext());
         }

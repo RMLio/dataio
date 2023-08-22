@@ -43,13 +43,8 @@ public class JSONSource extends Source {
      */
     @Override
     public List<Object> get(String value) {
-        if (value.startsWith("_")) {
-            return processMagicProperty(value);
-        }
-
-        // unescape the value, as it's now a real property
         if (value.startsWith("\\_")) {
-            value = value.replaceFirst("\\\\", "");
+            return processMagicProperty(value);
         }
 
         List<Object> results = new ArrayList<>();
@@ -116,7 +111,7 @@ public class JSONSource extends Source {
     }
 
     private List<Object> processMagicProperty(String reference) {
-        if (reference.startsWith("_PATH")) {
+        if (reference.startsWith("\\_PATH")) {
             return processPath(reference);
         }
 

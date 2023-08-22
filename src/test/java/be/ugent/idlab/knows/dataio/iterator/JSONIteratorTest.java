@@ -43,9 +43,9 @@ public class JSONIteratorTest extends TestCore {
             assertEquals("John", source.get("firstName").get(0));
 
             // grab the whole path
-            assertEquals("[0,people]", source.get("_PATH").get(0));
+            assertEquals("[0,people]", source.get("\\_PATH").get(0));
             // index the path
-            assertEquals("people", source.get("_PATH[1]").get(0));
+            assertEquals("people", source.get("\\_PATH[1]").get(0));
             assertFalse(iterator.hasNext());
         }
     }
@@ -61,9 +61,10 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONSource source = (JSONSource) iterator.next();
             // real property
-            assertEquals("foo", source.get("\\_PATH").get(0));
+            assertEquals("foo", source.get("_PATH").get(0));
             // magic property
-            assertEquals("[0,people]", source.get("_PATH").get(0));
+            assertEquals("[0,people]", source.get("\\_PATH").get(0));
+            assertNull(source.get("\\\\_PATH"));
         }
     }
 }

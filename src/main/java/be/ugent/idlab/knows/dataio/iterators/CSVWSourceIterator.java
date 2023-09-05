@@ -1,19 +1,19 @@
+
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.source.CSVSource;
 import be.ugent.idlab.knows.dataio.source.Source;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
-import com.opencsv.exceptions.CsvValidationException;
+import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.Reader;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -24,7 +24,8 @@ public class CSVWSourceIterator extends SourceIterator {
     private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
-    private transient CSVReader reader;
+    private transient Reader inputReader;
+    private transient Iterator<String[]> iterator;
 
     public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException {
         this.access = access;
@@ -38,62 +39,50 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws SQLException, IOException {
-        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
-                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                .withCSVParser(this.config.getParser())
-                .withSkipLines(this.config.isSkipHeader() ? 1 : 0)
-                .build();
+        this.inputReader = new InputStreamReader(access.getInputStream(), config.getEncoding());
+
+        CsvParser.DSL parser = config.getParser();
+        this.iterator = parser.iterator(this.inputReader);
 
         if (this.config.isSkipHeader()) {
             this.header = config.getHeader().toArray(new String[0]);
         } else {
-            this.header = readLine();
+            this.header = nextLine();
 
             if (header == null) {
                 throw new IllegalStateException("Unable to read the file!");
             }
         }
 
-        this.next = readLine();
+        this.next = nextLine();
 
         if (this.next == null) {
             throw new IllegalStateException("No further data could be read from the file!");
         }
     }
 
-    private String[] readLine() throws IOException {
-        String[] line;
-        do {
-            try {
-                line = this.reader.readNext();
-
-                if (line == null) {
-                    return null;
-                }
-            } catch (CsvValidationException e) {
-                throw new IllegalArgumentException(String.format("File does not conform to configuration! Offending line: %s", Arrays.toString(this.reader.peek())));
+    private String[] nextLine() {
+        if (this.iterator.hasNext()) {
+            String[] r = this.iterator.next();
+            // go over the lines till uncommented line found
+            while (r[0].startsWith(config.getCommentPrefix()) && this.iterator.hasNext()) {
+                r = this.iterator.next();
             }
-        } while (invalidLine(line));
 
-        return line;
-    }
+            if (r[0].startsWith(config.getCommentPrefix())) {
+                return null;
+            }
 
-    /**
-     * Checks if the passed line corresponds to the filters set
-     *
-     * @param line line to be checked
-     * @return true if the line passes all checks
-     */
-    private boolean invalidLine(String[] line) {
-        return Arrays.stream(line).allMatch(s -> s.length() == 0) || // all of the parts are not empty strings
-                line[0].startsWith(this.config.getCommentPrefix()); // line does not start with a comment prefix
+            return r;
+        }
+        return null;
     }
 
     /**
      * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
      *
-     * @param record
-     * @return
+     * @param record record to be checked
+     * @return checked and possibly changed record
      */
     public CSVSource replaceNulls(CSVSource record) {
         Map<String, String> data = record.getData();
@@ -139,13 +128,9 @@ public class CSVWSourceIterator extends SourceIterator {
         if (this.next == null) {
             throw new NoSuchElementException();
         }
-
         String[] line = this.next;
-        try {
-            this.next = readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        this.next = nextLine();
 
         if (!config.getTrim().equals("false")) {
             line = applyTrimArray(line, config.getTrim());
@@ -161,6 +146,6 @@ public class CSVWSourceIterator extends SourceIterator {
 
     @Override
     public void close() throws IOException {
-        this.reader.close();
+        this.inputReader.close();
     }
 }

@@ -1,7 +1,7 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
+
+import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.Serializable;
 import java.util.List;
@@ -89,11 +89,10 @@ public final class CSVWConfiguration implements Serializable {
         return encoding;
     }
 
-    public CSVParser getParser() {
-        return new CSVParserBuilder()
-                .withSeparator(this.delimiter)
-                .withEscapeChar(this.escapeCharacter)
-                .withQuoteChar(this.quoteCharacter)
-                .build();
+    public CsvParser.DSL getParser() {
+        return CsvParser
+                .separator(this.delimiter)
+                .escape(this.escapeCharacter)
+                .quote(this.quoteCharacter);
     }
 }

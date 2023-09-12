@@ -76,26 +76,6 @@ public class ODSSource extends Source {
         return data_types.getOrDefault(value, "");
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this.getClass() != obj.getClass()) return false;
-
-        //TODO other object could have more columns in row then this.row and this would still return true
-        ODSSource odsSource = (ODSSource) obj;
-        for (String value : this.data.keySet()) {
-
-            if (!this.get(value).equals(odsSource.get(value)))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        //TODO
-        return 1;
-    }
-
     /**
      * This method returns the objects for a column in the ODS record (= ODS row).
      *

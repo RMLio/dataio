@@ -3,12 +3,18 @@ package be.ugent.idlab.knows.dataio.iterator;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
+import be.ugent.idlab.knows.dataio.source.CSVSource;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CSVIteratorTest extends TestCore {
@@ -58,6 +64,25 @@ public class CSVIteratorTest extends TestCore {
         Access access = makeLocalAccess("/csv/0002_BOM.csv", "", "csv", "utf-8");
         try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
             assertTrue(evaluate_0002_BOM(iterator));
+        }
+    }
+
+    @Test
+    public void evaluateSparseInput() throws SQLException, IOException {
+        Access access = makeLocalAccess("/csv/sparseInput.csv", "", "csv", "utf-8");
+        try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
+            assertTrue(iterator.hasNext());
+
+            // check first source
+            CSVSource source = (CSVSource) iterator.next();
+            Map<String, String> expected = new HashMap<>(){{
+                put("A", "1");
+                put("B", null);
+                put("C", "3");
+            }};
+            Map<String, String> actual = source.getData();
+
+            assertEquals(expected, actual);
         }
     }
 }

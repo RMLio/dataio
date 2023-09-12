@@ -84,33 +84,11 @@ public class CSVSource extends Source {
         }
         String obj = this.data.get(toDatabaseCase);
 
-        if (obj == null || obj.equals("")) return List.of();
+        if (obj == null) return List.of();
         return List.of(obj);
     }
 
     public Map<String, String> getData() {
         return data;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-
-        if (object == null) return false;
-
-        if (this == object) return true;
-
-        if (getClass() != object.getClass()) return false;
-
-        CSVSource o = (CSVSource) object;
-
-        return this.data.equals(o.data) &&
-                ((this.datatypes != null && this.datatypes.equals(o.datatypes)) || (this.datatypes == null && o.datatypes == null));
-
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 31 * 7 + (data == null ? 0 : data.hashCode());
-        return 31 * hash + (datatypes == null ? 0 : datatypes.hashCode());
     }
 }

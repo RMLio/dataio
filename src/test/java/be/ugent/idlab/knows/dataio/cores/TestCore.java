@@ -173,7 +173,7 @@ public class TestCore {
         for (String key : map.keySet()) {
             List<Object> values = source.get(key);
 
-            if (values.size() == 0) { // empty list returned, value not in source
+            if (values.isEmpty()) { // empty list returned, value not in source
                 if (!map.get(key).equals("")) { // no value expected here
                     return false;
                 }

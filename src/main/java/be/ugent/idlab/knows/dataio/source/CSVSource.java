@@ -91,4 +91,22 @@ public class CSVSource extends Source {
     public Map<String, String> getData() {
         return data;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CSVSource csvSource = (CSVSource) o;
+
+        if (!data.equals(csvSource.data)) return false;
+        return datatypes.equals(csvSource.datatypes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = data.hashCode();
+        result = 31 * result + datatypes.hashCode();
+        return result;
+    }
 }

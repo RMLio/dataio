@@ -96,13 +96,13 @@ public class ODSSource extends Source {
         if (cellType == null) {
             return "";
         }
-        switch (cellType) {
-            case "boolean":
-                return XSDDatatype.XSDboolean.getURI();
-            case "float":
-                return XSDDatatype.XSDdouble.getURI();
-            default: // String URI by default
+//        switch (cellType) {
+//            case "boolean":
+//                return XSDDatatype.XSDboolean.getURI();
+//            case "float":
+//                return XSDDatatype.XSDdouble.getURI();
+//            default: // String URI by default
                 return XSDDatatype.XSDstring.getURI();
-        }
+//        }
     }
 }

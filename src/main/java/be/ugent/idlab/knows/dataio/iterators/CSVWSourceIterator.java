@@ -55,10 +55,6 @@ public class CSVWSourceIterator extends SourceIterator {
         }
 
         this.next = nextLine();
-
-        if (this.next == null) {
-            throw new IllegalStateException("No further data could be read from the file!");
-        }
     }
 
     private String[] nextLine() {

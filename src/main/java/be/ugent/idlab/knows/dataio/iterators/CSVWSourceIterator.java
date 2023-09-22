@@ -48,10 +48,6 @@ public class CSVWSourceIterator extends SourceIterator {
             this.header = config.getHeader().toArray(new String[0]);
         } else {
             this.header = nextLine();
-
-            if (header == null) {
-                throw new IllegalStateException("Unable to read the file!");
-            }
         }
 
         this.next = nextLine();

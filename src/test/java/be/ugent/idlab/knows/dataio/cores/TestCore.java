@@ -110,6 +110,10 @@ public class TestCore {
         return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
 
+    public boolean evaluate_empty(Iterator<Source> iterator) {
+        return !iterator.hasNext();
+    }
+
     public boolean compareIterator(Iterator<Source> iterator, Set<Source> expectedSources) {
         int counter = 0;
         while (iterator.hasNext()) {

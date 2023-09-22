@@ -60,4 +60,12 @@ public class CSVIteratorTest extends TestCore {
             assertTrue(evaluate_0002_BOM(iterator));
         }
     }
+
+    @Test
+    public void evaluate_empty_CSV() throws SQLException, IOException {
+        Access access = makeLocalAccess("/csv/empty.csv", "", "csv", "utf-8");
+        try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
+            assertTrue(evaluate_empty(iterator));
+        }
+    }
 }

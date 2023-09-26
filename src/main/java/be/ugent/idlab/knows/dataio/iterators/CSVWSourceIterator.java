@@ -39,7 +39,6 @@ public class CSVWSourceIterator extends SourceIterator {
 
     private void bootstrap() throws SQLException, IOException {
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
-                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                 .withCSVParser(this.config.getParser())
                 .withSkipLines(this.config.isSkipHeader() ? 1 : 0)
                 .build();
@@ -55,10 +54,6 @@ public class CSVWSourceIterator extends SourceIterator {
         }
 
         this.next = readLine();
-
-        if (this.next == null) {
-            throw new IllegalStateException("No further data could be read from the file!");
-        }
     }
 
     private String[] readLine() throws IOException {
@@ -80,13 +75,14 @@ public class CSVWSourceIterator extends SourceIterator {
 
     /**
      * Checks if the passed line corresponds to the filters set
+     * A line is considered valid if it doesn't start with the comment prefix
+     * If the first value is null, the line is accepted
      *
      * @param line line to be checked
      * @return true if the line passes all checks
      */
     private boolean invalidLine(String[] line) {
-        return Arrays.stream(line).allMatch(s -> s.length() == 0) || // all of the parts are not empty strings
-                line[0].startsWith(this.config.getCommentPrefix()); // line does not start with a comment prefix
+        return line[0] != null && line[0].startsWith(this.config.getCommentPrefix());
     }
 
     /**
@@ -98,7 +94,7 @@ public class CSVWSourceIterator extends SourceIterator {
     public CSVSource replaceNulls(CSVSource record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (this.config.getNulls().contains(value)) {
+            if (value != null && this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });

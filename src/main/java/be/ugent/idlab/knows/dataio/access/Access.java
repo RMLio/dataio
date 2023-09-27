@@ -19,7 +19,7 @@ public interface Access extends Serializable {
 
     InputStream getInputStream() throws IOException, SQLException;
 
-    InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException;
+    InputStreamReader getInputStreamReader() throws IOException, SQLException;
 
     /**
      * This method returns a map of datatypes.

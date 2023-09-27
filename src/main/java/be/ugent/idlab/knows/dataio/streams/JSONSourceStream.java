@@ -32,7 +32,7 @@ public class JSONSourceStream implements SourceStream {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         this.iterator.close();
     }
 }

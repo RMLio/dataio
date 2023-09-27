@@ -90,7 +90,6 @@ public class JSONSource extends Source {
             }
         } catch (JsonPathException e) {
             logger.warn("{} for path {} ", e.getMessage(), this.path + value, e);
-            return null;
         }
 
         return results;

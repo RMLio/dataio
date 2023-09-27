@@ -133,7 +133,7 @@ public class TestCore {
      * @param iterator iterator with actual values
      * @param list     list of expected values
      */
-    private boolean compareIterator(Iterator<Source> iterator, List<Map<String, Object>> list) {
+    public boolean compareIterator(Iterator<Source> iterator, List<Map<String, Object>> list) {
         int counter = 0;
 
         while (iterator.hasNext()) {

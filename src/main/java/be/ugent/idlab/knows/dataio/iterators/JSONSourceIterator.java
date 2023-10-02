@@ -86,7 +86,7 @@ public class JSONSourceIterator extends SourceIterator {
     public Source next() {
         ObjectMapper mapper = new ObjectMapper();
 
-        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.currentPath);
+        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.iterationPath, this.currentPath);
     }
 
     @Override

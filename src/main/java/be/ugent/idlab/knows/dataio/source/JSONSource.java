@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.source;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
@@ -35,6 +36,17 @@ public class JSONSource extends Source {
     public List<Object> get(String value) {
         List<Object> results = new ArrayList<>();
 
+        // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
+        if (this.document instanceof TextNode && value.equals("@")) {
+            String v = ((TextNode) this.document).asText();
+            return List.of(v);
+        }
+
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
+        }
+
+
         if (value.contains(" ")) {
             value = String.format("['%s']", value);
         }
@@ -42,6 +54,11 @@ public class JSONSource extends Source {
         if (!value.contains("$")) {
             value = String.format("$.%s", value);
         }
+
+        if (value.equals("@")) {
+            value = "";
+        }
+
 
 //        // We put simple values between square brackets to make sure no non-escaped shenanigans happen.
 //        if (!value.contains("[") && !value.contains(".") && !value.equals("@")) {
@@ -72,6 +89,7 @@ public class JSONSource extends Source {
             //Object t = JsonPath.read(document, fullValue);
             Object t = JsonPath.read(this.document, value);
 
+
             if (t instanceof JSONArray) {
                 JSONArray array = (JSONArray) t;
                 ArrayList<String> tempList = new ArrayList<>();
@@ -83,7 +101,9 @@ public class JSONSource extends Source {
                 }
 
                 results.add(tempList);
-            } else {
+            } else if (t instanceof ArrayList<?>) {
+                return (ArrayList<Object>) t;
+            }else {
                 if (t != null) {
                     results.add(t.toString());
                 }

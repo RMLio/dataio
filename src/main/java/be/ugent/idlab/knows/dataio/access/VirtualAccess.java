@@ -18,8 +18,11 @@ public class VirtualAccess implements Access {
     private final String contentType;
     private final String accessPath;
 
-    public VirtualAccess(byte[] data, Access other) {
-        this.data = data;
+    public VirtualAccess(Access other) throws IOException, SQLException {
+        try(InputStream is = other.getInputStream()) {
+            this.data = is.readAllBytes();
+        }
+
         this.dataTypes = other.getDataTypes();
         this.contentType = other.getContentType();
         this.accessPath = other.getAccessPath();

@@ -4,10 +4,12 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.source.JSONSource;
 import be.ugent.idlab.knows.dataio.source.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import org.jsfr.json.*;
 import org.jsfr.json.compiler.JsonPathCompiler;
+import org.jsfr.json.path.JsonPath;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -46,7 +48,9 @@ public class JSONSourceIterator extends SourceIterator {
 
     private void bootstrap() throws SQLException, IOException {
         this.inputStream = access.getInputStream();
-        SurfingConfiguration config = JsonSurferJackson.INSTANCE
+        JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+
+        SurfingConfiguration config = surfer
                 .configBuilder()
                 .bind(iterationPath, (value, context) -> {
                     this.match = value;
@@ -55,9 +59,6 @@ public class JSONSourceIterator extends SourceIterator {
                     context.pause();
                 })
                 .build();
-
-        JsonSurfer surfer = JsonSurferJackson.INSTANCE;
-
         this.parser = surfer.createResumableParser(this.inputStream, config);
         this.parser.parse();
     }
@@ -90,14 +91,19 @@ public class JSONSourceIterator extends SourceIterator {
 
     @Override
     public Source next() {
-        if (hasNext()) {
+        if (this.hasNext()) {
             Object match = this.match;
+            String path = this.currentPath;
             this.match = null;
             this.currentPath = null;
             this.hasMatch = false;
 
-            ObjectMapper mapper = new ObjectMapper();
-            return new JSONSource(mapper.convertValue(match, Map.class), this.currentPath);
+            if (! (match instanceof TextNode)) {
+                ObjectMapper mapper = new ObjectMapper();
+                match = mapper.convertValue(match, Map.class);
+            }
+
+            return new JSONSource(match, path);
         }
 
         throw new NoSuchElementException();

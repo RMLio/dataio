@@ -13,19 +13,24 @@ import java.util.Map;
  */
 public class VirtualAccess implements Access {
 
+    private static final long serialVersionUID = 3814081534660206173L;
     private final byte[] data;
-    private final Map<String, String> dataTypes;
-    private final String contentType;
-    private final String accessPath;
+    private Map<String, String> dataTypes;
+    private String contentType;
+    private String accessPath;
 
     public VirtualAccess(Access other) throws IOException, SQLException {
-        try(InputStream is = other.getInputStream()) {
+        try (InputStream is = other.getInputStream()) {
             this.data = is.readAllBytes();
         }
 
         this.dataTypes = other.getDataTypes();
         this.contentType = other.getContentType();
         this.accessPath = other.getAccessPath();
+    }
+
+    public VirtualAccess(byte[] data) {
+        this.data = data;
     }
 
     @Override

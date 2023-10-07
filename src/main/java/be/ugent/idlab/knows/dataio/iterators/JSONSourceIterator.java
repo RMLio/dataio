@@ -5,6 +5,7 @@ import be.ugent.idlab.knows.dataio.source.JSONSource;
 import be.ugent.idlab.knows.dataio.source.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import org.jsfr.json.*;
@@ -32,7 +33,8 @@ public class JSONSourceIterator extends SourceIterator {
 
     public JSONSourceIterator(Access access, String iterationPath) throws SQLException, IOException {
         this.access = access;
-        this.iterationPath = iterationPath;
+        // replace any occurences of .[ (e.g. $.[*]) with [ (such that we get $[*])
+        this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
 
@@ -68,22 +70,6 @@ public class JSONSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
-    Object getDocumentFromStream(InputStream stream, String contentType) throws IOException {
-        if (contentType.equalsIgnoreCase("jsonl")) {
-            JsonProvider provider = Configuration.defaultConfiguration().jsonProvider();
-            BufferedReader lineReader = new BufferedReader(new InputStreamReader(stream));
-            Object items = provider.createArray();
-            int index = 0;
-            while (lineReader.ready()) {
-                provider.setArrayIndex(items, index, provider.parse(lineReader.readLine()));
-                index += 1;
-            }
-            return items;
-        } else {
-            return getDocumentFromStream(stream);
-        }
-    }
-
     @Override
     public boolean hasNext() {
         return hasMatch || this.parser.resume() && hasMatch;
@@ -98,7 +84,7 @@ public class JSONSourceIterator extends SourceIterator {
             this.currentPath = null;
             this.hasMatch = false;
 
-            if (! (match instanceof TextNode)) {
+            if (! (match instanceof ValueNode)) {
                 ObjectMapper mapper = new ObjectMapper();
                 match = mapper.convertValue(match, Map.class);
             }

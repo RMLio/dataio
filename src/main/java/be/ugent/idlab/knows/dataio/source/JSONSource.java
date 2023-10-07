@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.dataio.source;
 
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
@@ -37,8 +38,8 @@ public class JSONSource extends Source {
         List<Object> results = new ArrayList<>();
 
         // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
-        if (this.document instanceof TextNode && value.equals("@")) {
-            String v = ((TextNode) this.document).asText();
+        if (this.document instanceof ValueNode && value.equals("@")) {
+            String v = ((ValueNode) this.document).asText();
             return List.of(v);
         }
 
@@ -59,51 +60,21 @@ public class JSONSource extends Source {
             value = "";
         }
 
-
-//        // We put simple values between square brackets to make sure no non-escaped shenanigans happen.
-//        if (!value.contains("[") && !value.contains(".") && !value.equals("@")) {
-//            value = "['" + value + "']";
-//        } else if (value.equals("@")) {
-//            value = "" ;
-//        } else {
-//            value = "." + value;
-//        }
-
-        // TODO do we need to be smarter that this? Below isn't complete yet, but also doesn't seem necessary
-//        String[] valueParts = value.split("\\.");
-//        StringBuilder escapedValue = new StringBuilder();
-//        for (String valuePart : valueParts) {
-//            // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-//            String escapedValuePart = valuePart.replaceAll(",", "\\\\,");
-//            if (!(escapedValuePart.startsWith("["))) {
-//                escapedValue.append("['").append(escapedValuePart).append("']");
-//            } else {
-//                escapedValue.append(escapedValuePart);
-//            }
-//        }
-
-//        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-//        String fullValue = (this.path + value).replaceAll(",", "\\\\,");
-
         try {
-            //Object t = JsonPath.read(document, fullValue);
             Object t = JsonPath.read(this.document, value);
 
-
-            if (t instanceof JSONArray) {
-                JSONArray array = (JSONArray) t;
+            if (t instanceof ArrayList) {
+                ArrayList<Object> tCast = (ArrayList<Object>) t;
                 ArrayList<String> tempList = new ArrayList<>();
 
-                for (Object o : array) {
+                for (Object o : tCast) {
                     if (o != null) {
                         tempList.add(o.toString());
                     }
                 }
 
                 results.add(tempList);
-            } else if (t instanceof ArrayList<?>) {
-                return (ArrayList<Object>) t;
-            }else {
+            } else {
                 if (t != null) {
                     results.add(t.toString());
                 }

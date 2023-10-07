@@ -28,6 +28,12 @@ getContentType: gives the content type of the access object.
 ### SourceIterator
 Interface which is an implementation of an Iterator<Source>, which overrides the remove and forEachRemaining as these function are trivial for each implementation.
 
+#### Important note on JSONPath
+As JSONPath is not yet standardized, compatibility issues may arise. We follow the implementation of JsonSurfer, with following additions
+
+- A combination of the child operators will be reduced to a single child operator. In practice, this means that `$.['child']` becomes `$['child']`.
+- In test cases, you may find a construction like `$.[*]`. This construction will also be reduced to `$[*]`.
+
 ### SourceStream
 Interface and implementations of the Stream interface.
 

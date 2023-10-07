@@ -2,12 +2,15 @@ package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
+import be.ugent.idlab.knows.dataio.iterators.JSONLinesSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
+import be.ugent.idlab.knows.dataio.source.JSONSource;
 import be.ugent.idlab.knows.dataio.source.Source;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +66,10 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Source s1 = iterator.next();
-            assertEquals(s1.get("ISO 3166").get(0), "BO");
+            assertEquals("BO", s1.get("ISO 3166").get(0));
 
             Source s2 = iterator.next();
-            assertEquals(s2.get("\"ISO 3166\"").get(0), "IE");
+            assertEquals("IE", s2.get("\"ISO 3166\"").get(0));
         }
     }
 
@@ -75,8 +78,39 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*].ingredients[*]")) {
             Source s = iterator.next();
-            System.out.println(s.get("@"));
+            assertEquals("garlic", s.get("@").get(0));
         }
+    }
 
+    /**
+     * Tests the replacement of .[*] construction in the iteratorPath
+     */
+    @Test
+    public void evaluate_path_replacement() throws SQLException, IOException {
+        Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
+        try (
+                JSONSourceIterator it1 = new JSONSourceIterator(access, "$.[*]");
+                JSONSourceIterator it2 = new JSONSourceIterator(access, "$[*]")
+        ) {
+            while (it1.hasNext()) {
+                assertTrue(it2.hasNext());
+                assertEquals(it1.next(), it2.next());
+            }
+        }
+    }
+
+    /**
+     * Tests the JSONLines iterator
+     */
+    @Test
+    public void evaluate_json_lines() throws SQLException, IOException {
+        List<Object> expected = List.of("10", "Venus", "11", "null", "12", "Serena");
+        Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", "utf-8");
+        try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
+            List<Object> actual = new ArrayList<>();
+            iterator.forEachRemaining(s -> actual.add(s.get("@").get(0)));
+
+            assertEquals(expected, actual);
+        }
     }
 }

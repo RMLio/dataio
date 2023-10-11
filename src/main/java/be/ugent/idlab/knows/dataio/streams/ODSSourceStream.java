@@ -2,7 +2,7 @@ package be.ugent.idlab.knows.dataio.streams;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.Record;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -14,13 +14,14 @@ import java.util.stream.StreamSupport;
 
 /**
  * Implementation of the ODS stream. Streams values based on the ODS file provided in Access.
- * Internally, this implementation relies on the ODSSourceIterator, which already reads the files the streaming way
+ * Internally, this implementation relies on the ODSSourceIterator.
+ * Warning: this class consumes the entire source into memory.
  */
 public class ODSSourceStream implements SourceStream {
     private static final long serialVersionUID = -8550401945125763790L;
     private final ODSSourceIterator iterator;
 
-    public ODSSourceStream(Access access) throws XMLStreamException, SQLException, IOException {
+    public ODSSourceStream(Access access) throws SQLException, IOException {
         this.iterator = new ODSSourceIterator(access);
     }
 
@@ -30,7 +31,7 @@ public class ODSSourceStream implements SourceStream {
      * @return a Stream object
      */
     @Override
-    public Stream<Source> getStream() {
+    public Stream<Record> getStream() {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.IMMUTABLE | Spliterator.NONNULL), false);
     }

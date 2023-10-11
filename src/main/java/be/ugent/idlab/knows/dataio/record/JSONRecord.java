@@ -1,10 +1,8 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
-import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +14,13 @@ import java.util.Objects;
  * This class is a specific implementation of a source for JSON.
  * Every source corresponds with a JSON object in a data source.
  */
-public class JSONSource extends Source {
+public class JSONRecord extends Record {
 
     private final String path;
     private final Object document;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public JSONSource(Object document, String path) {
+    public JSONRecord(Object document, String path) {
         this.path = path;
         this.document = document;
     }
@@ -90,7 +88,7 @@ public class JSONSource extends Source {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JSONSource that = (JSONSource) o;
+        JSONRecord that = (JSONRecord) o;
         return path.equals(that.path) && document.equals(that.document);
     }
 

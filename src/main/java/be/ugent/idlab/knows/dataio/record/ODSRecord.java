@@ -1,6 +1,5 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
-import be.ugent.idlab.knows.dataio.exceptions.BadHeaderException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Row;
@@ -14,11 +13,11 @@ import java.util.Map;
  * This class is a specific implementation of a record for ODS.
  * Every record corresponds with a row of the ODS data source.
  */
-public class ODSSource extends Source {
+public class ODSRecord extends Record {
     private Row row;
     private Map<String, Cell> header = new HashMap<>();
 
-    public ODSSource(Row header, Row row) {
+    public ODSRecord(Row header, Row row) {
         // get name from first row and types from second row
         Row nextRow = header.getNextRow();
         for (int i = 0; i < header.getCellCount(); i++) {

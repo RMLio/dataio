@@ -2,8 +2,8 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.exceptions.BadHeaderException;
-import be.ugent.idlab.knows.dataio.source.ODSSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.ODSRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.odftoolkit.simple.Document;
 import org.odftoolkit.simple.SpreadsheetDocument;
 import org.odftoolkit.simple.table.Row;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ODSSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 4036007304900261485L;
     private final Access access;
-    private transient Iterator<ODSSource> sources;
+    private transient Iterator<ODSRecord> sources;
 
     public ODSSourceIterator(Access access) throws SQLException, IOException {
         this.access = access;
@@ -38,7 +38,7 @@ public class ODSSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws SQLException, IOException {
-        List<ODSSource> sources = new ArrayList<>();
+        List<ODSRecord> sources = new ArrayList<>();
         try (InputStream is = this.access.getInputStream()) {
             Document document;
 
@@ -61,7 +61,7 @@ public class ODSSourceIterator extends SourceIterator {
 
                 for (int i = 1; i < t.getRowList().size(); i++) {
                     Row row = t.getRowByIndex(i);
-                    sources.add(new ODSSource(header, row));
+                    sources.add(new ODSRecord(header, row));
                 }
             }
 
@@ -75,7 +75,7 @@ public class ODSSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         return this.sources.next();
     }
 

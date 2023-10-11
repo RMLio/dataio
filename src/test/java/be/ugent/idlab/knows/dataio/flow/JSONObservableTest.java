@@ -6,13 +6,13 @@ import be.ugent.idlab.knows.dataio.cores.ObservableTestCore;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.JSONObservable;
-import be.ugent.idlab.knows.dataio.source.JSONSource;
+import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import org.junit.jupiter.api.Test;
 
 public class JSONObservableTest extends ObservableTestCore {
     private void runJSONTest(String path, TestCore.Evaluator evaluator, String iterator) throws Exception {
         Access access = new LocalFileAccess("", path, "json");
-        try (SourceObservable<JSONSource> o = new JSONObservable(access, iterator)) {
+        try (SourceObservable<JSONRecord> o = new JSONObservable(access, iterator)) {
             runTest(o, evaluator);
         }
 

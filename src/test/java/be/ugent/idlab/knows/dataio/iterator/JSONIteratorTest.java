@@ -4,8 +4,7 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.JSONLinesSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
-import be.ugent.idlab.knows.dataio.source.JSONSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -65,10 +64,10 @@ public class JSONIteratorTest extends TestCore {
     public void evaluate_quoted_multiword_keys() throws SQLException, IOException {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
-            Source s1 = iterator.next();
+            Record s1 = iterator.next();
             assertEquals("BO", s1.get("ISO 3166").get(0));
 
-            Source s2 = iterator.next();
+            Record s2 = iterator.next();
             assertEquals("IE", s2.get("\"ISO 3166\"").get(0));
         }
     }
@@ -77,7 +76,7 @@ public class JSONIteratorTest extends TestCore {
     public void evaluate_path_to_array() throws SQLException, IOException {
         Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*].ingredients[*]")) {
-            Source s = iterator.next();
+            Record s = iterator.next();
             assertEquals("garlic", s.get("@").get(0));
         }
     }

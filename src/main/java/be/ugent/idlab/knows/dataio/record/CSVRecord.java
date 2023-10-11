@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +8,13 @@ import java.util.Map;
  * This class is a specific implementation of a record for CSV.
  * Every record corresponds with a row of the CSV data source.
  */
-public class CSVSource extends Source {
+public class CSVRecord extends Record {
 
     // The CSV record that is provided by the Apache CSVParser.
     private final Map<String, String> data;
     private final Map<String, String> datatypes;
 
-    public CSVSource(String[] header, String[] data, Map<String, String> datatypes) {
+    public CSVRecord(String[] header, String[] data, Map<String, String> datatypes) {
         this.data = new HashMap<>();
         if (header.length > data.length) {
             logger.warn("Header has more columns than this row");
@@ -97,10 +97,10 @@ public class CSVSource extends Source {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CSVSource csvSource = (CSVSource) o;
+        CSVRecord csvRecord = (CSVRecord) o;
 
-        if (!data.equals(csvSource.data)) return false;
-        return datatypes.equals(csvSource.datatypes);
+        if (!data.equals(csvRecord.data)) return false;
+        return datatypes.equals(csvRecord.datatypes);
     }
 
     @Override

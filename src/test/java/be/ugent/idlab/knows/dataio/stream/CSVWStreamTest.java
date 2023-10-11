@@ -4,7 +4,7 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.StreamTestCore;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 import org.junit.Test;
 
@@ -53,12 +53,12 @@ public class CSVWStreamTest extends StreamTestCore {
 
         String[] header = new String[]{"ID", "Name"};
 
-        CSVSource source1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes());
-        CSVSource source2 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes());
-        CSVSource source3 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes());
+        CSVRecord source1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes());
+        CSVRecord source2 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes());
+        CSVRecord source3 = new CSVRecord(header, new String[]{"13", "null"}, access.getDataTypes());
 
         String[] array = new String[]{"11", null};
-        CSVSource source_null = new CSVSource(header, array, access.getDataTypes());
+        CSVRecord source_null = new CSVRecord(header, array, access.getDataTypes());
 
         try (CSVWSourceStream stream = new CSVWSourceStream(access, config)) {
             assertTrue(compareIterator(stream.getStream().iterator(), Set.of(source1, source2, source3, source_null)));

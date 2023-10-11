@@ -18,6 +18,7 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
  */
 public class SPARQLEndpointAccess implements Access {
 
+    private static final long serialVersionUID = 7331603102049875880L;
     private String contentType;
     private String endpoint;
     private String query;

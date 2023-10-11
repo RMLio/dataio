@@ -5,14 +5,14 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.ObservableTestCore;
 import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.ExcelObservable;
-import be.ugent.idlab.knows.dataio.source.ExcelSource;
+import be.ugent.idlab.knows.dataio.record.ExcelRecord;
 import org.junit.jupiter.api.Test;
 
 public class ExcelObservableTest extends ObservableTestCore {
 
     private synchronized void runExcelTest(String path, Evaluator evaluator) throws Exception {
         Access access = new LocalFileAccess("", path, "xlsx");
-        try (SourceObservable<ExcelSource> o = new ExcelObservable(access)) {
+        try (SourceObservable<ExcelRecord> o = new ExcelObservable(access)) {
             runTest(o, evaluator);
         }
     }

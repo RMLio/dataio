@@ -1,8 +1,8 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.HTMLSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.HTMLRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
@@ -49,9 +49,9 @@ public class HTMLSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (hasNext()) {
-            return new HTMLSource(iterator.next(), headers);
+            return new HTMLRecord(iterator.next(), headers);
         } else {
             throw new NoSuchElementException();
         }

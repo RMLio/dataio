@@ -1,15 +1,13 @@
 package be.ugent.idlab.knows.dataio.streams;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
-import be.ugent.idlab.knows.dataio.source.ExcelSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.ExcelRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import com.github.pjfanning.xlsx.StreamingReader;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -20,13 +18,15 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Stream of Excel records.
+ */
 public class ExcelSourceStream implements SourceStream {
-
     private static final long serialVersionUID = -5883688877961394710L;
+    private final Access access;
     private transient Iterator<Sheet> iterator;
     private transient Workbook wb;
     private transient InputStream in;
-    private final Access access;
     private Row header;
 
     public ExcelSourceStream(Access access) throws IOException, SQLException {
@@ -52,12 +52,12 @@ public class ExcelSourceStream implements SourceStream {
      * @return a Stream object
      */
     @Override
-    public Stream<Source> getStream() {
+    public Stream<Record> getStream() {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED), true)
                 .peek(sheet -> this.header = sheet.iterator().next()) // grab the header for current sheet
                 .flatMap(this::getRowStreamFromSheet)
                 .skip(1) // skip the header
-                .map(row -> new ExcelSource(header, row));
+                .map(row -> new ExcelRecord(header, row));
     }
 
     private Stream<Row> getRowStreamFromSheet(Sheet sheet) {

@@ -19,6 +19,7 @@ import java.util.Map;
  * Combines the functionality of LocalFileAccess and SPARQLEndpointAccess.
  */
 public class SPARQLLocalFileAccess implements Access, AutoCloseable {
+    private static final long serialVersionUID = -4392563969906913155L;
     private final String query;
     private final FusekiServer server;
     private final String contentType;

@@ -1,8 +1,8 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.ExcelSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.ExcelRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class ExcelSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 5223150147849184514L;
     private final Access access;
-    private transient Iterator<ExcelSource> iterator;
+    private transient Iterator<ExcelRecord> iterator;
     private transient XSSFWorkbook wb;
 
     public ExcelSourceIterator(Access access) throws IOException, SQLException {
@@ -29,7 +28,7 @@ public class ExcelSourceIterator extends SourceIterator {
     private void boostrap() throws SQLException, IOException {
         this.wb = new XSSFWorkbook(this.access.getInputStream());
 
-        List<ExcelSource> sources = new ArrayList<>();
+        List<ExcelRecord> sources = new ArrayList<>();
         for (int i = 0; i < this.wb.getNumberOfSheets(); i++) {
             XSSFSheet sheet = this.wb.getSheetAt(i);
 
@@ -39,7 +38,7 @@ public class ExcelSourceIterator extends SourceIterator {
             if (iterator.hasNext()) {
                 Row header = iterator.next();
 
-                iterator.forEachRemaining(row -> sources.add(new ExcelSource(header, row)));
+                iterator.forEachRemaining(row -> sources.add(new ExcelRecord(header, row)));
             }
         }
 
@@ -52,7 +51,7 @@ public class ExcelSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         return this.iterator.next();
     }
 

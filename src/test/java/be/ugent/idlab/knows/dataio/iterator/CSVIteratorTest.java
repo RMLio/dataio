@@ -3,15 +3,13 @@ package be.ugent.idlab.knows.dataio.iterator;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -74,7 +72,7 @@ public class CSVIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
 
             // check first source
-            CSVSource source = (CSVSource) iterator.next();
+            CSVRecord source = (CSVRecord) iterator.next();
             Map<String, String> expected = new HashMap<>(){{
                 put("A", "1");
                 put("B", null);

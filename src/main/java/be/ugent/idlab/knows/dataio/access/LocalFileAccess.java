@@ -26,6 +26,7 @@ public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
     private static final int CONFIDENCE_LIMIT = 90;
+    private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
     private final String base;
     private final String type;

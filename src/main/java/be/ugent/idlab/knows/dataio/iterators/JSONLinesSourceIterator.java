@@ -2,7 +2,7 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.VirtualAccess;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.Record;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -40,9 +40,9 @@ public class JSONLinesSourceIterator extends SourceIterator {
             if (this.lineIterator.hasNext()) {
                 String line = this.lineIterator.next();
                 try {
-                    this.iterator = new JSONSourceIterator(new VirtualAccess(line.getBytes()), this.iteratorPath);
+                    // a small hack for using the existing
+                    this.iterator = new JSONSourceIterator(line, this.iteratorPath);
                 } catch (SQLException | IOException e) {
-                    // todo be more nice and gentle
                     throw new RuntimeException(e);
                 }
             } else {
@@ -53,7 +53,7 @@ public class JSONLinesSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (this.hasNext()) {
             return this.iterator.next();
         }
@@ -65,6 +65,10 @@ public class JSONLinesSourceIterator extends SourceIterator {
         this.lineIterator.close();
     }
 
+    /**
+     * Class for iterating over the lines of the input.
+     * Written to hide the specifics of input reading.
+     */
     private static class LineIterator implements Iterator<String>, AutoCloseable {
 
         private final BufferedReader reader;

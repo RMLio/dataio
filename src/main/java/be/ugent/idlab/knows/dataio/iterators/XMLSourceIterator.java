@@ -2,8 +2,8 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.xpath.SaxNamespaceResolver;
-import be.ugent.idlab.knows.dataio.source.Source;
-import be.ugent.idlab.knows.dataio.source.XMLSource;
+import be.ugent.idlab.knows.dataio.record.Record;
+import be.ugent.idlab.knows.dataio.record.XMLRecord;
 import net.sf.saxon.s9api.*;
 
 import javax.xml.transform.stream.StreamSource;
@@ -50,9 +50,9 @@ public class XMLSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (this.iterator.hasNext()) {
-            return new XMLSource(iterator.next(), compiler);
+            return new XMLRecord(iterator.next(), compiler);
         } else {
             throw new NoSuchElementException();
         }

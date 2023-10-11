@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathCompiler;
@@ -12,12 +12,12 @@ import java.util.List;
  * This class is a specific implementation of a record for XML.
  * Every record corresponds with an XML element in a data source.
  */
-public class XMLSource extends Source {
+public class XMLRecord extends Record {
 
     private XdmItem item;
     private XPathCompiler compiler;
 
-    public XMLSource(XdmItem item, XPathCompiler compiler) {
+    public XMLRecord(XdmItem item, XPathCompiler compiler) {
         this.item = item;
         // Keep a reference to the XPath compiler for faster future queries
         this.compiler = compiler;
@@ -54,7 +54,7 @@ public class XMLSource extends Source {
 
         if(getClass() != obj.getClass()) return false;
 
-        XMLSource o = (XMLSource) obj;
+        XMLRecord o = (XMLRecord) obj;
         return ((this.compiler != null && this.compiler.equals(o.compiler)) || (this.compiler == null && o.compiler == null))
                 && ((this.item != null && this.item.equals(o.item)) || (this.item == null && o.item == null));
     }

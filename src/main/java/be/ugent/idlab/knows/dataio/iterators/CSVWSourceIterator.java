@@ -2,11 +2,10 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.IOException;
@@ -86,10 +85,10 @@ public class CSVWSourceIterator extends SourceIterator {
     /**
      * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
      *
-     * @param record
+     * @param record record to be checked
      * @return
      */
-    public CSVSource replaceNulls(CSVSource record) {
+    public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
             if (value != null && this.config.getNulls().contains(value)) {
@@ -129,7 +128,7 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (this.next == null) {
             throw new NoSuchElementException();
         }
@@ -145,7 +144,7 @@ public class CSVWSourceIterator extends SourceIterator {
             line = applyTrimArray(line, config.getTrim());
         }
 
-        return replaceNulls(new CSVSource(header, line, this.access.getDataTypes()));
+        return replaceNulls(new CSVRecord(header, line, this.access.getDataTypes()));
     }
 
     @Override

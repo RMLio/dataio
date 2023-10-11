@@ -1,8 +1,8 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import be.ugent.idlab.knows.dataio.access.utils.WoT_Handlers;
-import be.ugent.idlab.knows.dataio.source.JSONSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.JSONRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import be.ugent.idlab.knows.dataio.utils.Utils;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -37,8 +37,8 @@ public class WoTTest {
             Access wot = new WoTAccess(target, "application/json", headers, auth);
             Access local = new LocalFileAccess("", inputFile, "json", "utf-8");
 
-            List<Source> expected = getJsonSources(local, iterator);
-            List<Source> actual = getJsonSources(wot, iterator);
+            List<Record> expected = getJsonSources(local, iterator);
+            List<Record> actual = getJsonSources(wot, iterator);
 
             assertEquals(expected, actual);
 
@@ -162,17 +162,17 @@ public class WoTTest {
         }
     }
 
-    public List<Source> getJsonSources(Access access, String iterator) {
+    public List<Record> getJsonSources(Access access, String iterator) {
         try {
-            List<Source> sources = new ArrayList<>();
+            List<Record> records = new ArrayList<>();
 
             Configuration conf = Configuration.builder().options(Option.AS_PATH_LIST).build();
             Object document = conf.jsonProvider().parse(access.getInputStream(), "utf-8");
             List<String> pathList = JsonPath.using(conf).parse(document).read(iterator);
 
-            pathList.forEach(path -> sources.add(new JSONSource(document, path)));
+            pathList.forEach(path -> records.add(new JSONRecord(document, path)));
 
-            return sources;
+            return records;
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }

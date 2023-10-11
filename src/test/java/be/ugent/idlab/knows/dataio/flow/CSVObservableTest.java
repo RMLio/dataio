@@ -6,13 +6,13 @@ import be.ugent.idlab.knows.dataio.cores.ObservableTestCore;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.CSVObservable;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import org.junit.jupiter.api.Test;
 
 public class CSVObservableTest extends ObservableTestCore {
     private void runCSVTest(String path, TestCore.Evaluator evaluator) throws Exception {
         Access access = new LocalFileAccess("", path, "csv");
-        try (SourceObservable<CSVSource> o = new CSVObservable(access)) {
+        try (SourceObservable<CSVRecord> o = new CSVObservable(access)) {
             runTest(o, evaluator);
         }
     }

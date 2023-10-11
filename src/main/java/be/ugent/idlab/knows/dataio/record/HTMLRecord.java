@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -9,12 +9,12 @@ import java.util.List;
  * This class is a specific implementation of a record for XML.
  * Every record corresponds with an XML element in a data source.
  */
-public class HTMLSource extends Source {
+public class HTMLRecord extends Record {
 
     private Element element;
     private List<String> headers;
 
-    public HTMLSource(Element element, List<String> headers) {
+    public HTMLRecord(Element element, List<String> headers) {
         this.element = element;
         this.headers = headers;
     }
@@ -50,7 +50,7 @@ public class HTMLSource extends Source {
 
         if(getClass() != obj.getClass()) return false;
 
-        HTMLSource o = (HTMLSource) obj;
+        HTMLRecord o = (HTMLRecord) obj;
 
         return ((this.element != null && this.element.text().equals(o.element.text())) || (this.element == null && o.element == null)) &&
                 ((this.headers != null && this.headers.equals(o.headers)) || (this.headers == null && o.headers == null));

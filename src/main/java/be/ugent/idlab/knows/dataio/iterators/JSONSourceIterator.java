@@ -1,20 +1,16 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.JSONSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.access.VirtualAccess;
+import be.ugent.idlab.knows.dataio.record.JSONRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.spi.json.JsonProvider;
 import org.jsfr.json.*;
-import org.jsfr.json.compiler.JsonPathCompiler;
-import org.jsfr.json.path.JsonPath;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -37,6 +33,12 @@ public class JSONSourceIterator extends SourceIterator {
         this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
+
+    public JSONSourceIterator(String json, String iterationPath) throws SQLException, IOException {
+        // small hack to use the existing constructor
+        this(new VirtualAccess(json.getBytes()), iterationPath);
+    }
+
 
     /**
      * This method returns a JSON document from an InputStream.
@@ -76,7 +78,7 @@ public class JSONSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (this.hasNext()) {
             Object match = this.match;
             String path = this.currentPath;
@@ -89,7 +91,7 @@ public class JSONSourceIterator extends SourceIterator {
                 match = mapper.convertValue(match, Map.class);
             }
 
-            return new JSONSource(match, path);
+            return new JSONRecord(match, path);
         }
 
         throw new NoSuchElementException();

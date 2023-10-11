@@ -16,7 +16,6 @@ public interface Access extends Serializable {
      * @return the InputStream corresponding to the access.
      * @throws IOException
      */
-
     InputStream getInputStream() throws IOException, SQLException;
 
     InputStreamReader getInputStreamReader() throws IOException, SQLException;

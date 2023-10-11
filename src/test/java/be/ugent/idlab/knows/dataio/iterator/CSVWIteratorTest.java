@@ -5,7 +5,7 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -31,12 +31,12 @@ public class CSVWIteratorTest extends TestCore {
         CSVWConfiguration config = CSVWConfiguration.builder().withNulls(List.of("NULL")).build();
         String[] header = new String[]{"ID", "Name"};
 
-        CSVSource source1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes());
-        CSVSource source2 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes());
-        CSVSource source3 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes());
+        CSVRecord source1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes());
+        CSVRecord source2 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes());
+        CSVRecord source3 = new CSVRecord(header, new String[]{"13", "null"}, access.getDataTypes());
 
         String[] array = new String[]{"11", null};
-        CSVSource source_null = new CSVSource(header, array, access.getDataTypes());
+        CSVRecord source_null = new CSVRecord(header, array, access.getDataTypes());
 
         try (CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator(access, config)) {
             assertTrue(compareIterator(csvwSourceIterator, Set.of(source1, source2, source3, source_null)));
@@ -89,7 +89,7 @@ public class CSVWIteratorTest extends TestCore {
     @Nested
     public class MapperTests {
         private void runMapperTest(Access access, CSVWConfiguration config) throws SQLException, IOException {
-            CSVSource expected = new CSVSource(new String[]{"ID", "Name"}, new String[]{"10", "Venus"}, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(new String[]{"ID", "Name"}, new String[]{"10", "Venus"}, access.getDataTypes());
 
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(iterator.hasNext());
@@ -160,10 +160,10 @@ public class CSVWIteratorTest extends TestCore {
 
 
             String[] header = new String[]{"ID", "Name"};
-            CSVSource expected1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes()),
-                    expected2 = new CSVSource(header, new String[]{"11", null}, access.getDataTypes()),
-                    expected3 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes()),
-                    expected4 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes());
+            CSVRecord expected1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes()),
+                    expected2 = new CSVRecord(header, new String[]{"11", null}, access.getDataTypes()),
+                    expected3 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes()),
+                    expected4 = new CSVRecord(header, new String[]{"13", "null"}, access.getDataTypes());
 
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(compareIterator(iterator, Set.of(expected1, expected2, expected3, expected4)));
@@ -179,10 +179,10 @@ public class CSVWIteratorTest extends TestCore {
                     .build();
 
             String[] header = new String[]{"ID", "Name"};
-            CSVSource e1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes()),
-                    e2 = new CSVSource(header, new String[]{null, "Richard"}, access.getDataTypes()),
-                    e3 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes()),
-                    e4 = new CSVSource(header, new String[]{"13", null}, access.getDataTypes());
+            CSVRecord e1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes()),
+                    e2 = new CSVRecord(header, new String[]{null, "Richard"}, access.getDataTypes()),
+                    e3 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes()),
+                    e4 = new CSVRecord(header, new String[]{"13", null}, access.getDataTypes());
 
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(compareIterator(iterator, Set.of(e1, e2, e3, e4)));
@@ -205,7 +205,7 @@ public class CSVWIteratorTest extends TestCore {
         public void evaluate_0000_trim_false() throws SQLException, IOException {
             Access access = new LocalFileAccess("", "src/test/resources/csvw/0000_trim.csv", "csv");
             CSVWConfiguration config = CSVWConfiguration.builder().withTrim(false).build();
-            CSVSource expected = new CSVSource(new String[]{"ID", "Name"}, new String[]{"  10  ", "Venus"}, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(new String[]{"ID", "Name"}, new String[]{"  10  ", "Venus"}, access.getDataTypes());
 
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(iterator.hasNext());
@@ -217,7 +217,7 @@ public class CSVWIteratorTest extends TestCore {
         public void evaluate_0000_trim_start() throws SQLException, IOException {
             Access access = new LocalFileAccess("", "src/test/resources/csvw/0000_trim.csv", "csv");
             CSVWConfiguration config = CSVWConfiguration.builder().withTrim("start").build();
-            CSVSource expected = new CSVSource(new String[]{"ID", "Name"}, new String[]{"10  ", "Venus"}, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(new String[]{"ID", "Name"}, new String[]{"10  ", "Venus"}, access.getDataTypes());
 
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(iterator.hasNext());
@@ -229,7 +229,7 @@ public class CSVWIteratorTest extends TestCore {
         public void evaluate_0000_trim_end() throws SQLException, IOException {
             Access access = new LocalFileAccess("", "src/test/resources/csvw/0000_trim.csv", "csv");
             CSVWConfiguration config = CSVWConfiguration.builder().withTrim("end").build();
-            CSVSource expected = new CSVSource(new String[]{"ID", "Name"}, new String[]{"  10", "Venus"}, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(new String[]{"ID", "Name"}, new String[]{"  10", "Venus"}, access.getDataTypes());
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(iterator.hasNext());
                 assertEquals(expected, iterator.next());

@@ -14,6 +14,7 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getInputStreamFromURL;
  */
 public class RemoteFileAccess implements Access {
 
+    private static final long serialVersionUID = -681410592061545964L;
     private String location;
     private String contentType;
 

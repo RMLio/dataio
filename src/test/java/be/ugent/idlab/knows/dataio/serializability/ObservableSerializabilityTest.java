@@ -7,6 +7,11 @@ import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.*;
+// This class must be imported separately, otherwise the build will fail.
+// Java auto-imports java.lang.Record, which then causes an ambiguous reference.
+// This cannot be avoided, so Record must be imported separately
+// Do not remove this.
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
 public class ObservableSerializabilityTest extends ObservableTestCore {
@@ -21,7 +26,7 @@ public class ObservableSerializabilityTest extends ObservableTestCore {
     public void testCSVObservable() throws Exception {
         Access access = new LocalFileAccess("", "src/test/resources/csv/0001.csv", "csv");
         try (SourceObservable<CSVRecord> o = new CSVObservable(access)) {
-            runSerializabilityTest(o);
+            this.runSerializabilityTest(o);
         }
     }
 

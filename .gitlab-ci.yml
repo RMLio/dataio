@@ -44,8 +44,6 @@ General:
   parallel:
     matrix:
       - TEST: [
-                # utility
-                ODSFileParserTest$$*,
                 # iterator
                 CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream

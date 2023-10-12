@@ -7,11 +7,7 @@ import be.ugent.idlab.knows.dataio.iterators.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IteratorSerializabilityTest extends TestCore {
 

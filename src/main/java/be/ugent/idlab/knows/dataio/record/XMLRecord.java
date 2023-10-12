@@ -7,10 +7,11 @@ import net.sf.saxon.s9api.XdmValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class is a specific implementation of a record for XML.
- * Every record corresponds with an XML element in a data source.
+ * Every record corresponds to an XML element in a data source.
  */
 public class XMLRecord extends Record {
 
@@ -32,14 +33,12 @@ public class XMLRecord extends Record {
     @Override
     public List<Object> get(String value) {
         List<Object> results = new ArrayList<>();
-        
+
         try {
             XdmValue result = compiler.evaluate(value, item);
-            result.forEach((node) -> {
-                results.add(node.getStringValue());  
-            });
+            result.forEach((node) -> results.add(node.getStringValue()));
         } catch (SaxonApiException e1) {
-            e1.printStackTrace();
+            throw new RuntimeException(e1);
         }
 
 
@@ -47,20 +46,28 @@ public class XMLRecord extends Record {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj == null) return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        XMLRecord xmlRecord = (XMLRecord) o;
 
-        if(this == obj) return true;
+        return itemEquals(xmlRecord.item);
+    }
 
-        if(getClass() != obj.getClass()) return false;
-
-        XMLRecord o = (XMLRecord) obj;
-        return ((this.compiler != null && this.compiler.equals(o.compiler)) || (this.compiler == null && o.compiler == null))
-                && ((this.item != null && this.item.equals(o.item)) || (this.item == null && o.item == null));
+    /**
+     * Compares an item to the item of this.
+     * This method is implemented due to the lack of proper equals() method in the XdmItem class we rely on.
+     * Two XdmItems are considered equivalent if their string values are equal
+     *
+     * @param item item to compare
+     * @return true if the items are equivalent, false otherwise
+     */
+    private boolean itemEquals(XdmItem item) {
+        return this.item.getStringValue().matches(item.getStringValue());
     }
 
     @Override
     public int hashCode() {
-        return 1;
+        return Objects.hash(item, compiler);
     }
 }

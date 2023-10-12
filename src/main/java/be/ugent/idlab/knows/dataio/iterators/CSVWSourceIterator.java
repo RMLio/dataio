@@ -15,9 +15,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class CSVWSourceIterator extends SourceIterator {
-
     private static final long serialVersionUID = -5824558388620967495L;
     private final Access access;
     private final CSVWConfiguration config;
@@ -155,5 +155,21 @@ public class CSVWSourceIterator extends SourceIterator {
     @Override
     public void close() throws IOException {
         this.reader.close();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CSVWSourceIterator that = (CSVWSourceIterator) o;
+        return Objects.equals(access, that.access) && Objects.equals(config, that.config) && Arrays.equals(header, that.header) && Arrays.equals(next, that.next);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(access, config);
+        result = 31 * result + Arrays.hashCode(header);
+        result = 31 * result + Arrays.hashCode(next);
+        return result;
     }
 }

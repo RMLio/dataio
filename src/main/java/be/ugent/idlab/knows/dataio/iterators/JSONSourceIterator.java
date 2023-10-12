@@ -7,9 +7,14 @@ import be.ugent.idlab.knows.dataio.record.Record;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.Configuration;
-import org.jsfr.json.*;
+import org.jsfr.json.JsonSurfer;
+import org.jsfr.json.JsonSurferJackson;
+import org.jsfr.json.ResumableParser;
+import org.jsfr.json.SurfingConfiguration;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -86,7 +91,7 @@ public class JSONSourceIterator extends SourceIterator {
             this.currentPath = null;
             this.hasMatch = false;
 
-            if (! (match instanceof ValueNode)) {
+            if (!(match instanceof ValueNode)) {
                 ObjectMapper mapper = new ObjectMapper();
                 match = mapper.convertValue(match, Map.class);
             }

@@ -4,6 +4,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class is a specific implementation of a record for XML.
@@ -11,8 +12,8 @@ import java.util.List;
  */
 public class HTMLRecord extends Record {
 
-    private Element element;
-    private List<String> headers;
+    private final Element element;
+    private final List<String> headers;
 
     public HTMLRecord(Element element, List<String> headers) {
         this.element = element;
@@ -21,22 +22,23 @@ public class HTMLRecord extends Record {
 
     /**
      * This method returns the objects for a reference (XPath) in the record.
+     *
      * @param value the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     @Override
     public List<Object> get(String value) {
         int index = headers.indexOf(value);
-        if(index == -1){
+        if (index == -1) {
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
         }
         Elements tr = element.select("tr");
-        if(tr.size() == 0){
+        if (tr.isEmpty()) {
             // TODO decent exception
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
         }
         Elements td = tr.get(0).select("td");
-        if(td.size() <= index){
+        if (td.size() <= index) {
             return List.of();
         }
         return List.of(td.get(index).text());
@@ -44,11 +46,11 @@ public class HTMLRecord extends Record {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == null) return false;
+        if (obj == null) return false;
 
-        if(this == obj) return true;
+        if (this == obj) return true;
 
-        if(getClass() != obj.getClass()) return false;
+        if (getClass() != obj.getClass()) return false;
 
         HTMLRecord o = (HTMLRecord) obj;
 
@@ -58,7 +60,6 @@ public class HTMLRecord extends Record {
 
     @Override
     public int hashCode() {
-        //TODO
-        return 1;
+        return Objects.hash(element, headers);
     }
 }

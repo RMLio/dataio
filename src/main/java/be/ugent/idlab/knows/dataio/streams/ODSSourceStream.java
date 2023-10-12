@@ -4,7 +4,6 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
 import be.ugent.idlab.knows.dataio.record.Record;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Spliterator;

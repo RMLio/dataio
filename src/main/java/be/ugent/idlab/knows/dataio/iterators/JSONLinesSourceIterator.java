@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.access.VirtualAccess;
 import be.ugent.idlab.knows.dataio.record.Record;
 
 import java.io.*;

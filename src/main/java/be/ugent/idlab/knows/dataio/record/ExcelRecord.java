@@ -41,6 +41,28 @@ public class ExcelRecord extends Record {
     }
 
     /**
+     * Convert a CellType to a XSD datatype URI
+     *
+     * @param cell
+     * @return
+     */
+    public static String getIRI(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+
+        CellType cellType = cell.getCellType();
+        switch (cellType) {
+            case NUMERIC:
+                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
+            case BOOLEAN:
+                return XSDDatatype.XSDboolean.getURI();
+            default:
+                return XSDDatatype.XSDstring.getURI();
+        }
+    }
+
+    /**
      * This method returns the datatype of a reference in the record.
      *
      * @param value the reference for which the datatype needs to be returned.
@@ -114,28 +136,6 @@ public class ExcelRecord extends Record {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    /**
-     * Convert a CellType to a XSD datatype URI
-     *
-     * @param cell
-     * @return
-     */
-    public static String getIRI(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-
-        CellType cellType = cell.getCellType();
-        switch (cellType) {
-            case NUMERIC:
-                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
-            case BOOLEAN:
-                return XSDDatatype.XSDboolean.getURI();
-            default:
-                return XSDDatatype.XSDstring.getURI();
         }
     }
 

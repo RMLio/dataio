@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class JSONLinesSourceIterator extends SourceIterator {
-
     private static final long serialVersionUID = -6863412600310339167L;
     private final Access access;
     private final String iteratorPath;

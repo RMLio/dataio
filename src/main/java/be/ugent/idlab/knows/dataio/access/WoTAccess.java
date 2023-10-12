@@ -21,6 +21,7 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getInputStreamFromURL;
 public class WoTAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(WoTAccess.class);
+    private static final long serialVersionUID = -1098654761923880385L;
     private final Map<String, Map<String, String>> auth;
     private final String location;
     private final String contentType;

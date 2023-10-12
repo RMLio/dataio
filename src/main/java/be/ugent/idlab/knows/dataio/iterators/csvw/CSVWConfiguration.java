@@ -24,6 +24,7 @@ import java.util.List;
  * As such, the default configuration parses regular CSV files.
  */
 public final class CSVWConfiguration implements Serializable {
+    private static final long serialVersionUID = -5750213407136895070L;
     public static CSVWConfiguration DEFAULT = CSVWConfiguration.builder().build();
     private final char delimiter;
     private final char escapeCharacter;

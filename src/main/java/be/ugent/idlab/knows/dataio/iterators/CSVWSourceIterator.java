@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public class CSVWSourceIterator extends SourceIterator {
     private static final long serialVersionUID = -5824558388620967495L;
@@ -36,6 +35,12 @@ public class CSVWSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void bootstrap() throws SQLException, IOException {
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
                 .withCSVParser(this.config.getParser())

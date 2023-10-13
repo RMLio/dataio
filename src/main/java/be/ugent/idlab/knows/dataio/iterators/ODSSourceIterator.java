@@ -1,7 +1,7 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.exceptions.BadHeaderException;
+import be.ugent.idlab.knows.dataio.exceptions.HeaderEmptyValuesException;
 import be.ugent.idlab.knows.dataio.record.ODSRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
 import org.odftoolkit.simple.Document;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ODSSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 4036007304900261485L;
     private final Access access;
-    private transient Iterator<ODSRecord> sources;
+    private transient Iterator<ODSRecord> records;
 
     public ODSSourceIterator(Access access) throws SQLException, IOException {
         this.access = access;
@@ -37,6 +37,12 @@ public class ODSSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void bootstrap() throws SQLException, IOException {
         List<ODSRecord> sources = new ArrayList<>();
         try (InputStream is = this.access.getInputStream()) {
@@ -55,7 +61,7 @@ public class ODSSourceIterator extends SourceIterator {
                 // check the header
                 for (int i = 0; i < header.getCellCount(); i++) {
                     if (header.getCellByIndex(i).getStringValue().isEmpty()) {
-                        throw new BadHeaderException(access.getAccessPath());
+                        throw new HeaderEmptyValuesException(access.getAccessPath());
                     }
                 }
 
@@ -65,18 +71,18 @@ public class ODSSourceIterator extends SourceIterator {
                 }
             }
 
-            this.sources = sources.iterator();
+            this.records = sources.iterator();
         }
     }
 
     @Override
     public boolean hasNext() {
-        return this.sources.hasNext();
+        return this.records.hasNext();
     }
 
     @Override
     public Record next() {
-        return this.sources.next();
+        return this.records.next();
     }
 
     @Override

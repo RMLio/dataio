@@ -1,6 +1,9 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -14,7 +17,8 @@ public interface Access extends Serializable {
      * This method returns an InputStream for the access.
      *
      * @return the InputStream corresponding to the access.
-     * @throws IOException
+     * @throws IOException  thrown when something goes wrong with reading the source
+     * @throws SQLException thrown by RDBAccess when something goes wrong with reading the database
      */
     InputStream getInputStream() throws IOException, SQLException;
 

@@ -25,6 +25,12 @@ public class ExcelSourceIterator extends SourceIterator {
         this.boostrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void boostrap() throws SQLException, IOException {
         this.wb = new XSSFWorkbook(this.access.getInputStream());
 

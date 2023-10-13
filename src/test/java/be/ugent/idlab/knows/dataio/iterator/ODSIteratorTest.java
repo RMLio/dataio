@@ -2,11 +2,10 @@ package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
-import be.ugent.idlab.knows.dataio.exceptions.BadHeaderException;
+import be.ugent.idlab.knows.dataio.exceptions.HeaderEmptyValuesException;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
 import org.junit.Test;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -35,7 +34,7 @@ public class ODSIteratorTest extends TestCore {
     @Test
     public void evaluate_1001_header_col_missing_CSV() {
         Access access = makeLocalAccess("/ods/1001_header_col_missing.ods", "", "ods", "utf-8");
-        assertThrows(BadHeaderException.class, () -> {
+        assertThrows(HeaderEmptyValuesException.class, () -> {
             ODSSourceIterator iterator = new ODSSourceIterator(access);
             iterator.close();
         });
@@ -52,7 +51,7 @@ public class ODSIteratorTest extends TestCore {
     @Test
     public void evaluate_1001_header_short_CSV() {
         Access access = makeLocalAccess("/ods/1001_header_short.ods", "", "ods", "utf-8");
-        assertThrows(BadHeaderException.class, () -> {
+        assertThrows(HeaderEmptyValuesException.class, () -> {
             ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access);
             odsSourceIterator.close();
         });

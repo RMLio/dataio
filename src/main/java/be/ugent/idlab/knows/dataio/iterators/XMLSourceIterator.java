@@ -19,7 +19,6 @@ public class XMLSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 5027462468699419883L;
     private final Access access;
     private final String stringIterator;
-
     private transient XdmSequenceIterator<XdmItem> iterator;
     private transient XPathCompiler compiler;
 
@@ -29,6 +28,12 @@ public class XMLSourceIterator extends SourceIterator {
         bootstrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void bootstrap() throws SQLException, IOException, SaxonApiException {
         // Saxon processor to be reused across XPath query evaluations
         Processor saxProcessor = new Processor(false);

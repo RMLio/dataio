@@ -30,6 +30,12 @@ public class HTMLSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void bootstrap() throws SQLException, IOException {
         this.iterator = Jsoup.parse(this.access.getInputStream(), "UTF-8", "http://example.com/")
                 .select(this.stringIterator)

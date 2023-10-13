@@ -22,6 +22,12 @@ public class JSONLinesSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
     private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
         inputStream.defaultReadObject();
         this.bootstrap();

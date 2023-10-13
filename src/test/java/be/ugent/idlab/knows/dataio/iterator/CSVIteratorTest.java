@@ -1,19 +1,21 @@
 package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
-import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CSVIteratorTest extends TestCore {
     @Test
@@ -73,7 +75,7 @@ public class CSVIteratorTest extends TestCore {
 
             // check first source
             CSVRecord source = (CSVRecord) iterator.next();
-            Map<String, String> expected = new HashMap<>(){{
+            Map<String, String> expected = new HashMap<>() {{
                 put("A", "1");
                 put("B", null);
                 put("C", "3");
@@ -81,6 +83,29 @@ public class CSVIteratorTest extends TestCore {
             Map<String, String> actual = source.getData();
 
             assertEquals(expected, actual);
+        }
+    }
+
+    /**
+     * Tests correct reading of empty CSV values into null values.
+     */
+    @Test
+    public void test_missing_values() throws SQLException, IOException {
+        Access access = new LocalFileAccess("csv/null_value.csv", "src/test/resources", "csv");
+
+        String[] header = new String[]{"ID", "Name", "Age"};
+        // must be able to recognise missing value at the beginning
+        List<CSVRecord> expectedValues = List.of(
+                new CSVRecord(header, new String[]{"1", "Foo", ""}, access.getDataTypes()), // empty string is accepted
+                new CSVRecord(header, new String[]{"2", null, "2"}, access.getDataTypes()), // empty value in the middle is recognised as null
+                new CSVRecord(header, new String[]{null, "Bar", "3"}, access.getDataTypes()) // empty value in the beginning is also accepted
+        );
+
+        try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
+            for (CSVRecord expected : expectedValues) {
+                CSVRecord actual = (CSVRecord) iterator.next();
+                assertEquals(expected.getData(), actual.getData());
+            }
         }
     }
 }

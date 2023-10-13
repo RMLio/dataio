@@ -1,9 +1,11 @@
 package be.ugent.idlab.knows.dataio.iterator;
 
 import be.ugent.idlab.knows.dataio.access.Access;
+import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.JSONLinesSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
+import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +62,26 @@ public class JSONIteratorTest extends TestCore {
         }
     }
 
+    /**
+     * Tests the magic property path indexing
+     */
+    @Test
+    public void testMagicPropertyPathIndexing() throws SQLException, IOException {
+        Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
+        try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
+            assertTrue(iterator.hasNext());
+            JSONRecord record = (JSONRecord) iterator.next();
+            // sanity check
+            assertEquals("John", record.get("firstName").get(0));
+
+            // grab the whole path
+            assertEquals("[0,people]", record.get("\\_PATH").get(0));
+            // index the path
+            assertEquals("people", record.get("\\_PATH[1]").get(0));
+            assertFalse(iterator.hasNext());
+        }
+    }
+
     @Test
     public void evaluate_quoted_multiword_keys() throws SQLException, IOException {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", "utf-8");
@@ -110,6 +132,24 @@ public class JSONIteratorTest extends TestCore {
             iterator.forEachRemaining(s -> actual.add(s.get("@").get(0)));
 
             assertEquals(expected, actual);
+        }
+    }
+
+    /**
+     * Tests referencing the real _PATH reference.
+     * To obtain the real property, the _ must be escaped
+     */
+    @Test
+    public void testMagicPropertyEscapedPath() throws SQLException, IOException {
+        Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
+        try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
+            assertTrue(iterator.hasNext());
+            JSONRecord record = (JSONRecord) iterator.next();
+            // real property
+            assertEquals("foo", record.get("_PATH").get(0));
+            // magic property
+            assertEquals("[0,people]", record.get("\\_PATH").get(0));
+            assertEquals(0, record.get("\\\\_PATH").size());
         }
     }
 }

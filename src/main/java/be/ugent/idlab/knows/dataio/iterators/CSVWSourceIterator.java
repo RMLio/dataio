@@ -74,6 +74,8 @@ public class CSVWSourceIterator extends SourceIterator {
 
     /**
      * Checks if the passed line corresponds to the filters set
+     * A line is considered valid if it doesn't start with the comment prefix
+     * If the first value is null, the line is accepted
      *
      * @param line line to be checked
      * @return true if the line passes all checks

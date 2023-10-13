@@ -52,3 +52,27 @@ Interface which generalizes the access to data
 get(String value); returns a list of objects associated to the given string value.
 
 getDataType(String value) returns the IRI of the datatype of a reference in the record
+
+## Magic properties
+
+### _PATH
+_PATH is a magic property that can be used to obtain a reverse path through the document to reach a specific object. 
+Index notation can be used to grab a specific element.
+
+Suppose a file people.json
+```json
+{
+  "people": [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "phoneNumbers": [
+        "0123-4567-8888",
+        "0123-4567-8910"
+      ]
+    }
+  ]
+}
+```
+And suppose a JSON path ``$.people.[*]``, then a specific path for the first "people" object would be ``$.people.[0]``.
+This object's ``_PATH`` property would resolve to ``[0,people]``, and ``_PATH[1]`` would resolve to ``people``.

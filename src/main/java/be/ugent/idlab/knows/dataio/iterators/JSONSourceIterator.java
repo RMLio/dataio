@@ -96,7 +96,7 @@ public class JSONSourceIterator extends SourceIterator {
                 match = mapper.convertValue(match, Map.class);
             }
 
-            return new JSONRecord(match, path);
+            return new JSONRecord(match, this.iterationPath, path);
         }
 
         throw new NoSuchElementException();

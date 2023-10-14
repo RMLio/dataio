@@ -64,7 +64,7 @@ public class SPARQLEndpointAccess implements Access {
         connection.setRequestProperty("Accept", contentType);
 
         // Set 'query' parameter
-        Map<String, String> urlParams = new HashMap<String, String>() {{
+        Map<String, String> urlParams = new HashMap<>() {{
             put("query", query);
         }};
 

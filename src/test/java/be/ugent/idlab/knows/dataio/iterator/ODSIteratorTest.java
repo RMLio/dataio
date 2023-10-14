@@ -4,14 +4,16 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.exceptions.HeaderEmptyValuesException;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
-import org.junit.Test;
+import be.ugent.idlab.knows.dataio.record.ODSRecord;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ODSIteratorTest extends TestCore {
 
@@ -19,7 +21,7 @@ public class ODSIteratorTest extends TestCore {
     public void evaluate_0000_ods() throws SQLException, IOException {
         Access access = makeLocalAccess("/ods/0000.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
-            assertTrue(evaluate_0000(odsSourceIterator));
+            Assertions.assertTrue(evaluate_0000(odsSourceIterator));
         }
     }
 
@@ -27,7 +29,7 @@ public class ODSIteratorTest extends TestCore {
     public void evaluate_0001_ods() throws SQLException, IOException {
         Access access = makeLocalAccess("/ods/0001.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
-            assertTrue(evaluate_0001(odsSourceIterator));
+            Assertions.assertTrue(evaluate_0001(odsSourceIterator));
         }
     }
 
@@ -44,7 +46,7 @@ public class ODSIteratorTest extends TestCore {
     public void evaluate_1001_header_long_CSV() throws SQLException, IOException {
         Access access = makeLocalAccess("/ods/1001_header_long.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
-            assertTrue(evaluate_1001_header_long(odsSourceIterator));
+            Assertions.assertTrue(evaluate_1001_header_long(odsSourceIterator));
         }
     }
 
@@ -55,5 +57,18 @@ public class ODSIteratorTest extends TestCore {
             ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access);
             odsSourceIterator.close();
         });
+    }
+
+    @Test
+    public void test_value_types() throws SQLException, IOException {
+        Access access = makeLocalAccess("/ods/value_types.ods", "", "ods", "utf-8");
+        try (ODSSourceIterator iterator = new ODSSourceIterator(access)) {
+            ODSRecord record = (ODSRecord) iterator.next();
+
+            assertEquals(record.getDataType("integer"), XSDDatatype.XSDinteger.getURI());
+            assertEquals(record.getDataType("double"), XSDDatatype.XSDdouble.getURI());
+            assertEquals(record.getDataType("string"), XSDDatatype.XSDstring.getURI());
+            assertEquals(record.getDataType("boolean"), XSDDatatype.XSDboolean.getURI());
+        }
     }
 }

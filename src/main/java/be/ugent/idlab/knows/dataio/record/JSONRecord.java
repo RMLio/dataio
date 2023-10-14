@@ -41,42 +41,42 @@ public class JSONRecord extends Record {
     /**
      * This method returns the objects for a reference (JSONPath) in the record.
      *
-     * @param value the reference for which objects need to be returned.
+     * @param reference the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String value) {
-        if (value.startsWith("\\_")) {
-            return processMagicProperty(value);
+    public List<Object> get(String reference) {
+        if (reference.startsWith("\\_")) {
+            return processMagicProperty(reference);
         }
 
         List<Object> results = new ArrayList<>();
 
         // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
-        if (this.document instanceof ValueNode && value.equals("@")) {
+        if (this.document instanceof ValueNode && reference.equals("@")) {
             String v = ((ValueNode) this.document).asText();
             return List.of(v);
         }
 
-        if (value.startsWith("\"") && value.endsWith("\"")) {
-            value = value.substring(1, value.length() - 1);
+        if (reference.startsWith("\"") && reference.endsWith("\"")) {
+            reference = reference.substring(1, reference.length() - 1);
         }
 
 
-        if (value.contains(" ")) {
-            value = String.format("['%s']", value);
+        if (reference.contains(" ")) {
+            reference = String.format("['%s']", reference);
         }
 
-        if (!value.contains("$")) {
-            value = String.format("$.%s", value);
+        if (!reference.contains("$")) {
+            reference = String.format("$.%s", reference);
         }
 
-        if (value.equals("@")) {
-            value = "";
+        if (reference.equals("@")) {
+            reference = "";
         }
 
         try {
-            Object t = JsonPath.read(this.document, value);
+            Object t = JsonPath.read(this.document, reference);
 
             if (t instanceof ArrayList) {
                 ArrayList<Object> tCast = (ArrayList<Object>) t;
@@ -95,7 +95,7 @@ public class JSONRecord extends Record {
                 }
             }
         } catch (JsonPathException e) {
-            logger.warn("{} for path {} ", e.getMessage(), this.path + value, e);
+            logger.warn("{} for path {} ", e.getMessage(), this.path + reference, e);
         }
 
         return results;

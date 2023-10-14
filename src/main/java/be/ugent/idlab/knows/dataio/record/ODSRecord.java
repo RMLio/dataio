@@ -1,182 +1,122 @@
 package be.ugent.idlab.knows.dataio.record;
 
+import be.ugent.idlab.knows.dataio.exceptions.UnequalHeaderLengthException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Row;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/**
- * This class is a specific implementation of a record for ODS.
- * Every record corresponds with a row of the ODS data source.
- */
 public class ODSRecord extends Record {
-    private Row row;
-    private Map<String, Cell> header = new HashMap<>();
+
+    private final Map<String, Cell> values;
 
     public ODSRecord(Row header, Row row) {
-        // get name from first row and types from second row
-        Row nextRow = header.getNextRow();
+        this.values = new HashMap<>();
+
+        if (header.getCellCount() != row.getCellCount()) {
+            throw new UnequalHeaderLengthException(header.toString(), row.toString());
+        }
+
+
         for (int i = 0; i < header.getCellCount(); i++) {
-            Cell cell = header.getCellByIndex(i);
-            this.header.put(cell.getStringValue(), nextRow.getCellByIndex(i));
-        }
+            Cell headerCell = header.getCellByIndex(i);
+            Cell valueCell = row.getCellByIndex(i);
 
-        this.row = row;
+            this.values.put(headerCell.getStringValue(), valueCell);
+        }
     }
 
-    /**
-     * Convert a cell type to a XSD datatype URI
-     *
-     * @param cellType
-     * @return
-     */
-    public static String getIRI(String cellType) {
-//        https://odftoolkit.org/api/simple/org/odftoolkit/simple/table/Cell.html#getValueType--
-        if (cellType == null) {
-            return "";
-        }
-        switch (cellType) {
+    private static Object getValueFromCell(Cell cell) {
+        Object out;
+        switch (cell.getValueType()) {
             case "boolean":
-                return XSDDatatype.XSDboolean.getURI();
+                out = cell.getBooleanValue();
+                break;
             case "float":
-                return XSDDatatype.XSDdouble.getURI();
-            default: // String URI by default
-                return XSDDatatype.XSDstring.getURI();
-//        }
+                Double d = cell.getDoubleValue();
+                if (d % 1.0 == 0.0) {
+                    out = d.intValue();
+                } else {
+                    out = d;
+                }
+                break;
+            default:
+                out = cell.getStringValue();
+                break;
         }
+
+        out = String.valueOf(out);
+        return out;
     }
 
-    /**
-     * This method returns the datatype of a reference in the record.
-     *
-     * @param value the reference for which the datatype needs to be returned.
-     * @return the IRI of the datatype.
-     */
-    public String getDataType(String value) {
-        String cellType = null;
-
-        if (header != null && header.get(value) != null) {
-            cellType = header.get(value).getValueType();
-        }
-        return getIRI(cellType);
-    }
-
-    /**
-     * This method returns the objects for a column in the ODS record (= ODS row).
-     *
-     * @param value the column for which objects need to be returned.
-     * @return a list of objects for the column.
-     */
     @Override
-    public List<Object> get(String value) {
+    public List<Object> get(String reference) {
         List<Object> result = new ArrayList<>();
-        Object obj;
-        try {
-            int index = header.get(value).getColumnIndex();
-            Cell cell = row.getCellByIndex(index);
-            switch (cell.getValueType()) {
-                case "boolean":
-                    obj = cell.getBooleanValue();
-                    break;
-                case "float":
-                    double d = cell.getDoubleValue();
-                    // Cast to int if needed
-                    if (d % 1 == 0) {
-                        obj = (int) d;
-                    } else {
-                        obj = d;
-                    }
-                    break;
-                case "string":
-                default:
-                    obj = cell.getStringValue();
-                    break;
-            }
-            // TODO don't stringify all types, but retain them
-            // needs object comparison in join function
-            // FunctionModel
-            // java.lang.IllegalArgumentException: argument type mismatch
-            obj = String.valueOf(obj);
-            result.add(obj);
-        } catch (Exception e) {
+
+        Cell cell = this.values.get(reference);
+
+        // if the reference is unknown or if the cell is empty, return an empty list
+        // Empty cell can be recognized by Cell::getValueType returning null
+        if (cell == null || cell.getValueType() == null) {
             return result;
         }
 
+        Object out = getValueFromCell(cell);
+        result.add(out);
+
         return result;
+    }
+
+    @Override
+    public String getDataType(String reference) {
+        Cell cell = this.values.get(reference);
+
+        if (cell == null) {
+            return null;
+        }
+
+        switch (cell.getValueType()) {
+            case "boolean":
+                return XSDDatatype.XSDboolean.getURI();
+            case "float":
+                // here, it could be an integer, or it could be a double
+                double d = cell.getDoubleValue();
+                if (d % 1.0 == 0.0) { // no decimal part, therefore an integer
+                    return XSDDatatype.XSDinteger.getURI();
+                }
+                return XSDDatatype.XSDdouble.getURI();
+            case "string":
+            default:
+                return XSDDatatype.XSDstring.getURI();
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ODSRecord odsRecord = (ODSRecord) o;
-        return rowEquals(odsRecord.row) && headerEquals(odsRecord.header);
-    }
 
-    /**
-     * Compares the headers.
-     * This method is implemented because of the lack of proper equals() method in Cell class we depend on.
-     *
-     * @param otherHeader header to compare with the header of this
-     * @return true if the headers are equivalent, false otherwise
-     */
-    private boolean headerEquals(Map<String, Cell> otherHeader) {
-        if (this.header.keySet().equals(otherHeader.keySet())) {
-            for (String header : this.header.keySet()) {
-                Cell thisCell = this.header.get(header);
-                Cell otherCell = otherHeader.get(header);
+        ODSRecord that = (ODSRecord) o;
 
-                if (!cellEquals(thisCell, otherCell)) {
-                    return false;
-                }
+        for (Map.Entry<String, Cell> e : this.values.entrySet()) {
+            Cell thisCell = e.getValue();
+            Cell thatCell = that.values.get(e.getKey());
+
+            if (!cellEquals(thisCell, thatCell)) {
+                return false;
             }
-            return true;
         }
-        return false;
-    }
 
-    /**
-     * Compares the row of this record with another.
-     * This method is implemented because of the lack of proper equals() method in the library we depend on.
-     * The comparison is based on the cell count and cell contents.
-     *
-     * @param row row to compare with the row of this
-     * @return true if the rows are equivalent, false otherwise
-     */
-    private boolean rowEquals(Row row) {
-        if (this.row.getCellCount() == row.getCellCount()) {
-            for (int i = 0; i < this.row.getCellCount(); i++) {
-                if (!cellEquals(i, row)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Compares a cell at cellIndex with another cell in row at the same index.
-     * This method is implemented because of the lack of proper equals() method in the library we depend on.
-     * The comparison is based on the cell type and cell content
-     *
-     * @param cellIndex index of the cell to compare
-     * @param row       row to find the cell in
-     * @return true if the cells are equivalent, false otherwise
-     */
-    private boolean cellEquals(int cellIndex, Row row) {
-        Cell thisCell = this.row.getCellByIndex(cellIndex);
-        Cell otherCell = row.getCellByIndex(cellIndex);
-
-        // check that both cells have the same value type and same string contents
-        return cellEquals(thisCell, otherCell);
+        return true;
     }
 
     /**
      * Compares two cells.
-     * Two cells are equivalent if the type of their values is the same and the string value of their contents is the same
+     * Two cells are equivalent if they have the same value type and the same string values
      *
      * @param cell
      * @param otherCell
@@ -188,6 +128,6 @@ public class ODSRecord extends Record {
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, header);
+        return values.hashCode();
     }
 }

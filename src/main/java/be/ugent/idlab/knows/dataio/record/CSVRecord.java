@@ -66,18 +66,18 @@ public class CSVRecord extends Record {
     /**
      * This method returns the objects for a column in the CSV record (= CSV row).
      *
-     * @param value the column for which objects need to be returned.
+     * @param reference the column for which objects need to be returned.
      * @return a list of objects for the column.
      */
     @Override
-    public List<Object> get(String value) {
+    public List<Object> get(String reference) {
         String toDatabaseCase;
-        if (this.data.containsKey(value.toUpperCase())) {
-            toDatabaseCase = value.toUpperCase();
-        } else if (this.data.containsKey(value.toLowerCase())) {
-            toDatabaseCase = value.toLowerCase();
+        if (this.data.containsKey(reference.toUpperCase())) {
+            toDatabaseCase = reference.toUpperCase();
+        } else if (this.data.containsKey(reference.toLowerCase())) {
+            toDatabaseCase = reference.toLowerCase();
         } else {
-            toDatabaseCase = value;
+            toDatabaseCase = reference;
         }
         if (!this.data.containsKey(toDatabaseCase)) {
             throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));

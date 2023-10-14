@@ -27,15 +27,15 @@ public class XMLRecord extends Record {
     /**
      * This method returns the objects for a reference (XPath) in the record.
      *
-     * @param value the reference for which objects need to be returned.
+     * @param reference the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String value) {
+    public List<Object> get(String reference) {
         List<Object> results = new ArrayList<>();
 
         try {
-            XdmValue result = compiler.evaluate(value, item);
+            XdmValue result = compiler.evaluate(reference, item);
             result.forEach((node) -> results.add(node.getStringValue()));
         } catch (SaxonApiException e1) {
             throw new RuntimeException(e1);

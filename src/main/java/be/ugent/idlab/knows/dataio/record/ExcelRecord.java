@@ -100,12 +100,12 @@ public class ExcelRecord extends Record {
     /**
      * This method returns the objects for a column in the Excel record (= Excel row).
      *
-     * @param value the column for which objects need to be returned.
+     * @param reference the column for which objects need to be returned.
      * @return a list of objects for the column.
      */
     @Override
-    public List<Object> get(String value) {
-        Object obj = data.getOrDefault(value, null);
+    public List<Object> get(String reference) {
+        Object obj = data.getOrDefault(reference, null);
         if (obj == null) return List.of();
         return List.of(obj);
     }

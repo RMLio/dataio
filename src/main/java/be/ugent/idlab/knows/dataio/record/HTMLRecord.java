@@ -23,19 +23,19 @@ public class HTMLRecord extends Record {
     /**
      * This method returns the objects for a reference (XPath) in the record.
      *
-     * @param value the reference for which objects need to be returned.
+     * @param reference the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String value) {
-        int index = headers.indexOf(value);
+    public List<Object> get(String reference) {
+        int index = headers.indexOf(reference);
         if (index == -1) {
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
+            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements tr = element.select("tr");
         if (tr.isEmpty()) {
             // TODO decent exception
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", value, headers));
+            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements td = tr.get(0).select("td");
         if (td.size() <= index) {

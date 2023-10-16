@@ -38,11 +38,6 @@ public class RemoteFileAccess implements Access {
         return getInputStreamFromURL(new URL(location), contentType);
     }
 
-    @Override
-    public InputStreamReader getInputStreamReader() throws MalformedURLException {
-        return new InputStreamReader(this.getInputStream());
-    }
-
     /**
      * This method returns the datatypes of the file.
      * This method always returns null, because the datatypes can't be determined from a remote file for the moment.

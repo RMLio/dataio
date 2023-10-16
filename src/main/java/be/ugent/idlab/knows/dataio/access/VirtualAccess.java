@@ -37,11 +37,6 @@ public class VirtualAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() throws Exception {
-        return new InputStreamReader(this.getInputStream());
-    }
-
-    @Override
     public Map<String, String> getDataTypes() {
         return this.dataTypes;
     }

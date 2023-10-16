@@ -167,11 +167,6 @@ public class RDBAccess implements Access {
         return inputStream;
     }
 
-    @Override
-    public InputStreamReader getInputStreamReader() throws Exception {
-        return new InputStreamReader(this.getInputStream());
-    }
-
     /**
      * This method returns the datatypes used for the columns in the accessed database.
      *

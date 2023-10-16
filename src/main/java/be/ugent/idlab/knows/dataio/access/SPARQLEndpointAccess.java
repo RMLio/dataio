@@ -81,11 +81,6 @@ public class SPARQLEndpointAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() throws IOException {
-        return new InputStreamReader(this.getInputStream());
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o instanceof SPARQLEndpointAccess) {
             SPARQLEndpointAccess access = (SPARQLEndpointAccess) o;

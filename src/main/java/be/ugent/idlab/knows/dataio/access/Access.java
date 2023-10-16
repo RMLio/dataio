@@ -14,11 +14,14 @@ public interface Access extends Serializable {
     /**
      * This method returns an InputStream for the access.
      *
+     * @throws Exception when something goes wrong with reading / construction of the input stream
      * @return the InputStream corresponding to the access.
      */
     InputStream getInputStream() throws Exception;
 
-    InputStreamReader getInputStreamReader() throws Exception;
+    default InputStreamReader getInputStreamReader() throws Exception {
+        return new InputStreamReader(this.getInputStream());
+    }
 
     /**
      * This method returns a map of datatypes.

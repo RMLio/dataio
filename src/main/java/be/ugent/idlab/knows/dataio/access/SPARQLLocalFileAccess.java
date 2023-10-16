@@ -67,11 +67,6 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() throws IOException {
-        return new InputStreamReader(this.getInputStream());
-    }
-
-    @Override
     public Map<String, String> getDataTypes() {
         return null;
     }

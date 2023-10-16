@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -65,11 +64,6 @@ public class WoTAccess implements Access {
             response = getInputStreamFromURL(new URL(location), contentType, headers);
         }
         return response;
-    }
-
-    @Override
-    public InputStreamReader getInputStreamReader() throws MalformedURLException {
-        return new InputStreamReader(this.getInputStream());
     }
 
     /**

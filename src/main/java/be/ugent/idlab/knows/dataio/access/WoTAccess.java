@@ -47,7 +47,7 @@ public class WoTAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws MalformedURLException {
         logger.debug("get inputstream");
         InputStream response;
 
@@ -68,8 +68,8 @@ public class WoTAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
+    public InputStreamReader getInputStreamReader() throws MalformedURLException {
+        return new InputStreamReader(this.getInputStream());
     }
 
     /**

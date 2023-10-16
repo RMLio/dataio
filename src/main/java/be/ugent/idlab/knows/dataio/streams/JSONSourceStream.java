@@ -18,7 +18,7 @@ public class JSONSourceStream implements SourceStream {
     private static final long serialVersionUID = -4481189880575751432L;
     private final JSONSourceIterator iterator;
 
-    public JSONSourceStream(Access access, String jsonPath) throws SQLException, IOException {
+    public JSONSourceStream(Access access, String jsonPath) throws Exception {
         this.iterator = new JSONSourceIterator(access, jsonPath);
     }
 

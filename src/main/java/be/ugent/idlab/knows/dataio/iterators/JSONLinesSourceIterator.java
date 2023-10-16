@@ -15,7 +15,7 @@ public class JSONLinesSourceIterator extends SourceIterator {
     private transient LineIterator lineIterator;
     private transient JSONSourceIterator iterator;
 
-    public JSONLinesSourceIterator(Access access, String iteratorPath) throws SQLException, IOException {
+    public JSONLinesSourceIterator(Access access, String iteratorPath) throws Exception {
         this.access = access;
         this.iteratorPath = iteratorPath;
 
@@ -24,16 +24,13 @@ public class JSONLinesSourceIterator extends SourceIterator {
 
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
-     *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
      */
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         this.lineIterator = new LineIterator(access.getInputStream());
     }
 
@@ -46,7 +43,7 @@ public class JSONLinesSourceIterator extends SourceIterator {
                 try {
                     // a small hack for using the existing
                     this.iterator = new JSONSourceIterator(line, this.iteratorPath);
-                } catch (SQLException | IOException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {

@@ -81,8 +81,8 @@ public class SPARQLEndpointAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
+    public InputStreamReader getInputStreamReader() throws IOException {
+        return new InputStreamReader(this.getInputStream());
     }
 
     @Override

@@ -32,14 +32,14 @@ public class JSONSourceIterator extends SourceIterator {
     private transient Object match = null;
     private boolean hasMatch = false;
 
-    public JSONSourceIterator(Access access, String iterationPath) throws SQLException, IOException {
+    public JSONSourceIterator(Access access, String iterationPath) throws Exception {
         this.access = access;
         // replace any occurences of .[ (e.g. $.[*]) with [ (such that we get $[*])
         this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
 
-    public JSONSourceIterator(String json, String iterationPath) throws SQLException, IOException {
+    public JSONSourceIterator(String json, String iterationPath) throws Exception {
         // small hack to use the existing constructor
         this(new VirtualAccess(json.getBytes()), iterationPath);
     }
@@ -61,8 +61,9 @@ public class JSONSourceIterator extends SourceIterator {
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
      * @throws SQLException
      */
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         this.inputStream = access.getInputStream();
+
         JsonSurfer surfer = JsonSurferJackson.INSTANCE;
 
         SurfingConfiguration config = surfer
@@ -78,7 +79,7 @@ public class JSONSourceIterator extends SourceIterator {
         this.parser.parse();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }

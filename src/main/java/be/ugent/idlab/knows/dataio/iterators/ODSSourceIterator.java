@@ -27,12 +27,12 @@ public class ODSSourceIterator extends SourceIterator {
     private final Access access;
     private transient Iterator<ODSRecord> records;
 
-    public ODSSourceIterator(Access access) throws SQLException, IOException {
+    public ODSSourceIterator(Access access) throws Exception {
         this.access = access;
         bootstrap();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, XMLStreamException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
@@ -43,7 +43,7 @@ public class ODSSourceIterator extends SourceIterator {
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
      * @throws SQLException
      */
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         List<ODSRecord> sources = new ArrayList<>();
         try (InputStream is = this.access.getInputStream()) {
             Document document;

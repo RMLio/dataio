@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ODSIteratorTest extends TestCore {
 
     @Test
-    public void evaluate_0000_ods() throws SQLException, IOException {
+    public void evaluate_0000_ods() throws Exception {
         Access access = makeLocalAccess("/ods/0000.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_0000(odsSourceIterator));
@@ -26,7 +26,7 @@ public class ODSIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_0001_ods() throws SQLException, IOException {
+    public void evaluate_0001_ods() throws Exception {
         Access access = makeLocalAccess("/ods/0001.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_0001(odsSourceIterator));
@@ -43,7 +43,7 @@ public class ODSIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_1001_header_long_CSV() throws SQLException, IOException {
+    public void evaluate_1001_header_long_CSV() throws Exception {
         Access access = makeLocalAccess("/ods/1001_header_long.ods", "", "ods", "utf-8");
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_1001_header_long(odsSourceIterator));
@@ -60,7 +60,7 @@ public class ODSIteratorTest extends TestCore {
     }
 
     @Test
-    public void test_value_types() throws SQLException, IOException {
+    public void test_value_types() throws Exception {
         Access access = makeLocalAccess("/ods/value_types.ods", "", "ods", "utf-8");
         try (ODSSourceIterator iterator = new ODSSourceIterator(access)) {
             ODSRecord record = (ODSRecord) iterator.next();

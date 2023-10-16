@@ -20,18 +20,15 @@ public class ExcelSourceIterator extends SourceIterator {
     private transient Iterator<ExcelRecord> iterator;
     private transient XSSFWorkbook wb;
 
-    public ExcelSourceIterator(Access access) throws IOException, SQLException {
+    public ExcelSourceIterator(Access access) throws Exception {
         this.access = access;
         this.boostrap();
     }
 
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
-     *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
      */
-    private void boostrap() throws SQLException, IOException {
+    private void boostrap() throws Exception {
         this.wb = new XSSFWorkbook(this.access.getInputStream());
 
         List<ExcelRecord> sources = new ArrayList<>();
@@ -51,7 +48,7 @@ public class ExcelSourceIterator extends SourceIterator {
         this.iterator = sources.iterator();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws SQLException, IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         boostrap();
     }

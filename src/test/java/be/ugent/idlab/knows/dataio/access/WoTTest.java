@@ -172,6 +172,8 @@ public class WoTTest {
             return records;
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

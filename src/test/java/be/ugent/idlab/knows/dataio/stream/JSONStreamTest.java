@@ -8,8 +8,6 @@ import be.ugent.idlab.knows.dataio.record.Record;
 import be.ugent.idlab.knows.dataio.streams.JSONSourceStream;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 
 import static org.junit.Assert.*;
@@ -17,7 +15,7 @@ import static org.junit.Assert.*;
 public class JSONStreamTest extends StreamTestCore {
 
     @Test
-    public void eval_0000() throws SQLException, IOException {
+    public void eval_0000() throws Exception {
         Access access = new LocalFileAccess("json/0000.json", "src/test/resources", "json");
         try (JSONSourceStream stream = new JSONSourceStream(access, "$.students[*]")) {
             runTest(stream, this::evaluate_0000);
@@ -25,7 +23,7 @@ public class JSONStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_0001() throws SQLException, IOException {
+    public void eval_0001() throws Exception {
         Access access = new LocalFileAccess("json/0001.json", "src/test/resources", "json");
         try (JSONSourceStream stream = new JSONSourceStream(access, "$.pubs[*]")) {
             runTest(stream, this::evaluate_0001);
@@ -33,7 +31,7 @@ public class JSONStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void testMagicPropertyPath() throws SQLException, IOException {
+    public void testMagicPropertyPath() throws Exception {
         Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
         try (JSONSourceStream stream = new JSONSourceStream(access, "$.people[*]")) {
             // consume stream into iterator

@@ -1,10 +1,8 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -19,7 +17,7 @@ public class VirtualAccess implements Access {
     private String contentType;
     private String accessPath;
 
-    public VirtualAccess(Access other) throws IOException, SQLException {
+    public VirtualAccess(Access other) throws Exception {
         try (InputStream is = other.getInputStream()) {
             this.data = is.readAllBytes();
         }
@@ -34,12 +32,12 @@ public class VirtualAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException, SQLException {
+    public InputStream getInputStream() throws Exception {
         return new ByteArrayInputStream(this.data);
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() throws IOException, SQLException {
+    public InputStreamReader getInputStreamReader() throws Exception {
         return new InputStreamReader(this.getInputStream());
     }
 

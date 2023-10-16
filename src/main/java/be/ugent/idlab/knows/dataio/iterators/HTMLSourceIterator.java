@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -24,7 +25,9 @@ public class HTMLSourceIterator extends SourceIterator {
     private transient Iterator<Element> iterator;
     private transient List<String> headers;
 
-    public HTMLSourceIterator(Access access, String stringIterator) throws SQLException, IOException {
+    private transient InputStream inputStream;
+
+    public HTMLSourceIterator(Access access, String stringIterator) throws Exception {
         this.access = access;
         this.stringIterator = stringIterator;
         this.bootstrap();
@@ -36,8 +39,9 @@ public class HTMLSourceIterator extends SourceIterator {
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
      * @throws SQLException
      */
-    private void bootstrap() throws SQLException, IOException {
-        this.iterator = Jsoup.parse(this.access.getInputStream(), "UTF-8", "http://example.com/")
+    private void bootstrap() throws Exception {
+        this.inputStream = this.access.getInputStream();
+        this.iterator = Jsoup.parse(this.inputStream, "UTF-8", "http://example.com/")
                 .select(this.stringIterator)
                 .iterator();
         if (this.iterator.hasNext()) {
@@ -49,7 +53,7 @@ public class HTMLSourceIterator extends SourceIterator {
         }
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         bootstrap();
     }
@@ -69,7 +73,7 @@ public class HTMLSourceIterator extends SourceIterator {
     }
 
     @Override
-    public void close() {
-        // nothing to close
+    public void close() throws IOException {
+        this.inputStream.close();
     }
 }

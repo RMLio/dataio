@@ -29,19 +29,20 @@ public class ExcelSourceStream implements SourceStream {
     private transient InputStream in;
     private Row header;
 
-    public ExcelSourceStream(Access access) throws IOException, SQLException {
+    public ExcelSourceStream(Access access) throws Exception {
         this.access = access;
         this.bootstrap();
     }
 
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         this.in = this.access.getInputStream();
+
         this.wb = StreamingReader.builder()
                 .open(in);
         this.iterator = this.wb.iterator();
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream in) throws Exception {
         in.defaultReadObject();
         this.bootstrap();
     }

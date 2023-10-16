@@ -46,7 +46,7 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException, SQLException {
+    public InputStream getInputStream() throws IOException {
         URL url = new URL(String.format("%sdata", this.server.serverURL()));
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -67,12 +67,8 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() {
-        try {
-            return new InputStreamReader(this.getInputStream());
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException("Unable to obtain an input stream from passed configuration!", e);
-        }
+    public InputStreamReader getInputStreamReader() throws IOException {
+        return new InputStreamReader(this.getInputStream());
     }
 
     @Override

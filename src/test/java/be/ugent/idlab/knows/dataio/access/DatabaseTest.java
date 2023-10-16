@@ -78,6 +78,8 @@ public class DatabaseTest {
                     .collect(Collectors.toList());
         } catch (CsvException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,6 +1,6 @@
 package be.ugent.idlab.knows.dataio.record;
 
-import be.ugent.idlab.knows.dataio.exceptions.UnequalHeaderLengthException;
+import be.ugent.idlab.knows.dataio.exceptions.UnequalHeaderRowLengthException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Row;
@@ -18,7 +18,7 @@ public class ODSRecord extends Record {
         this.values = new HashMap<>();
 
         if (header.getCellCount() != row.getCellCount()) {
-            throw new UnequalHeaderLengthException(header.toString(), row.toString());
+            throw new UnequalHeaderRowLengthException(header.toString(), row.toString());
         }
 
 

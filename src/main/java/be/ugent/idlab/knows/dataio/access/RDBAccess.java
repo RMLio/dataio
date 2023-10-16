@@ -152,7 +152,7 @@ public class RDBAccess implements Access {
                 if (statement != null) {
                     statement.close();
                 }
-            } catch (SQLException se2) {
+            } catch (SQLException ignored) {
             }// nothing we can do
 
             try {
@@ -168,8 +168,8 @@ public class RDBAccess implements Access {
     }
 
     @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
+    public InputStreamReader getInputStreamReader() throws Exception {
+        return new InputStreamReader(this.getInputStream());
     }
 
     /**

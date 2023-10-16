@@ -22,7 +22,7 @@ public class XMLSourceIterator extends SourceIterator {
     private transient XdmSequenceIterator<XdmItem> iterator;
     private transient XPathCompiler compiler;
 
-    public XMLSourceIterator(Access access, String stringIterator) throws SQLException, IOException, SaxonApiException {
+    public XMLSourceIterator(Access access, String stringIterator) throws Exception {
         this.access = access;
         this.stringIterator = stringIterator;
         bootstrap();
@@ -34,7 +34,7 @@ public class XMLSourceIterator extends SourceIterator {
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
      * @throws SQLException
      */
-    private void bootstrap() throws SQLException, IOException, SaxonApiException {
+    private void bootstrap() throws Exception {
         // Saxon processor to be reused across XPath query evaluations
         Processor saxProcessor = new Processor(false);
         DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
@@ -49,7 +49,7 @@ public class XMLSourceIterator extends SourceIterator {
         this.iterator = result.iterator();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, SaxonApiException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         bootstrap();
     }

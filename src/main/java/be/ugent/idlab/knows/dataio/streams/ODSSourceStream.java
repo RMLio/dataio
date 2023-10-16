@@ -20,7 +20,7 @@ public class ODSSourceStream implements SourceStream {
     private static final long serialVersionUID = -8550401945125763790L;
     private final ODSSourceIterator iterator;
 
-    public ODSSourceStream(Access access) throws SQLException, IOException {
+    public ODSSourceStream(Access access) throws Exception {
         this.iterator = new ODSSourceIterator(access);
     }
 

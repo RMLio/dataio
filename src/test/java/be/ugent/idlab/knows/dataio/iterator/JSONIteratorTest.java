@@ -9,8 +9,6 @@ import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONIteratorTest extends TestCore {
     @Test
-    public void evaluate_0000_JSON() throws SQLException, IOException {
+    public void evaluate_0000_JSON() throws Exception {
         Access access = makeLocalAccess("/json/0000.json", "", "json", "utf-8");
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.students[*]");
 
@@ -28,7 +26,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_0001_JSON() throws SQLException, IOException {
+    public void evaluate_0001_JSON() throws Exception {
         Access access = makeLocalAccess("/json/0001.json", "", "json", "utf-8");
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.pubs[*]");
 
@@ -36,7 +34,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_multiple_sources() throws SQLException, IOException {
+    public void evaluate_multiple_sources() throws Exception {
         Map<String, Object> e1 = new LinkedHashMap<>() {{
             put("ID", "10");
             put("Sport", "100");
@@ -55,7 +53,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_empty_array() throws SQLException, IOException {
+    public void evaluate_empty_array() throws Exception {
         Access access = makeLocalAccess("/json/empty_array.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*]")) {
             assertFalse(iterator.hasNext());
@@ -66,7 +64,7 @@ public class JSONIteratorTest extends TestCore {
      * Tests the magic property path indexing
      */
     @Test
-    public void testMagicPropertyPathIndexing() throws SQLException, IOException {
+    public void testMagicPropertyPathIndexing() throws Exception {
         Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
             assertTrue(iterator.hasNext());
@@ -83,7 +81,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_quoted_multiword_keys() throws SQLException, IOException {
+    public void evaluate_quoted_multiword_keys() throws Exception {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Record s1 = iterator.next();
@@ -95,7 +93,7 @@ public class JSONIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_path_to_array() throws SQLException, IOException {
+    public void evaluate_path_to_array() throws Exception {
         Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*].ingredients[*]")) {
             Record s = iterator.next();
@@ -107,7 +105,7 @@ public class JSONIteratorTest extends TestCore {
      * Tests the replacement of .[*] construction in the iteratorPath
      */
     @Test
-    public void evaluate_path_replacement() throws SQLException, IOException {
+    public void evaluate_path_replacement() throws Exception {
         Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
         try (
                 JSONSourceIterator it1 = new JSONSourceIterator(access, "$.[*]");
@@ -124,7 +122,7 @@ public class JSONIteratorTest extends TestCore {
      * Tests the JSONLines iterator
      */
     @Test
-    public void evaluate_json_lines() throws SQLException, IOException {
+    public void evaluate_json_lines() throws Exception {
         List<Object> expected = List.of("10", "Venus", "11", "null", "12", "Serena");
         Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", "utf-8");
         try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
@@ -140,7 +138,7 @@ public class JSONIteratorTest extends TestCore {
      * To obtain the real property, the _ must be escaped
      */
     @Test
-    public void testMagicPropertyEscapedPath() throws SQLException, IOException {
+    public void testMagicPropertyEscapedPath() throws Exception {
         Access access = new LocalFileAccess("json/people.json", "src/test/resources", "json");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.people[*]")) {
             assertTrue(iterator.hasNext());

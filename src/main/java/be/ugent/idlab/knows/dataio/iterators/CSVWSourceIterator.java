@@ -11,7 +11,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,24 +24,21 @@ public class CSVWSourceIterator extends SourceIterator {
     private transient String[] next;
     private transient CSVReader reader;
 
-    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException {
+    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
         this.access = access;
         this.config = config;
         this.bootstrap();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
-     *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
      */
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
                 .withCSVParser(this.config.getParser())
                 .withSkipLines(this.config.isSkipHeader() ? 1 : 0)

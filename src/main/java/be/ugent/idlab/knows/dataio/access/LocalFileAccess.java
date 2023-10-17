@@ -26,6 +26,7 @@ public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
     private static final int CONFIDENCE_LIMIT = 90;
+    private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
     private final String base;
     private final String type;
@@ -59,10 +60,10 @@ public class LocalFileAccess implements Access {
      * This method returns the InputStream of the local file.
      *
      * @return an InputStream.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException when the file cannot be found.
      */
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws FileNotFoundException {
         File file = new File(this.path);
 
         if (!file.isAbsolute()) {

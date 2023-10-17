@@ -1,4 +1,4 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,12 +14,12 @@ import java.util.Objects;
  * This class is a specific implementation of a Record for Excel.
  * Every record corresponds with a row of the Excel file.
  */
-public class ExcelSource extends Source {
+public class ExcelRecord extends Record {
 
     private final Map<String, Object> data = new HashMap<>();
     private final Map<String, String> data_types = new HashMap<>();
 
-    public ExcelSource(Row header, Row row) {
+    public ExcelRecord(Row header, Row row) {
         if (header.getLastCellNum() > row.getLastCellNum()) {
             logger.warn("Header has more columns than this row, these will be filled with empty strings");
         }
@@ -37,6 +37,28 @@ public class ExcelSource extends Source {
                 data.put(header.getCell(i).getStringCellValue(), null);
                 data_types.put(header.getCell(i).getStringCellValue(), "");
             }
+        }
+    }
+
+    /**
+     * Convert a CellType to a XSD datatype URI
+     *
+     * @param cell
+     * @return
+     */
+    public static String getIRI(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+
+        CellType cellType = cell.getCellType();
+        switch (cellType) {
+            case NUMERIC:
+                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
+            case BOOLEAN:
+                return XSDDatatype.XSDboolean.getURI();
+            default:
+                return XSDDatatype.XSDstring.getURI();
         }
     }
 
@@ -61,7 +83,7 @@ public class ExcelSource extends Source {
         if (this.getClass() != obj.getClass()) return false;
 
         //TODO other object could have more columns in row then this.row and this would still return true
-        ExcelSource excelSource = (ExcelSource) obj;
+        ExcelRecord excelSource = (ExcelRecord) obj;
         for (String value : this.data.keySet()) {
 
             if (!this.get(value).equals(excelSource.get(value)))
@@ -78,12 +100,12 @@ public class ExcelSource extends Source {
     /**
      * This method returns the objects for a column in the Excel record (= Excel row).
      *
-     * @param value the column for which objects need to be returned.
+     * @param reference the column for which objects need to be returned.
      * @return a list of objects for the column.
      */
     @Override
-    public List<Object> get(String value) {
-        Object obj = data.getOrDefault(value, null);
+    public List<Object> get(String reference) {
+        Object obj = data.getOrDefault(reference, null);
         if (obj == null) return List.of();
         return List.of(obj);
     }
@@ -114,28 +136,6 @@ public class ExcelSource extends Source {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    /**
-     * Convert a CellType to a XSD datatype URI
-     *
-     * @param cell
-     * @return
-     */
-    public static String getIRI(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-
-        CellType cellType = cell.getCellType();
-        switch (cellType) {
-            case NUMERIC:
-                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
-            case BOOLEAN:
-                return XSDDatatype.XSDboolean.getURI();
-            default:
-                return XSDDatatype.XSDstring.getURI();
         }
     }
 

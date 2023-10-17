@@ -19,6 +19,7 @@ import java.util.Map;
  * Combines the functionality of LocalFileAccess and SPARQLEndpointAccess.
  */
 public class SPARQLLocalFileAccess implements Access, AutoCloseable {
+    private static final long serialVersionUID = -4392563969906913155L;
     private final String query;
     private final FusekiServer server;
     private final String contentType;
@@ -45,7 +46,7 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException, SQLException {
+    public InputStream getInputStream() throws IOException {
         URL url = new URL(String.format("%sdata", this.server.serverURL()));
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -63,15 +64,6 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
         out.close();
 
         return conn.getInputStream();
-    }
-
-    @Override
-    public InputStreamReader getInputStreamReader() {
-        try {
-            return new InputStreamReader(this.getInputStream());
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException("Unable to obtain an input stream from passed configuration!", e);
-        }
     }
 
     @Override

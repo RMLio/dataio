@@ -65,7 +65,7 @@ public class LocalAccessTest extends LocalAccessTestCore {
     @Test
     public void nonExistentFile() {
         Access access = new LocalFileAccess("", "not_existing_file.csv", "csv", "utf-8");
-        assertThrows(FileNotFoundException.class, access::getInputStream);
+        assertThrows(FileNotFoundException.class, () -> access.getInputStream());
     }
 
     @EnabledOnOs(OS.WINDOWS)

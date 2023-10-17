@@ -1,12 +1,11 @@
 package be.ugent.idlab.knows.dataio.iterators.ods;
 
-import be.ugent.idlab.knows.dataio.exceptions.BadHeaderException;
+import be.ugent.idlab.knows.dataio.exceptions.HeaderEmptyValuesException;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,9 +23,9 @@ public final class StdODSFileParser implements ODSFileParser, AutoCloseable {
 
         // check for header to be correct (no null values)
         if (this.header == null) {
-            throw new BadHeaderException("empty");
+            throw new HeaderEmptyValuesException("empty");
         } else if (Arrays.stream(this.header).anyMatch(Objects::isNull)) {
-            throw new BadHeaderException(Arrays.toString(this.header));
+            throw new HeaderEmptyValuesException(Arrays.toString(this.header));
         }
     }
 

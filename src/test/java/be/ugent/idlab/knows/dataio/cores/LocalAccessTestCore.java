@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 public class LocalAccessTestCore extends TestCore {
 
 
-    public String getResultUTF8(Access access, Charset encoding) throws SQLException, FileNotFoundException, ClassNotFoundException {
+    public String getResultUTF8(Access access, Charset encoding) throws FileNotFoundException {
         InputStream input;
         try {
             input = access.getInputStream();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(input, encoding));
@@ -37,11 +37,11 @@ public class LocalAccessTestCore extends TestCore {
         return string_input.toString();
     }
 
-    public String getInput(Access access) throws SQLException {
+    public String getInput(Access access) {
         byte[] b;
         try {
             b = access.getInputStream().readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 

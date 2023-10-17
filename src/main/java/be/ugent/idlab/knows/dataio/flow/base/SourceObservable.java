@@ -1,24 +1,21 @@
 package be.ugent.idlab.knows.dataio.flow.base;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.Record;
 import be.ugent.idlab.knows.dataio.streams.SourceStream;
 import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.BackpressureStrategy;
-import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
 /**
- * Implementation of RxJava's Observables for the sources we support. Relies on SourceStream to produce values for the subscribers.
- * @param <T> parameter subclassing Source
+ * Implementation of RxJava's Observables for the sources we support. Relies on RecordStream to produce values for the subscribers.
+ * @param <T> parameter subclassing Record
  */
-public abstract class SourceObservable<T extends Source> extends Observable<T> implements AutoCloseable, Serializable {
+public abstract class SourceObservable<T extends Record> extends Observable<T> implements AutoCloseable, Serializable {
+    private static final long serialVersionUID = 2571726576202799037L;
     protected Access access;
     protected SourceStream stream;
 

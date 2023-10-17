@@ -32,6 +32,7 @@ public class RDBAccess implements Access {
     private final static String DATE = "http://www.w3.org/2001/XMLSchema#date";
     private final static String TIME = "http://www.w3.org/2001/XMLSchema#time";
     private final static String DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    private static final long serialVersionUID = 786349656223609949L;
     private String dsn;
     private DatabaseType databaseType;
     private String username;
@@ -151,7 +152,7 @@ public class RDBAccess implements Access {
                 if (statement != null) {
                     statement.close();
                 }
-            } catch (SQLException se2) {
+            } catch (SQLException ignored) {
             }// nothing we can do
 
             try {
@@ -164,11 +165,6 @@ public class RDBAccess implements Access {
         }
 
         return inputStream;
-    }
-
-    @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
     }
 
     /**

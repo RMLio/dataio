@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,6 +20,7 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getInputStreamFromURL;
 public class WoTAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(WoTAccess.class);
+    private static final long serialVersionUID = -1098654761923880385L;
     private final Map<String, Map<String, String>> auth;
     private final String location;
     private final String contentType;
@@ -46,7 +46,7 @@ public class WoTAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws MalformedURLException {
         logger.debug("get inputstream");
         InputStream response;
 
@@ -64,11 +64,6 @@ public class WoTAccess implements Access {
             response = getInputStreamFromURL(new URL(location), contentType, headers);
         }
         return response;
-    }
-
-    @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
     }
 
     /**

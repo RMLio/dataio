@@ -2,7 +2,7 @@ package be.ugent.idlab.knows.dataio.cores;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class TestCore {
 
     protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
-    public boolean evaluate_0000(Iterator<Source> iterator) {
+    public boolean evaluate_0000(Iterator<Record> iterator) {
         Map<String, Object> expected = Map.of(
                 "ID", "10",
                 "Name", "Venus"
@@ -26,7 +26,7 @@ public class TestCore {
         return compareIterator(iterator, List.of(expected));
     }
 
-    public boolean evaluate_0001(Iterator<Source> iterator) {
+    public boolean evaluate_0001(Iterator<Record> iterator) {
         Map<String, Object> expectedRecord1 = Map.of(
                 "name", "Trollekelder",
                 "description", "Beer café in the shadows of the St James' church",
@@ -47,7 +47,7 @@ public class TestCore {
         return compareIterator(iterator, List.of(expectedRecord1, expectedRecord2, expectedRecord3));
     }
 
-    public boolean evaluate_0002_BOM(Iterator<Source> iterator) {
+    public boolean evaluate_0002_BOM(Iterator<Record> iterator) {
         Map<String, Object> r1 = Map.of(
                 "Id", "1",
                 "Name", "Sasha",
@@ -69,7 +69,7 @@ public class TestCore {
         return compareIterator(iterator, List.of(r1, r2, r3));
     }
 
-    public boolean evaluate_1001_header_long(Iterator<Source> iterator) {
+    public boolean evaluate_1001_header_long(Iterator<Record> iterator) {
         Map<String, Object> expected1 = Map.of(
                 "name", "Trollekelder",
                 "description", "Beer café in the shadows of the St James' church",
@@ -93,7 +93,7 @@ public class TestCore {
         return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
 
-    public boolean evaluate_1001_header_short(Iterator<Source> iterator) {
+    public boolean evaluate_1001_header_short(Iterator<Record> iterator) {
         Map<String, Object> expected1 = Map.of(
                 "name", "Trollekelder",
                 "description", "Beer café in the shadows of the St James' church"
@@ -110,17 +110,17 @@ public class TestCore {
         return compareIterator(iterator, List.of(expected1, expected2, expected3));
     }
 
-    public boolean compareIterator(Iterator<Source> iterator, Set<Source> expectedSources) {
+    public boolean compareIterator(Iterator<Record> iterator, Set<Record> expectedRecords) {
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
-            Source source = iterator.next();
-            if (!expectedSources.contains(source)) {
+            Record record = iterator.next();
+            if (!expectedRecords.contains(record)) {
                 return false;
             }
 
         }
-        return expectedSources.size() == counter;
+        return expectedRecords.size() == counter;
     }
 
     public Access makeLocalAccess(String inputFile, String base, String type, String encoding) {
@@ -133,12 +133,12 @@ public class TestCore {
      * @param iterator iterator with actual values
      * @param list     list of expected values
      */
-    private boolean compareIterator(Iterator<Source> iterator, List<Map<String, Object>> list) {
+    public boolean compareIterator(Iterator<Record> iterator, List<Map<String, Object>> list) {
         int counter = 0;
 
         while (iterator.hasNext()) {
-            Source source = iterator.next();
-            if (!compareMap(source, list)) {
+            Record record = iterator.next();
+            if (!compareMap(record, list)) {
                 return false; // source doesn't line up with expected values
             }
             counter++;
@@ -149,13 +149,13 @@ public class TestCore {
     /**
      * Asserts if the source conforms to a particular map
      *
-     * @param source    source to be checked
+     * @param record    source to be checked
      * @param checkMaps list of maps to check against
      * @return true if the source conforms to a map in checkMaps
      */
-    private boolean compareMap(Source source, List<Map<String, Object>> checkMaps) {
+    private boolean compareMap(Record record, List<Map<String, Object>> checkMaps) {
         for (Map<String, Object> map : checkMaps) {
-            if (compareMapParticular(source, map)) {
+            if (compareMapParticular(record, map)) {
                 return true;
             }
         }
@@ -165,13 +165,13 @@ public class TestCore {
     /**
      * Asserts if the source conforms to the checkMap
      *
-     * @param source source to be checked
+     * @param record source to be checked
      * @param map    map to be compared against
      * @return true if all the fields in the map appear correctly in source
      */
-    private boolean compareMapParticular(Source source, Map<String, Object> map) {
+    private boolean compareMapParticular(Record record, Map<String, Object> map) {
         for (String key : map.keySet()) {
-            List<Object> values = source.get(key);
+            List<Object> values = record.get(key);
 
             if (values.isEmpty()) { // empty list returned, value not in source
                 if (!map.get(key).equals("")) { // no value expected here
@@ -210,7 +210,7 @@ public class TestCore {
      * Functional interface for evaluator functions
      */
     protected interface Evaluator {
-        boolean evaluate(Iterator<Source> iterator);
+        boolean evaluate(Iterator<Record> iterator);
     }
 
     /**

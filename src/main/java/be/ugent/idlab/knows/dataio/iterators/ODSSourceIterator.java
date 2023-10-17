@@ -1,64 +1,88 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.iterators.ods.ODSFileParser;
-import be.ugent.idlab.knows.dataio.source.ODSSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.exceptions.HeaderEmptyValuesException;
+import be.ugent.idlab.knows.dataio.record.ODSRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
+import org.odftoolkit.simple.Document;
+import org.odftoolkit.simple.SpreadsheetDocument;
+import org.odftoolkit.simple.table.Row;
+import org.odftoolkit.simple.table.Table;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+/**
+ * Class representing an Iterator for ODS documents.
+ * Warning: Loads the entire document into memory, not suitable for large ODS documents!
+ */
 public class ODSSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 4036007304900261485L;
     private final Access access;
-    private transient String[] header;
-    private transient ODSFileParser parser;
-    private transient String[] data;
+    private transient Iterator<ODSRecord> records;
 
-    public ODSSourceIterator(Access access) throws SQLException, IOException, XMLStreamException {
+    public ODSSourceIterator(Access access) throws Exception {
         this.access = access;
         bootstrap();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, XMLStreamException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    private void bootstrap() throws SQLException, IOException, XMLStreamException {
-        this.parser = ODSFileParser.newInstance(access.getInputStream());
-        this.header = this.parser.getHeader();
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
+    private void bootstrap() throws Exception {
+        List<ODSRecord> sources = new ArrayList<>();
+        try (InputStream is = this.access.getInputStream()) {
+            Document document;
 
-        // read initial data
-        readData();
-    }
+            // SpreadsheetDocument.loadDocument(is) throws simply an Exception
+            // nested try is used to catch this separately
+            try {
+                document = SpreadsheetDocument.loadDocument(is);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            List<Table> tables = document.getTableList();
+            for (Table t : tables) {
+                Row header = t.getRowByIndex(0);
+                // check the header
+                for (int i = 0; i < header.getCellCount(); i++) {
+                    if (header.getCellByIndex(i).getStringValue().isEmpty()) {
+                        throw new HeaderEmptyValuesException(access.getAccessPath());
+                    }
+                }
 
-    private void readData() {
-        if (this.parser.canReadNextRow()) {
-            this.data = this.parser.readNextRow();
-
-            if (this.data.length != this.header.length) {
-                throw new RuntimeException(String.format("The row read does not match the header.\nHeader: %s\nRow: %s", Arrays.toString(this.header), Arrays.toString(this.data)));
+                for (int i = 1; i < t.getRowList().size(); i++) {
+                    Row row = t.getRowByIndex(i);
+                    sources.add(new ODSRecord(header, row));
+                }
             }
 
-        } else {
-            this.data = null;
+            this.records = sources.iterator();
         }
     }
 
     @Override
     public boolean hasNext() {
-        return this.data != null;
+        return this.records.hasNext();
     }
 
     @Override
-    public Source next() {
-        String[] temp = this.data;
-        readData();
-        return new ODSSource(this.header, temp, this.access.getDataTypes());
+    public Record next() {
+        return this.records.next();
     }
 
     @Override

@@ -1,5 +1,6 @@
-package be.ugent.idlab.knows.dataio.source;
+package be.ugent.idlab.knows.dataio.record;
 
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import net.minidev.json.JSONArray;
@@ -18,18 +19,20 @@ import java.util.regex.Pattern;
  * This class is a specific implementation of a source for JSON.
  * Every source corresponds with a JSON object in a data source.
  */
-public class JSONSource extends Source {
+public class JSONRecord extends Record {
     private final Object document; // JSON object
     private final String tag; // what iterator was used to obtain this.document
     private final String path; // what specific path was taken to arrive at this.document
+
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private List<String> compiledPath;
 
-    public JSONSource(Object document, String tag) {
+
+    public JSONRecord(Object document, String tag) {
         this(document, tag, "");
     }
 
-    public JSONSource(Object document, String tag, String path) {
+    public JSONRecord(Object document, String tag, String path) {
         this.document = document;
         this.tag = tag;
         this.path = path;
@@ -38,59 +41,48 @@ public class JSONSource extends Source {
     /**
      * This method returns the objects for a reference (JSONPath) in the record.
      *
-     * @param value the reference for which objects need to be returned.
+     * @param reference the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String value) {
-        if (value.startsWith("\\_")) {
-            return processMagicProperty(value);
+    public List<Object> get(String reference) {
+        if (reference.startsWith("\\_")) {
+            return processMagicProperty(reference);
         }
 
         List<Object> results = new ArrayList<>();
 
-        if (value.contains(" ")) {
-            value = String.format("['%s']", value);
+        // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
+        if (this.document instanceof ValueNode && reference.equals("@")) {
+            String v = ((ValueNode) this.document).asText();
+            return List.of(v);
         }
 
-        if (!value.contains("$")) {
-            value = String.format("$.%s", value);
+        if (reference.startsWith("\"") && reference.endsWith("\"")) {
+            reference = reference.substring(1, reference.length() - 1);
         }
 
-//        // We put simple values between square brackets to make sure no non-escaped shenanigans happen.
-//        if (!value.contains("[") && !value.contains(".") && !value.equals("@")) {
-//            value = "['" + value + "']";
-//        } else if (value.equals("@")) {
-//            value = "" ;
-//        } else {
-//            value = "." + value;
-//        }
 
-        // TODO do we need to be smarter that this? Below isn't complete yet, but also doesn't seem necessary
-//        String[] valueParts = value.split("\\.");
-//        StringBuilder escapedValue = new StringBuilder();
-//        for (String valuePart : valueParts) {
-//            // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-//            String escapedValuePart = valuePart.replaceAll(",", "\\\\,");
-//            if (!(escapedValuePart.startsWith("["))) {
-//                escapedValue.append("['").append(escapedValuePart).append("']");
-//            } else {
-//                escapedValue.append(escapedValuePart);
-//            }
-//        }
+        if (reference.contains(" ")) {
+            reference = String.format("['%s']", reference);
+        }
 
-//        // This JSONPath library specifically cannot handle keys with commas, so we need to escape it
-//        String fullValue = (this.path + value).replaceAll(",", "\\\\,");
+        if (!reference.contains("$")) {
+            reference = String.format("$.%s", reference);
+        }
+
+        if (reference.equals("@")) {
+            reference = "";
+        }
 
         try {
-            //Object t = JsonPath.read(document, fullValue);
-            Object t = JsonPath.read(this.document, value);
+            Object t = JsonPath.read(this.document, reference);
 
-            if (t instanceof JSONArray) {
-                JSONArray array = (JSONArray) t;
+            if (t instanceof ArrayList) {
+                ArrayList<Object> tCast = (ArrayList<Object>) t;
                 ArrayList<String> tempList = new ArrayList<>();
 
-                for (Object o : array) {
+                for (Object o : tCast) {
                     if (o != null) {
                         tempList.add(o.toString());
                     }
@@ -103,8 +95,7 @@ public class JSONSource extends Source {
                 }
             }
         } catch (JsonPathException e) {
-            logger.warn("{} for path {} ", e.getMessage(), this.path + value, e);
-            return null;
+            logger.warn("{} for path {} ", e.getMessage(), this.path + reference, e);
         }
 
         return results;
@@ -202,7 +193,7 @@ public class JSONSource extends Source {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JSONSource that = (JSONSource) o;
+        JSONRecord that = (JSONRecord) o;
         return path.equals(that.path) && document.equals(that.document);
     }
 

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 public class ODSStreamTest extends StreamTestCore {
     @Test
-    public void eval_0000() throws XMLStreamException, SQLException, IOException {
+    public void eval_0000() throws Exception {
         Access access = new LocalFileAccess("ods/0000.ods", "src/test/resources", "ods");
         try (ODSSourceStream stream = new ODSSourceStream(access)) {
             runTest(stream, this::evaluate_0000);
@@ -20,7 +20,7 @@ public class ODSStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_0001() throws XMLStreamException, SQLException, IOException {
+    public void eval_0001() throws Exception {
         Access access = new LocalFileAccess("ods/0001.ods", "src/test/resources", "ods");
         try (ODSSourceStream stream = new ODSSourceStream(access)) {
             runTest(stream, this::evaluate_0001);

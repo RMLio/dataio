@@ -1,6 +1,6 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
@@ -28,9 +28,9 @@ public class DatabaseTest {
 
     private static final String QUERY = "SELECT * FROM Patient";
 
-    private void runTest(Access access, CSVSource expected) {
+    private void runTest(Access access, CSVRecord expected) {
         try {
-            List<CSVSource> actual = getCSVFromDB(access);
+            List<CSVRecord> actual = getCSVFromDB(access);
             Assertions.assertTrue(actual.contains(expected));
 
         } catch (SQLException | IOException e) {
@@ -62,7 +62,7 @@ public class DatabaseTest {
                 "text/csv");
     }
 
-    private List<CSVSource> getCSVFromDB(Access access) throws SQLException, IOException {
+    private List<CSVRecord> getCSVFromDB(Access access) throws SQLException, IOException {
         try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream());
              CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                      .withSkipLines(0)
@@ -74,9 +74,11 @@ public class DatabaseTest {
             final String[] header = records.get(0);
             return records.subList(1, records.size()).stream()
                     .filter(r -> r.length != 0 && !(r.length == 1 && r[0] == null))
-                    .map(r -> new CSVSource(header, r, access.getDataTypes()))
+                    .map(r -> new CSVRecord(header, r, access.getDataTypes()))
                     .collect(Collectors.toList());
         } catch (CsvException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -99,7 +101,7 @@ public class DatabaseTest {
 
             String[] header = new String[]{"id", "firstname", "lastname", "sex", "weight", "height", "birthdate", "entrancedate", "paidinadvance", "photo"};
             String[] expectedValues = new String[]{"10", "Monica", "Geller", "female", "80.25", "1.65", "1981-10-10", "2009-10-10 12:12:22", "f", "89504E470D0A1A0A0000000D49484452000000050000000508060000008D6F26E50000001C4944415408D763F9FFFEBFC37F062005C3201284D031F18258CD04000EF535CBD18E0E1F0000000049454E44AE426082"};
-            CSVSource expected = new CSVSource(header, expectedValues, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(header, expectedValues, access.getDataTypes());
 
             runTest(access, expected);
         }
@@ -119,7 +121,7 @@ public class DatabaseTest {
 
             String[] header = new String[]{"ID", "FirstName", "LastName", "Sex", "Weight", "Height", "BirthDate", "EntranceDate", "PaidInAdvance", "Photo"};
             String[] expectedValues = new String[]{"10", "Monica", "Geller", "female", "80.25", "1.65", "1981-10-10", "2009-10-10 12:12:22.0", "0", "383935303445343730443041314130413030303030303044343934383434"};
-            CSVSource expected = new CSVSource(header, expectedValues, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(header, expectedValues, access.getDataTypes());
 
             runTest(access, expected);
         }
@@ -142,7 +144,7 @@ public class DatabaseTest {
 
             String[] header = new String[]{"ID", "FirstName", "LastName", "Sex", "Weight", "Height", "BirthDate", "EntranceDate", "PaidInAdvance", "Photo"};
             String[] expectedValues = new String[]{"10", "Monica", "Geller", "female", "80.25", "1.65", "1981-10-10", "2009-10-10 12:12:22", "0", "89504E470D0A1A0A0000000D49484452000000050000000508060000008D6F26E50000001C4944415408D763F9FFFEBFC37F062005C3201284D031F18258CD04000EF535CBD18E0E1F0000000049454E44AE426082"};
-            CSVSource expected = new CSVSource(header, expectedValues, access.getDataTypes());
+            CSVRecord expected = new CSVRecord(header, expectedValues, access.getDataTypes());
 
             runTest(access, expected);
         }
@@ -162,7 +164,7 @@ public class DatabaseTest {
             initializeDatabase("src/test/resources/db_setup/oracle_setup.sql", oracleContainer);
             Access access = getRDBAccess(DatabaseType.ORACLE, oracleContainer);
 
-            CSVSource expected = new CSVSource(
+            CSVRecord expected = new CSVRecord(
                     new String[]{"ID", "NAME"},
                     new String[]{"10", "Venus"},
                     access.getDataTypes()

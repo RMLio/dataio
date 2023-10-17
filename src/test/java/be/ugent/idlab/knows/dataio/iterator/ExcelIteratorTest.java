@@ -5,15 +5,12 @@ import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.ExcelSourceIterator;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import static org.junit.Assert.assertTrue;
 
 public class ExcelIteratorTest extends TestCore {
 
     @Test
-    public void evaluate_0000_excel() throws IOException, SQLException {
+    public void evaluate_0000_excel() throws Exception {
         Access access = makeLocalAccess("/excel/0000.xlsx", "", "xlsx", "utf-8");
         try (ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator(access)) {
             assertTrue(evaluate_0000(excelSourceIterator));
@@ -21,7 +18,7 @@ public class ExcelIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_0001_CSV() throws IOException, SQLException {
+    public void evaluate_0001_CSV() throws Exception {
         Access access = makeLocalAccess("/excel/0001.xlsx", "", "xlsx", "utf-8");
         try (ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator(access)) {
             assertTrue(evaluate_0001(excelSourceIterator));
@@ -29,7 +26,7 @@ public class ExcelIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_1001_header_col_missing_excel() throws IOException, SQLException {
+    public void evaluate_1001_header_col_missing_excel() throws Exception {
         Access access = makeLocalAccess("/excel/1001_header_col_missing.xlsx", "", "xlsx", "utf-8");
         try (ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator(access)) {
 
@@ -38,7 +35,7 @@ public class ExcelIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_1001_header_long_excel() throws IOException, SQLException {
+    public void evaluate_1001_header_long_excel() throws Exception {
         Access access = makeLocalAccess("/excel/1001_header_long.xlsx", "", "xlsx", "utf-8");
         try (ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator(access)) {
             assertTrue(evaluate_1001_header_long(excelSourceIterator));
@@ -46,11 +43,10 @@ public class ExcelIteratorTest extends TestCore {
     }
 
     @Test
-    public void evaluate_1001_header_short_excel() throws IOException, SQLException {
+    public void evaluate_1001_header_short_excel() throws Exception {
         Access access = makeLocalAccess("/excel/1001_header_short.xlsx", "", "xlsx", "utf-8");
         try (ExcelSourceIterator excelSourceIterator = new ExcelSourceIterator(access)) {
             assertTrue(evaluate_1001_header_short(excelSourceIterator));
         }
     }
-
 }

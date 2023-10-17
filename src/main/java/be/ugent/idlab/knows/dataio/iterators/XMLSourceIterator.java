@@ -8,8 +8,8 @@ import net.sf.saxon.s9api.*;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
 /**
@@ -32,21 +32,22 @@ public class XMLSourceIterator extends SourceIterator {
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      *
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
      */
     private void bootstrap() throws Exception {
         // Saxon processor to be reused across XPath query evaluations
         Processor saxProcessor = new Processor(false);
         DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
-        XdmNode document = docBuilder.build(new StreamSource(this.access.getInputStream()));
-        this.compiler = saxProcessor.newXPathCompiler();
-        // Enable expression caching
-        this.compiler.setCaching(true);
-        // Extract and register existing source namespaces into the XPath compiler
-        SaxNamespaceResolver.registerNamespaces(this.compiler, document);
-        // Execute iterator XPath query
-        XdmValue result = compiler.evaluate(this.stringIterator, document);
-        this.iterator = result.iterator();
+        try (InputStream in = access.getInputStream()) {
+            XdmNode document = docBuilder.build(new StreamSource(in));
+            this.compiler = saxProcessor.newXPathCompiler();
+            // Enable expression caching
+            this.compiler.setCaching(true);
+            // Extract and register existing source namespaces into the XPath compiler
+            SaxNamespaceResolver.registerNamespaces(this.compiler, document);
+            // Execute iterator XPath query
+            XdmValue result = compiler.evaluate(this.stringIterator, document);
+            this.iterator = result.iterator();
+        }
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {

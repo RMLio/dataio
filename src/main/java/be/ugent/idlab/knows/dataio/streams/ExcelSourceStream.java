@@ -11,7 +11,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -26,7 +25,6 @@ public class ExcelSourceStream implements SourceStream {
     private final Access access;
     private transient Iterator<Sheet> iterator;
     private transient Workbook wb;
-    private transient InputStream in;
     private Row header;
 
     public ExcelSourceStream(Access access) throws Exception {
@@ -35,11 +33,11 @@ public class ExcelSourceStream implements SourceStream {
     }
 
     private void bootstrap() throws Exception {
-        this.in = this.access.getInputStream();
-
-        this.wb = StreamingReader.builder()
-                .open(in);
-        this.iterator = this.wb.iterator();
+        try (InputStream in = this.access.getInputStream()) {
+            wb = StreamingReader.builder()
+                    .open(in);
+            this.iterator = wb.iterator();
+        }
     }
 
     private void readObject(ObjectInputStream in) throws Exception {
@@ -54,7 +52,7 @@ public class ExcelSourceStream implements SourceStream {
      */
     @Override
     public Stream<Record> getStream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED), true)
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this.iterator, Spliterator.ORDERED), false)
                 .peek(sheet -> this.header = sheet.iterator().next()) // grab the header for current sheet
                 .flatMap(this::getRowStreamFromSheet)
                 .skip(1) // skip the header
@@ -67,7 +65,6 @@ public class ExcelSourceStream implements SourceStream {
 
     @Override
     public void close() throws IOException {
-        this.wb.close();
-        this.in.close();
+        wb.close();
     }
 }

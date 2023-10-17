@@ -9,7 +9,6 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,8 +24,6 @@ public class HTMLSourceIterator extends SourceIterator {
     private transient Iterator<Element> iterator;
     private transient List<String> headers;
 
-    private transient InputStream inputStream;
-
     public HTMLSourceIterator(Access access, String stringIterator) throws Exception {
         this.access = access;
         this.stringIterator = stringIterator;
@@ -37,19 +34,19 @@ public class HTMLSourceIterator extends SourceIterator {
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      *
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
      */
     private void bootstrap() throws Exception {
-        this.inputStream = this.access.getInputStream();
-        this.iterator = Jsoup.parse(this.inputStream, "UTF-8", "http://example.com/")
-                .select(this.stringIterator)
-                .iterator();
-        if (this.iterator.hasNext()) {
-            this.headers = this.iterator.next()
-                    .select("th")
-                    .stream()
-                    .map(Element::text)
-                    .collect(Collectors.toList());
+        try (InputStream inputStream = this.access.getInputStream()) {
+            this.iterator = Jsoup.parse(inputStream, "UTF-8", "http://example.com/")
+                    .select(this.stringIterator)
+                    .iterator();
+            if (this.iterator.hasNext()) {
+                this.headers = this.iterator.next()
+                        .select("th")
+                        .stream()
+                        .map(Element::text)
+                        .collect(Collectors.toList());
+            }
         }
     }
 
@@ -74,6 +71,6 @@ public class HTMLSourceIterator extends SourceIterator {
 
     @Override
     public void close() throws IOException {
-        this.inputStream.close();
+        // do nothing
     }
 }

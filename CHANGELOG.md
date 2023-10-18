@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Require Java 17 (or more recent)
+
 ### Fixed
 - Updated Maven Surefire plugin to 3.1.2
 - Removed dependency on Logback
 - Updated POI to 5.2.3
 - Removed dependency on Commons CSV
 - Updated all testcontainers to 1.18.3
-- Updated mssql-jdbc to 12.2.0.jre11
+- Updated mssql-jdbc to 12.2.1.jre11
 - Updated ojdbc11 to 23.2.0.0
 - Updated mybatis to 3.5.13
 - Updated jOpenDocument to 1.3

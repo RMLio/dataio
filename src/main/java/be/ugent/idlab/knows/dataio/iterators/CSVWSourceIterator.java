@@ -36,8 +36,7 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        this.inputReader = new InputStreamReader(access.getInputStream(), config.getEncoding());
-
+        this.inputReader = access.getInputStreamReader();
         CsvParser.DSL parser = config.getSFMParser();
         this.iterator = parser.iterator(this.inputReader);
 

@@ -1,0 +1,73 @@
+package be.ugent.idlab.knows.dataio.record;
+
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmValue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * This class is a specific implementation of a record for XML.
+ * Every record corresponds to an XML element in a data source.
+ */
+public class XMLRecord extends Record {
+
+    private XdmItem item;
+    private XPathCompiler compiler;
+
+    public XMLRecord(XdmItem item, XPathCompiler compiler) {
+        this.item = item;
+        // Keep a reference to the XPath compiler for faster future queries
+        this.compiler = compiler;
+    }
+
+    /**
+     * This method returns the objects for a reference (XPath) in the record.
+     *
+     * @param reference the reference for which objects need to be returned.
+     * @return a list of objects for the reference.
+     */
+    @Override
+    public List<Object> get(String reference) {
+        List<Object> results = new ArrayList<>();
+
+        try {
+            XdmValue result = compiler.evaluate(reference, item);
+            result.forEach((node) -> results.add(node.getStringValue()));
+        } catch (SaxonApiException e1) {
+            throw new RuntimeException(e1);
+        }
+
+
+        return results;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        XMLRecord xmlRecord = (XMLRecord) o;
+
+        return itemEquals(xmlRecord.item);
+    }
+
+    /**
+     * Compares an item to the item of this.
+     * This method is implemented due to the lack of proper equals() method in the XdmItem class we rely on.
+     * Two XdmItems are considered equivalent if their string values are equal
+     *
+     * @param item item to compare
+     * @return true if the items are equivalent, false otherwise
+     */
+    private boolean itemEquals(XdmItem item) {
+        return this.item.getStringValue().matches(item.getStringValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(item, compiler);
+    }
+}

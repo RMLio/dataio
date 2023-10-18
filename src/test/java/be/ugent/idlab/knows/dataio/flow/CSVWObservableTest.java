@@ -6,7 +6,7 @@ import be.ugent.idlab.knows.dataio.cores.ObservableTestCore;
 import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.CSVWObservable;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 public class CSVWObservableTest extends ObservableTestCore {
     private void runCSVWTest(String path, Evaluator evaluator, CSVWConfiguration config) throws Exception {
         Access access = new LocalFileAccess("", path, "csv");
-        try (SourceObservable<CSVSource> o = new CSVWObservable(access, config)) {
+        try (SourceObservable<CSVRecord> o = new CSVWObservable(access, config)) {
             runTest(o, evaluator);
         }
     }
@@ -43,13 +43,13 @@ public class CSVWObservableTest extends ObservableTestCore {
         CSVWConfiguration config = CSVWConfiguration.builder().withNulls(List.of("NULL")).build();
 
         String[] header = new String[]{"ID", "Name"};
-        CSVSource s1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes()),
-                s2 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes()),
-                s3 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes()),
-                s_null = new CSVSource(header, new String[]{"11", null}, access.getDataTypes());
+        CSVRecord s1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes()),
+                s2 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes()),
+                s3 = new CSVRecord(header, new String[]{"13", "null"}, access.getDataTypes()),
+                s_null = new CSVRecord(header, new String[]{"11", null}, access.getDataTypes());
 
 
-        try (SourceObservable<CSVSource> o = new CSVWObservable(access, config)) {
+        try (SourceObservable<CSVRecord> o = new CSVWObservable(access, config)) {
             Assertions.assertTrue(compareIterator(getIteratorFromObservable(o), Set.of(s1, s2, s3, s_null)));
         }
     }

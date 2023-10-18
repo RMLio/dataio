@@ -1,7 +1,7 @@
 # DataIO
 
 The DataIO library opens the given files and allows to read them using an Iterator, a Stream or an RxJava's Observable.
-This library doesn't load the full file in memory (this is not the case for XML files).
+This library doesn't load the full file in memory (this is not the case for XML and ODS files).
 
 ## Setup
 Run the following command:
@@ -26,23 +26,53 @@ References to values are mapped to their datatypes, if available.
 getContentType: gives the content type of the access object.
 
 ### SourceIterator
-Interface which is an implementation of an Iterator<Source>, which overrides the remove and forEachRemaining as these function are trivial for each implementation.
+Interface which is an implementation of an Iterator<Record>, which overrides the remove and forEachRemaining as these function are trivial for each implementation.
+
+#### Important note on JSONPath
+As JSONPath is not yet standardized, compatibility issues may arise. We follow the implementation of JsonSurfer, with following additions
+
+- A combination of the child operators will be reduced to a single child operator. In practice, this means that `$.['child']` becomes `$['child']`.
+- In test cases, you may find a construction like `$.[*]`. This construction will also be reduced to `$[*]`.
 
 ### SourceStream
-Interface and implementations of the Stream interface.
+Interface and implementations for streaming the records from sources.
 
 ## Flow
-Implementation of the Flow interface, using RxJava under the hood. Implementations of RxJava's ``Observable`` for the different sources are provided.
+Implementation of the Flow interface, using RxJava under the hood. Implementations of RxJava's ``Observable`` for the different records are provided.
 
 #### Functions
 
-open(args): this function opens the corresponding files (using an Access object) and initiates the iterator and other needed values to allow the creation of sources (eg CSVSourceIterator initiates a header value). 
+open(args): this function opens the corresponding files (using an Access object) and initiates the iterator and other needed values to allow the creation of records (eg CSVSourceIterator initiates a header value). 
 
-### Source
+### Record
 Interface which generalizes the access to data
 
 #### Functions
      
 get(String value); returns a list of objects associated to the given string value.
 
-getDataType(String value) returns the IRI of the datatype of a reference in the source
+getDataType(String value) returns the IRI of the datatype of a reference in the record
+
+## Magic properties
+
+### _PATH
+_PATH is a magic property that can be used to obtain a reverse path through the document to reach a specific object. 
+Index notation can be used to grab a specific element.
+
+Suppose a file people.json
+```json
+{
+  "people": [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "phoneNumbers": [
+        "0123-4567-8888",
+        "0123-4567-8910"
+      ]
+    }
+  ]
+}
+```
+And suppose a JSON path ``$.people.[*]``, then a specific path for the first "people" object would be ``$.people.[0]``.
+This object's ``_PATH`` property would resolve to ``[0,people]``, and ``_PATH[1]`` would resolve to ``people``.

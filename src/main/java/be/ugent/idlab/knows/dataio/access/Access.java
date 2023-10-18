@@ -1,7 +1,8 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import java.io.*;
-import java.sql.SQLException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -13,13 +14,14 @@ public interface Access extends Serializable {
     /**
      * This method returns an InputStream for the access.
      *
+     * @throws Exception when something goes wrong with reading / construction of the input stream
      * @return the InputStream corresponding to the access.
-     * @throws IOException
      */
+    InputStream getInputStream() throws Exception;
 
-    InputStream getInputStream() throws IOException, SQLException;
-
-    InputStreamReader getInputStreamReader() throws FileNotFoundException, UnsupportedEncodingException;
+    default InputStreamReader getInputStreamReader() throws Exception {
+        return new InputStreamReader(this.getInputStream());
+    }
 
     /**
      * This method returns a map of datatypes.

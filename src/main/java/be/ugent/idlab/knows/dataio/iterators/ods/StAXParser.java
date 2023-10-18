@@ -56,6 +56,11 @@ public class StAXParser implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
+        try {
+            reader.close();
+        } catch (XMLStreamException e) {
+            // not too bad, just ignore
+        }
         this.inputStream.close();
     }
 }

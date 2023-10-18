@@ -1,6 +1,5 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

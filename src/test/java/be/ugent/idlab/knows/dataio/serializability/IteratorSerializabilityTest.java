@@ -7,13 +7,14 @@ import be.ugent.idlab.knows.dataio.iterators.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IteratorSerializabilityTest extends TestCore {
 
     private void runSerializabilityTest(SourceIterator iterator) throws Exception { // exception arises from AutoClosable interface
         try (SourceIterator i2 = simulateSerialization(iterator)) {
-            assertTrue(evaluate_0001(i2));
+            assertEquals(iterator.hasNext(), i2.hasNext());
+            assertEquals(iterator.next(), i2.next());
         }
     }
 
@@ -54,6 +55,14 @@ public class IteratorSerializabilityTest extends TestCore {
     public void testJSONIterator() throws Exception {
         Access access = new LocalFileAccess("json/0001.json", "src/test/resources", "json", "utf-8");
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.pubs[*]")) {
+            runSerializabilityTest(iterator);
+        }
+    }
+
+    @Test
+    public void testJSONLinesIterator() throws Exception {
+        Access access = new LocalFileAccess("json/data.jsonl", "src/test/resources", "jsonl", "utf-8");
+        try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
             runSerializabilityTest(iterator);
         }
     }

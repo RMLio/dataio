@@ -4,12 +4,10 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.StreamTestCore;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +17,7 @@ public class CSVWStreamTest extends StreamTestCore {
     private final CSVWConfiguration default_config = CSVWConfiguration.DEFAULT;
 
     @Test
-    public void eval_0000() throws SQLException, IOException {
+    public void eval_0000() throws Exception {
         Access access = new LocalFileAccess("csv/0000.csv", "src/test/resources", "csv", "UTF-8");
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_0000);
@@ -27,7 +25,7 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_0001() throws SQLException, IOException {
+    public void eval_0001() throws Exception {
         Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv", "UTF-8");
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_0001);
@@ -35,7 +33,7 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_0000_trim() throws SQLException, IOException {
+    public void eval_0000_trim() throws Exception {
         Access access = new LocalFileAccess("csvw/0000_trim.csv", "src/test/resources", "csv");
         CSVWConfiguration config = CSVWConfiguration.builder().withTrim(true).build();
 
@@ -45,7 +43,7 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_1000_nulls() throws SQLException, IOException {
+    public void eval_1000_nulls() throws Exception {
         Access access = new LocalFileAccess("csvw/1000_nulls.csv", "src/test/resources", "csvw");
         CSVWConfiguration config = CSVWConfiguration.builder()
                 .withNulls(List.of("NULL"))
@@ -53,12 +51,12 @@ public class CSVWStreamTest extends StreamTestCore {
 
         String[] header = new String[]{"ID", "Name"};
 
-        CSVSource source1 = new CSVSource(header, new String[]{"10", "Venus"}, access.getDataTypes());
-        CSVSource source2 = new CSVSource(header, new String[]{"12", "Serena"}, access.getDataTypes());
-        CSVSource source3 = new CSVSource(header, new String[]{"13", "null"}, access.getDataTypes());
+        CSVRecord source1 = new CSVRecord(header, new String[]{"10", "Venus"}, access.getDataTypes());
+        CSVRecord source2 = new CSVRecord(header, new String[]{"12", "Serena"}, access.getDataTypes());
+        CSVRecord source3 = new CSVRecord(header, new String[]{"13", "null"}, access.getDataTypes());
 
         String[] array = new String[]{"11", null};
-        CSVSource source_null = new CSVSource(header, array, access.getDataTypes());
+        CSVRecord source_null = new CSVRecord(header, array, access.getDataTypes());
 
         try (CSVWSourceStream stream = new CSVWSourceStream(access, config)) {
             assertTrue(compareIterator(stream.getStream().iterator(), Set.of(source1, source2, source3, source_null)));
@@ -66,7 +64,7 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_1001_header_long() throws SQLException, IOException {
+    public void eval_1001_header_long() throws Exception {
         Access access = new LocalFileAccess("csv/1001_header_long.csv", "src/test/resources", "csv");
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_1001_header_long);
@@ -74,7 +72,7 @@ public class CSVWStreamTest extends StreamTestCore {
     }
 
     @Test
-    public void eval_1001_header_short() throws SQLException, IOException {
+    public void eval_1001_header_short() throws Exception {
         Access access = new LocalFileAccess("csv/1001_header_short.csv", "src/test/resources", "csv");
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_1001_header_short);

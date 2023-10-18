@@ -1,19 +1,23 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.source.JSONSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.access.VirtualAccess;
+import be.ugent.idlab.knows.dataio.record.JSONRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.spi.json.JsonProvider;
 import org.jsfr.json.JsonSurfer;
 import org.jsfr.json.JsonSurferJackson;
 import org.jsfr.json.ResumableParser;
 import org.jsfr.json.SurfingConfiguration;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * This class is a JSONSourceIterator that allows the iteration of JSON data.
@@ -23,14 +27,23 @@ public class JSONSourceIterator extends SourceIterator {
     private final Access access;
     private final String iterationPath;
     private transient ResumableParser parser;
-    private transient Object currentObject;
+    private transient InputStream inputStream;
     private transient String currentPath;
+    private transient Object match = null;
+    private boolean hasMatch = false;
 
-    public JSONSourceIterator(Access access, String iterationPath) throws SQLException, IOException {
+    public JSONSourceIterator(Access access, String iterationPath) throws Exception {
         this.access = access;
-        this.iterationPath = iterationPath;
+        // replace any occurences of .[ (e.g. $.[*]) with [ (such that we get $[*])
+        this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
+
+    public JSONSourceIterator(String json, String iterationPath) throws Exception {
+        // small hack to use the existing constructor
+        this(new VirtualAccess(json.getBytes()), iterationPath);
+    }
+
 
     /**
      * This method returns a JSON document from an InputStream.
@@ -42,55 +55,62 @@ public class JSONSourceIterator extends SourceIterator {
         return Configuration.defaultConfiguration().jsonProvider().parse(stream, "utf-8");
     }
 
-    private void bootstrap() throws SQLException, IOException {
-        SurfingConfiguration config = JsonSurferJackson.INSTANCE
-                .configBuilder()
-                .bind(iterationPath, (value, context) -> {
-                    this.currentObject = value;
-                    this.currentPath = context.getJsonPath();
-                    context.pause();
-                }).build();
+    /**
+     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     *
+     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws SQLException
+     */
+    private void bootstrap() throws Exception {
+        this.inputStream = access.getInputStream();
 
         JsonSurfer surfer = JsonSurferJackson.INSTANCE;
-        this.parser = surfer.createResumableParser(access.getInputStream(), config);
+
+        SurfingConfiguration config = surfer
+                .configBuilder()
+                .bind(iterationPath, (value, context) -> {
+                    this.match = value;
+                    this.currentPath = context.getJsonPath();
+                    this.hasMatch = true;
+                    context.pause();
+                })
+                .build();
+        this.parser = surfer.createResumableParser(this.inputStream, config);
         this.parser.parse();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    Object getDocumentFromStream(InputStream stream, String contentType) throws IOException {
-        if (contentType.equalsIgnoreCase("jsonl")) {
-            JsonProvider provider = Configuration.defaultConfiguration().jsonProvider();
-            BufferedReader lineReader = new BufferedReader(new InputStreamReader(stream));
-            Object items = provider.createArray();
-            int index = 0;
-            while (lineReader.ready()) {
-                provider.setArrayIndex(items, index, provider.parse(lineReader.readLine()));
-                index += 1;
-            }
-            return items;
-        } else {
-            return getDocumentFromStream(stream);
-        }
-    }
-
     @Override
     public boolean hasNext() {
-        return parser.resume();
+        return hasMatch || this.parser.resume() && hasMatch;
     }
 
     @Override
-    public Source next() {
-        ObjectMapper mapper = new ObjectMapper();
+    public Record next() {
+        if (this.hasNext()) {
+            Object match = this.match;
+            String path = this.currentPath;
+            this.match = null;
+            this.currentPath = null;
+            this.hasMatch = false;
 
-        return new JSONSource(mapper.convertValue(this.currentObject, Map.class), this.currentPath);
+            if (!(match instanceof ValueNode)) {
+                ObjectMapper mapper = new ObjectMapper();
+                match = mapper.convertValue(match, Map.class);
+            }
+
+            return new JSONRecord(match, this.iterationPath, path);
+        }
+
+        throw new NoSuchElementException();
     }
 
     @Override
-    public void close() {
-        // nothing to close
+    public void close() throws IOException {
+        this.inputStream.close();
     }
 }

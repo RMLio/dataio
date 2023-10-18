@@ -36,7 +36,12 @@ public class SPARQLTest {
 
 
         Access access = new SPARQLEndpointAccess("application/sparql-results+json", endpoint, query);
-        Object actual = JSONSourceIterator.getDocumentFromStream(access.getInputStream());
+        Object actual = null;
+        try {
+            actual = JSONSourceIterator.getDocumentFromStream(access.getInputStream());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         runSparqlTest(actual);
 
@@ -57,6 +62,8 @@ public class SPARQLTest {
         try (SPARQLLocalFileAccess access = new SPARQLLocalFileAccess("src/test/resources/sparql/resource.ttl", query, "application/sparql-results+json")) {
             Object actual = JSONSourceIterator.getDocumentFromStream(access.getInputStream());
             runSparqlTest(actual);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

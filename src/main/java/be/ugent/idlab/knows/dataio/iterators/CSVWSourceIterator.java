@@ -1,24 +1,21 @@
-
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
-import be.ugent.idlab.knows.dataio.source.CSVSource;
-import be.ugent.idlab.knows.dataio.source.Source;
+import be.ugent.idlab.knows.dataio.record.CSVRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.Reader;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
-
     private static final long serialVersionUID = -5824558388620967495L;
     private final Access access;
     private final CSVWConfiguration config;
@@ -27,21 +24,21 @@ public class CSVWSourceIterator extends SourceIterator {
     private transient Reader inputReader;
     private transient Iterator<String[]> iterator;
 
-    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException {
+    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
         this.access = access;
         this.config = config;
         this.bootstrap();
     }
 
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException {
+    private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    private void bootstrap() throws SQLException, IOException {
+    private void bootstrap() throws Exception {
         this.inputReader = new InputStreamReader(access.getInputStream(), config.getEncoding());
 
-        CsvParser.DSL parser = config.getParser();
+        CsvParser.DSL parser = config.getSFMParser();
         this.iterator = parser.iterator(this.inputReader);
 
         if (this.config.isSkipHeader()) {
@@ -71,15 +68,27 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     /**
+     * Checks if the passed line corresponds to the filters set
+     * A line is considered valid if it doesn't start with the comment prefix
+     * If the first value is null, the line is accepted
+     *
+     * @param line line to be checked
+     * @return true if the line passes all checks
+     */
+    private boolean invalidLine(String[] line) {
+        return line[0] != null && line[0].startsWith(this.config.getCommentPrefix());
+    }
+
+    /**
      * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
      *
      * @param record record to be checked
      * @return checked and possibly changed record
      */
-    public CSVSource replaceNulls(CSVSource record) {
+    public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (this.config.getNulls().contains(value)) {
+            if (value != null && this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });
@@ -116,7 +125,7 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     @Override
-    public Source next() {
+    public Record next() {
         if (this.next == null) {
             throw new NoSuchElementException();
         }
@@ -128,7 +137,7 @@ public class CSVWSourceIterator extends SourceIterator {
             line = applyTrimArray(line, config.getTrim());
         }
 
-        return replaceNulls(new CSVSource(header, line, this.access.getDataTypes()));
+        return replaceNulls(new CSVRecord(header, line, this.access.getDataTypes()));
     }
 
     @Override

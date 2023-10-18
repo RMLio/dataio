@@ -5,13 +5,13 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.ObservableTestCore;
 import be.ugent.idlab.knows.dataio.flow.base.SourceObservable;
 import be.ugent.idlab.knows.dataio.flow.observables.XMLObservable;
-import be.ugent.idlab.knows.dataio.source.XMLSource;
+import be.ugent.idlab.knows.dataio.record.XMLRecord;
 import org.junit.jupiter.api.Test;
 
 public class XMLObservableTest extends ObservableTestCore {
     private void runXMLTest(String path, Evaluator evaluator, String xpath) throws Exception {
         Access access = new LocalFileAccess("", path, "xml");
-        try (SourceObservable<XMLSource> o = new XMLObservable(access, xpath)) {
+        try (SourceObservable<XMLRecord> o = new XMLObservable(access, xpath)) {
             runTest(o, evaluator);
         }
     }

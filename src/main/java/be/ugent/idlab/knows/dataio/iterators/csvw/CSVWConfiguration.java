@@ -2,6 +2,9 @@ package be.ugent.idlab.knows.dataio.iterators.csvw;
 
 
 import org.simpleflatmapper.lightningcsv.CsvParser;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.List;
  * As such, the default configuration parses regular CSV files.
  */
 public final class CSVWConfiguration implements Serializable {
+    private static final long serialVersionUID = -5750213407136895070L;
     public static CSVWConfiguration DEFAULT = CSVWConfiguration.builder().build();
     private final char delimiter;
     private final char escapeCharacter;
@@ -89,10 +93,19 @@ public final class CSVWConfiguration implements Serializable {
         return encoding;
     }
 
-    public CsvParser.DSL getParser() {
+    public CsvParser.DSL getSFMParser() {
         return CsvParser
                 .separator(this.delimiter)
                 .escape(this.escapeCharacter)
                 .quote(this.quoteCharacter);
+    }
+
+    public CSVParser getOpenCSVParser() {
+        return new CSVParserBuilder()
+                .withSeparator(this.delimiter)
+                .withEscapeChar(this.escapeCharacter)
+                .withQuoteChar(this.quoteCharacter)
+                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
+                .build();
     }
 }

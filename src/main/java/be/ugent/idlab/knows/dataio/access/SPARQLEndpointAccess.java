@@ -18,6 +18,7 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
  */
 public class SPARQLEndpointAccess implements Access {
 
+    private static final long serialVersionUID = 7331603102049875880L;
     private String contentType;
     private String endpoint;
     private String query;
@@ -63,7 +64,7 @@ public class SPARQLEndpointAccess implements Access {
         connection.setRequestProperty("Accept", contentType);
 
         // Set 'query' parameter
-        Map<String, String> urlParams = new HashMap<String, String>() {{
+        Map<String, String> urlParams = new HashMap<>() {{
             put("query", query);
         }};
 
@@ -77,11 +78,6 @@ public class SPARQLEndpointAccess implements Access {
         int status = connection.getResponseCode();
 
         return connection.getInputStream();
-    }
-
-    @Override
-    public InputStreamReader getInputStreamReader() {
-        return null;
     }
 
     @Override

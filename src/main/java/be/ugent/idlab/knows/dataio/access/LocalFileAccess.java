@@ -6,18 +6,16 @@ import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
-import static org.apache.commons.io.FileUtils.getFile;
-import static org.apache.commons.io.FilenameUtils.getExtension;
 
 /**
  * This class represents access to a local file.
@@ -26,9 +24,9 @@ public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
     private static final int CONFIDENCE_LIMIT = 90;
+    @Serial
     private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
-    private final String base;
     private final String type;
     private final String encoding;
 
@@ -42,8 +40,12 @@ public class LocalFileAccess implements Access {
      * @param encoding encoding of the file
      */
     public LocalFileAccess(String path, String base, String type, String encoding) {
-        this.path = path;
-        this.base = base;
+        if (base != null && !base.isEmpty()) {
+            Path basePath = Path.of(base);
+            this.path = basePath.resolve(path).toString();
+        } else {
+            this.path = Path.of(path).toString();
+        }
 
         if (!Charset.isSupported(encoding)) {
             throw new IllegalArgumentException("Passed encoding not supported.");
@@ -63,51 +65,25 @@ public class LocalFileAccess implements Access {
      * @throws FileNotFoundException when the file cannot be found.
      */
     @Override
-    public InputStream getInputStream() throws FileNotFoundException {
-        File file = new File(this.path);
-
-        if (!file.isAbsolute()) {
-            file = getFile(this.base, this.path);
-        }
-
-        encodingCheck(file);
-
-        return new BOMInputStream(new FileInputStream(file), false);
+    public InputStream getInputStream() throws IOException {
+        Path path = Path.of(this.path);
+        encodingCheck(path);
+        return new BOMInputStream(Files.newInputStream(path, StandardOpenOption.READ));
     }
 
-    private void encodingCheck(File file) throws FileNotFoundException {
-        InputStream in = new BufferedInputStream(new FileInputStream(file));
-        List<CharsetMatch> matches;
-        try {
-            matches = Arrays.stream(new CharsetDetector().setText(in).detectAll())
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ignored) {
-            }
-        }
-
-        List<String> matchesNames = matches.stream().map(CharsetMatch::getName).collect(Collectors.toList());
-
-        if (!matchesNames.contains(this.encoding)) {
-
-            // only warn if high confidence
-            if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
-                // matches are sorted based on confidence
-                String message = String.format("Detected encoding doesn't match the passed encoding! Most likely encoding of %s is %s, got passed %s", file.getName(), matches.get(0).getName(), this.encoding);
-                logger.warn(message);
+    private void encodingCheck(Path path) throws IOException {
+        try (InputStream in = new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)) ) {
+            List<CharsetMatch> matches = Arrays.stream(new CharsetDetector().setText(in).detectAll()).toList();
+            Set<String> matchesNames = matches.stream().map(CharsetMatch::getName).collect(Collectors.toSet());
+            if (!matchesNames.contains(this.encoding)) {
+                // only warn if high confidence
+                if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
+                    // matches are sorted based on confidence
+                    logger.warn("Detected encoding doesn't match the passed encoding! Most likely encoding of {} is {}, got passed {}", path, matches.get(0).getName(), this.encoding);
+                }
             }
         }
     }
-
-    @Override
-    public InputStreamReader getInputStreamReader() throws FileNotFoundException {
-        return new FileReader(new File(this.base, this.path));
-    }
-
 
     /**
      * This method returns the datatypes of the file.
@@ -117,15 +93,14 @@ public class LocalFileAccess implements Access {
      */
     @Override
     public Map<String, String> getDataTypes() {
-        return Collections.singletonMap(getFullPath(), this.type);
+        return Collections.singletonMap(getAccessPath(), this.type);
     }
 
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof LocalFileAccess) {
-            LocalFileAccess access = (LocalFileAccess) o;
-            return path.equals(access.path) && base.equals(access.getBase()) && type.equals(access.type) && encoding.equals(access.encoding);
+        if (o instanceof LocalFileAccess access) {
+            return path.equals(access.path) && type.equals(access.type) && encoding.equals(access.encoding);
         } else {
             return false;
         }
@@ -133,7 +108,7 @@ public class LocalFileAccess implements Access {
 
     @Override
     public int hashCode() {
-        return getHashOfString(getFullPath());
+        return getHashOfString(getAccessPath());
     }
 
     /**
@@ -145,23 +120,15 @@ public class LocalFileAccess implements Access {
         return Path.of(path);
     }
 
-    /**
-     * This method returns the base path of the access.
-     *
-     * @return the base path.
-     */
-    public String getBase() {
-        return base;
-    }
-
     @Override
     public String toString() {
-        return getFullPath();
+        return getAccessPath();
     }
 
     @Override
     public String getContentType() {
-        return getExtension(this.path);
+        MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+        return fileTypeMap.getContentType(path);
     }
 
     /**
@@ -169,22 +136,7 @@ public class LocalFileAccess implements Access {
      */
     @Override
     public String getAccessPath() {
-        File file = new File(this.path);
-
-        if (!file.isAbsolute()) {
-            file = getFile(this.base, this.path);
-        }
-
-        return file.getAbsolutePath();
-    }
-
-    private String getFullPath() {
-        File file = new File(this.path);
-        String fullPath = this.path;
-        if (!file.isAbsolute()) {
-            fullPath = this.base + this.path;
-        }
-        return fullPath;
+        return Path.of(path).toAbsolutePath().toString();
     }
 
     public String getEncoding() {

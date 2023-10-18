@@ -150,4 +150,18 @@ public class JSONIteratorTest extends TestCore {
             assertEquals(0, record.get("\\\\_PATH").size());
         }
     }
+
+    @Test
+    public void evaluate_nested_array() throws Exception {
+        Access access = makeLocalAccess("/json/nested_array.json", "", "json", "utf-8");
+        try(JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.main_array[*]")) {
+            while (jsonSourceIterator.hasNext()) {
+                Record source = jsonSourceIterator.next();
+                List<Object> names = source.get("names");
+                List<List<String>> expected = List.of(List.of("Jos", "Jef"));
+                assertEquals(names, expected);
+                System.out.println();
+            }
+        }
+    }
 }

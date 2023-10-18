@@ -3,7 +3,6 @@ package be.ugent.idlab.knows.dataio.record;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
-import net.minidev.json.JSONArray;
 import org.jsfr.json.compiler.JsonPathCompiler;
 import org.jsfr.json.path.PathOperator;
 import org.slf4j.Logger;
@@ -77,22 +76,8 @@ public class JSONRecord extends Record {
 
         try {
             Object t = JsonPath.read(this.document, reference);
-
-            if (t instanceof ArrayList) {
-                ArrayList<Object> tCast = (ArrayList<Object>) t;
-                ArrayList<String> tempList = new ArrayList<>();
-
-                for (Object o : tCast) {
-                    if (o != null) {
-                        tempList.add(o.toString());
-                    }
-                }
-
-                results.add(tempList);
-            } else {
-                if (t != null) {
-                    results.add(t.toString());
-                }
+            if (t != null) {
+                results.add(t);
             }
         } catch (JsonPathException e) {
             logger.warn("{} for path {} ", e.getMessage(), this.path + reference, e);

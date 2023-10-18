@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added source encoding in `pom.xml`
 - Removed unused dependency on jackson-annotations.
 - Removed dependency on commons-io
+- Removed unused code
 
 ### Security
 - Updated OpenCSV to 5.8

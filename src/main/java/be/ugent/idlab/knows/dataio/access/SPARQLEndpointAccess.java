@@ -1,11 +1,13 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import be.ugent.idlab.knows.dataio.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Serial;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -17,11 +19,13 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
  * This class represents the access to a SPARQL endpoint.
  */
 public class SPARQLEndpointAccess implements Access {
+    private final static Logger log = LoggerFactory.getLogger(SPARQLEndpointAccess.class);
 
+    @Serial
     private static final long serialVersionUID = 7331603102049875880L;
-    private String contentType;
-    private String endpoint;
-    private String query;
+    private final String contentType;
+    private final String endpoint;
+    private final String query;
 
     /**
      * This constructor takes a content type, url of the endpoint, and a SPARQL query as arguments.
@@ -51,7 +55,6 @@ public class SPARQLEndpointAccess implements Access {
      * This method returns an InputStream of the results of the SPARQL endpoint.
      *
      * @return an InputStream.
-     * @throws IOException
      */
     @Override
     public InputStream getInputStream() throws IOException {
@@ -69,21 +72,20 @@ public class SPARQLEndpointAccess implements Access {
         }};
 
         connection.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        out.writeBytes(Utils.getURLParamsString(urlParams));
-        out.flush();
-        out.close();
+        try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+            out.writeBytes(Utils.getURLParamsString(urlParams));
+        }
 
         // TODO check this code
         int status = connection.getResponseCode();
+        log.debug("Status code for getting InputStream for remote location [{}]: {}", endpoint, status);
 
         return connection.getInputStream();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SPARQLEndpointAccess) {
-            SPARQLEndpointAccess access = (SPARQLEndpointAccess) o;
+        if (o instanceof SPARQLEndpointAccess access) {
             return endpoint.equals(access.getEndpoint()) && contentType.equals(access.getContentType()) && query.equals(access.getQuery());
         } else {
             return false;

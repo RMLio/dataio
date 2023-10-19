@@ -30,6 +30,8 @@ public class LocalFileAccess implements Access {
     private final String type;
     private final String encoding;
 
+    transient private final MimetypesFileTypeMap fileTypeMap;
+
     /**
      * This constructor takes the path and the base path of a file.
      * When using the relative path for the file, put it in base and leave path empty
@@ -52,6 +54,10 @@ public class LocalFileAccess implements Access {
         }
         this.encoding = encoding;
         this.type = type;
+
+         fileTypeMap = new MimetypesFileTypeMap();
+         fileTypeMap.addMimeTypes("application/json json JSON");
+         fileTypeMap.addMimeTypes("application/jsonl jsonl JSONL");
     }
 
     public LocalFileAccess(String path, String basePath, String type) {
@@ -127,7 +133,6 @@ public class LocalFileAccess implements Access {
 
     @Override
     public String getContentType() {
-        MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
         return fileTypeMap.getContentType(path);
     }
 

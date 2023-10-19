@@ -4,6 +4,8 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector2;
 import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.IOException;
@@ -36,8 +38,9 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        this.inputReader = access.getInputStreamReader();
-        CsvParser.DSL parser = config.getSFMParser();
+        this.inputReader = new InputStreamReader(new CSVNullInjector2(access.getInputStream(), this.config.getDelimiter(), this.config.getQuoteCharacter()));
+//        this.inputReader = access.getInputStreamReader();
+        CsvParser.DSL parser = config.getSFMParser(1024 * 16);
         this.iterator = parser.iterator(this.inputReader);
 
         if (this.config.isSkipHeader()) {

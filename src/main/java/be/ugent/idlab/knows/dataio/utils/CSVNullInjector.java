@@ -1,9 +1,12 @@
 package be.ugent.idlab.knows.dataio.utils;
 
-import java.io.FilterInputStream;
+import com.drew.lang.annotations.NotNull;
+import io.reactivex.rxjava3.annotations.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -13,13 +16,13 @@ import java.util.Deque;
  */
 public class CSVNullInjector extends InputStream {
 
-    private static final byte[] NULL_VALUE = "DATAIO_INJECTED_NULL_VALUE".getBytes(Charset.defaultCharset());
+    private static final byte[] NULL_VALUE = "DATAIO_INJECTED_NULL_VALUE".getBytes(StandardCharsets.UTF_8);
     private final InputStream inputStream;
     private final Deque<Byte> backBuffer = new ArrayDeque<>();
-    private final byte[] readBuffer = new byte[NULL_VALUE.length];
     private final char delimiter;
     private final char quoteCharacter;
     private boolean quoteMode = false;
+    private boolean firstRead = true;
 
     public CSVNullInjector(InputStream in, char delimiter, char quoteCharacter) {
         this.inputStream = in;
@@ -48,6 +51,11 @@ public class CSVNullInjector extends InputStream {
 
         int first = this.inputStream.read();
 
+        if (first == '\n') {
+            firstRead = true;
+            return first;
+        }
+
         if (first == quoteCharacter) {
             quoteMode = !quoteMode;
             return first;
@@ -57,33 +65,31 @@ public class CSVNullInjector extends InputStream {
             if (quoteMode) { // if in quote mode, do not inject anything
                 return first;
             }
-            int second = this.inputStream.read();
 
-            if (second != delimiter) {
-
-                backBuffer.push((byte) (char) second);
+            if (firstRead) {
+                backBuffer.push((byte) this.delimiter);
+                addNullToBackBuffer();
+                firstRead = false;
+                return (int) backBuffer.pop();
             } else {
-                peekAndReplace();
+                int second = this.inputStream.read();
+
+                if (second != delimiter) {
+                    backBuffer.push((byte) (char) second);
+                } else {
+                    backBuffer.push((byte) this.delimiter);
+                    addNullToBackBuffer();
+                }
             }
         }
+        firstRead = false;
+
         return first;
     }
 
-    private void peekAndReplace() throws IOException {
-        int read = super.read(readBuffer, 0, NULL_VALUE.length);
-        // fill in backbuffer
-        for (int i = read - 1; i >= 0; i--) {
-            backBuffer.push(readBuffer[i]);
-        }
-        backBuffer.push((byte) this.delimiter);
-
-        for (int i = 0; i < NULL_VALUE.length; i++) {
-            if (read != NULL_VALUE.length || readBuffer[i] != NULL_VALUE[i]) {
-                for (int j = NULL_VALUE.length - 1; j >= 0; j--) {
-                    backBuffer.push(NULL_VALUE[j]);
-                }
-                return;
-            }
+    private void addNullToBackBuffer() {
+        for (int i = NULL_VALUE.length - 1; i >= 0; i--) {
+            backBuffer.push(NULL_VALUE[i]);
         }
     }
 }

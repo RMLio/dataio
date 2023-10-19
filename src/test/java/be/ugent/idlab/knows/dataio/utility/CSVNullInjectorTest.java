@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.dataio.utility;
 
 import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector2;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +19,7 @@ public class CSVNullInjectorTest {
     public void testInsertion() throws IOException {
         String testString = "ID,,Foo";
         InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(input);
+        CSVNullInjector injector = new CSVNullInjector2(input);
 
         // read out the injector
         String output = new String(injector.readAllBytes());
@@ -29,7 +30,7 @@ public class CSVNullInjectorTest {
     public void customDelimiter() throws IOException {
         String testString = "ID;;Foo";
         InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(input, ';', '"');
+        CSVNullInjector injector = new CSVNullInjector2(input, ';', '"');
 
         // read out the injector
         String output = new String(injector.readAllBytes());
@@ -43,7 +44,7 @@ public class CSVNullInjectorTest {
     public void ignoreQuotedSeparator() throws IOException {
         String testString = "ID,\",, ,\",Foo";
         InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(input);
+        CSVNullInjector injector = new CSVNullInjector2(input);
 
         String output = new String(injector.readAllBytes());
         assertEquals( testString, output);
@@ -56,9 +57,23 @@ public class CSVNullInjectorTest {
     public void escapedQuote() throws IOException {
         String testString = "\"aaa\",\"b\"\",,bb\",,\"ccc\"";
         InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(input);
+        CSVNullInjector injector = new CSVNullInjector2(input);
 
         String output = new String(injector.readAllBytes());
         assertEquals("\"aaa\",\"b\"\",,bb\",DATAIO_INJECTED_NULL_VALUE,\"ccc\"", output);
+    }
+
+    /**
+     * Tests injection of null value at the start of the string
+     */
+    @Test
+    public void emptyStart() throws IOException {
+        String testString = ",Foo,Bar";
+        InputStream input = new ByteArrayInputStream(testString.getBytes());
+        CSVNullInjector injector = new CSVNullInjector2(input);
+
+        String output = new String(injector.readAllBytes());
+        assertEquals("DATAIO_INJECTED_NULL_VALUE,Foo,Bar", output);
+
     }
 }

@@ -26,7 +26,7 @@ public class CSVRecord extends Record {
             if (i < data.length) {
                 this.data.put(header[i], data[i]);
             } else {
-                this.data.put(header[i], "");
+                this.data.put(header[i], null);
             }
         }
         this.datatypes = datatypes;

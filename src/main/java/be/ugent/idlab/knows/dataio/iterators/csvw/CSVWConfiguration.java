@@ -7,6 +7,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +50,11 @@ public final class CSVWConfiguration implements Serializable {
         this.skipHeader = skipHeader;
         this.commentPrefix = commentPrefix;
         this.header = header;
-        this.nulls = nulls;
+
+        List<String> nullValues = new ArrayList<>(nulls);
+        nullValues.add("DATAIO_INJECTED_NULL_VALUE"); // add our special null value
+
+        this.nulls = nullValues;
         this.encoding = encoding;
     }
 
@@ -93,11 +98,12 @@ public final class CSVWConfiguration implements Serializable {
         return encoding;
     }
 
-    public CsvParser.DSL getSFMParser() {
+    public CsvParser.DSL getSFMParser(int bufferSize) {
         return CsvParser
                 .separator(this.delimiter)
                 .escape(this.escapeCharacter)
-                .quote(this.quoteCharacter);
+                .quote(this.quoteCharacter)
+                .bufferSize(bufferSize);
     }
 
     public CSVParser getOpenCSVParser() {

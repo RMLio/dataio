@@ -4,14 +4,19 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
+import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator2;
+import be.ugent.idlab.knows.dataio.iterators.SourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
+import be.ugent.idlab.knows.dataio.record.Record;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -242,6 +247,38 @@ public class CSVWIteratorTest extends TestCore {
             try (CSVWSourceIterator iterator = new CSVWSourceIterator(access, config)) {
                 assertThrows(IllegalArgumentException.class, iterator::next);
             }
+        }
+    }
+
+    private long getExecTime(SourceIterator iterator) {
+        long start = System.currentTimeMillis();
+
+        iterator.forEachRemaining(new Consumer<>() {
+            int count = 0;
+
+            @Override
+            public void accept(Record source) {
+                if (count < 10) {
+                    System.out.println(((CSVRecord) source).getData());
+                }
+                count++;
+            }
+        });
+
+        long end = System.currentTimeMillis();
+        return end - start;
+    }
+
+
+    @Test
+    @Disabled
+    public void execTime() throws Exception {
+        Access access = new LocalFileAccess("/home/messik/Work/large_files/large_csv/taxonmappings/joined.tsv", "", "tsv", "UTF-8");
+        CSVWConfiguration config = CSVWConfiguration.builder().withDelimiter('\t').build();
+
+        try(SourceIterator iterator = new CSVWSourceIterator(access, config)) {
+            long execTime = getExecTime(iterator);
+            System.out.printf("Execution took %f seconds", execTime / 1000.0);
         }
     }
 }

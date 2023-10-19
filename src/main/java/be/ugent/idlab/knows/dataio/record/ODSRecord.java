@@ -118,8 +118,8 @@ public class ODSRecord extends Record {
      * Compares two cells.
      * Two cells are equivalent if they have the same value type and the same string values
      *
-     * @param cell
-     * @param otherCell
+     * @param cell  One cell to compare.
+     * @param otherCell The other cell to compare.
      * @return true if the cells are equivalent, false otherwise
      */
     private boolean cellEquals(Cell cell, Cell otherCell) {

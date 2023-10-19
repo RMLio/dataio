@@ -1,69 +1,56 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import be.ugent.idlab.knows.dataio.utils.Utils;
-import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.query.*;
 import org.apache.jena.riot.RDFDataMgr;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.io.*;
 import java.util.Map;
 
 /**
- * Access used to perform SPARQL querying of a local file, using a local Fuseki server.
- * Combines the functionality of LocalFileAccess and SPARQLEndpointAccess.
+ * Allows querying a local RDF file using SPARQL
  */
 public class SPARQLLocalFileAccess implements Access, AutoCloseable {
+    @Serial
     private static final long serialVersionUID = -4392563969906913155L;
     private final String query;
-    private final FusekiServer server;
+    private final String pathToFile;
     private final String contentType;
 
     /**
-     * Construct the access by starting a local Fuseki server on a free port.
-     * This port is only used internally and will be released once the Access is closed.
+     * Local RDF file access constructor
      *
      * @param pathToFile path to the file to run SPARQL query against.
      * @param query SPARQL query to run against the file
      * @param contentType content type for the expected response
-     * @throws IOException will be thrown if it occurs during opening or closing the socket.
      */
-    public SPARQLLocalFileAccess(String pathToFile, String query, String contentType) throws IOException {
+    public SPARQLLocalFileAccess(String pathToFile, String query, String contentType) {
+        this.pathToFile = pathToFile;
         this.query = query;
         this.contentType = contentType;
-        int port = Utils.getFreePortNumber();
-
-        this.server = FusekiServer.create()
-                .port(port)
-                .add("data", RDFDataMgr.loadDataset(pathToFile))
-                .build();
-        this.server.start();
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        URL url = new URL(String.format("%sdata", this.server.serverURL()));
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        // Load file into RDF dataset
+        Dataset data = RDFDataMgr.loadDataset(pathToFile);
 
-        conn.setRequestProperty("Accept", this.contentType);
+        // Execute the query
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, data)) {
+            final ResultSet results = qexec.execSelect();
 
-
-        conn.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-        Map<String, String> urlParams = new HashMap<>() {{
-            put("query", query);
-        }};
-        out.writeBytes(Utils.getURLParamsString(urlParams));
-        out.flush();
-        out.close();
-
-        return conn.getInputStream();
+            // Copy results into byte array, which will be passed to an InputStream.
+            // A PipedInputSteam approach doesn't seem to work due to the internals of ResultSetFormatter
+            try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                if (contentType.contains("json")) {
+                    ResultSetFormatter.outputAsJSON(out, results);
+                } else if (contentType.contains("xml")) {
+                    ResultSetFormatter.outputAsXML(out, results);
+                } else { // output CSV by default
+                    ResultSetFormatter.outputAsCSV(out, results);
+                }
+                return new ByteArrayInputStream(out.toByteArray());
+            }
+        }
     }
 
     @Override
@@ -78,11 +65,11 @@ public class SPARQLLocalFileAccess implements Access, AutoCloseable {
 
     @Override
     public String getAccessPath() {
-        return String.format("%sdata/sparql", this.server.serverURL());
+        return pathToFile;
     }
 
     @Override
     public void close() {
-        this.server.stop();
+        // do nothing
     }
 }

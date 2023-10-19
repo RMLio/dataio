@@ -249,23 +249,28 @@
             <scope>test</scope>
         </dependency>
 
+        <!--======================================-->
         <!-- SPARQL - RDF processing dependencies -->
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-fuseki-core</artifactId>
-            <version>${fuseki.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-fuseki-main</artifactId>
-            <version>${fuseki.version}</version>
-        </dependency>
+        <!--======================================-->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <version>${fuseki.version}</version>
         </dependency>
 
+        <!-- Fuseki, providing a SPARQL endpoint, is only needed during tests. -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki-core</artifactId>
+            <version>${fuseki.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki-main</artifactId>
+            <version>${fuseki.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

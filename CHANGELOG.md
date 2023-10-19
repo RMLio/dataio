@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused dependency on jackson-annotations.
 - Removed dependency on commons-io
 - Removed unused code
+- Use Jena to query local RDF files instead of Fuseki, eliminating need to start SPARQL endpoint.
 
 ### Security
 - Updated OpenCSV to 5.8

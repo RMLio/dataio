@@ -6,10 +6,13 @@
     <packaging>jar</packaging>
     <version>v0.1.3-SNAPSHOT</version>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
-        <junit.version>5.9.1</junit.version>
-        <maven.compiler.target>11</maven.compiler.target>
-        <testcontainers.version>1.18.0</testcontainers.version>
+        <junit.version>5.10.0</junit.version>
+        <testcontainers.version>1.18.3</testcontainers.version>
+        <slf4j.version>2.0.7</slf4j.version>
+        <poi.version>5.2.3</poi.version>
+        <fuseki.version>4.9.0</fuseki.version>
     </properties>
     <repositories>
         <repository>
@@ -24,78 +27,128 @@
     <name>dataio</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+
+        <!--======================-->
+        <!-- Logging dependencies -->
+        <!--======================-->
         <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0-M7</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+        <!-- provide a simple logging implementation for testing -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.10</version>
-        </dependency>
+        <!--=============================-->
+        <!-- CSV processing dependencies -->
+        <!--=============================-->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.5.2</version>
+            <version>5.8</version>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
-        </dependency>
+
+        <!--======================================-->
+        <!-- Microsoft document format processing -->
+        <!--======================================-->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.2.2</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.2</version>
+            <version>${poi.version}</version>
         </dependency>
+        <!-- Excel processing dependencies -->
+        <dependency>
+            <groupId>com.github.pjfanning</groupId>
+            <artifactId>excel-streaming-reader</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.monitorjbl</groupId>
+            <artifactId>xlsx-streamer</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
+        <!--==============================================-->
+        <!-- Open document format processing dependencies -->
+        <!--==============================================-->
         <dependency>
             <groupId>org.odftoolkit</groupId>
             <artifactId>simple-odf</artifactId>
             <version>0.9.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.9.0</version>
-        </dependency>
 
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.6.0</version>
-        </dependency>
+        <!--==============================-->
+        <!-- HTML processing dependencies -->
+        <!--==============================-->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.14.2</version>
+            <version>1.16.1</version>
         </dependency>
+
+        <!--=============================-->
+        <!-- XML processing dependencies -->
+        <!--=============================-->
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
-            <version>11.3</version>
+            <version>12.3</version>
         </dependency>
 
+        <!--==============================-->
+        <!-- JSON processing dependencies -->
+        <!--==============================-->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jsurfer</groupId>
+            <artifactId>jsurfer-jackson</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+
+        <!--=============================-->
+        <!-- SQL processing dependencies -->
+        <!--=============================-->
+        <!-- Easy parsing and execution of SQL files -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.13</version>
+        </dependency>
+
+        <!--==================-->
         <!-- Database drivers -->
+        <!--==================-->
         <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.0</version>
+            <version>42.6.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>8.0.31</version>
+            <version>8.1.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
@@ -109,10 +162,24 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc11</artifactId>
-            <version>21.7.0.0</version>
+            <version>23.2.0.0</version>
         </dependency>
 
-        <!--< testcontainer dependencies > -->
+        <!--=======================-->
+        <!-- Reactive dependencies -->
+        <!--=======================-->
+        <!-- RXJava for Flow implementation -->
+        <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>3.1.6</version>
+        </dependency>
+
+        <!--========================-->
+        <!-- Test-only dependencies -->
+        <!--========================-->
+
+        <!-- testcontainer dependencies  -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
@@ -143,17 +210,8 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Easy parsing and execution of SQL files -->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.5.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.jsurfer</groupId>
-            <artifactId>jsurfer-jackson</artifactId>
-            <version>1.6.3</version>
-        </dependency>
+
+        <!-- JUnit dependendies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -169,12 +227,12 @@
         <dependency>
             <groupId>org.jopendocument</groupId>
             <artifactId>jOpenDocument</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.any23</groupId>
             <artifactId>apache-any23-encoding</artifactId>
-            <version>1.1</version>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -191,53 +249,27 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.pjfanning</groupId>
-            <artifactId>excel-streaming-reader</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-to-slf4j</artifactId>
-            <version>2.8.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.monitorjbl</groupId>
-            <artifactId>xlsx-streamer</artifactId>
-            <version>2.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-fuseki-core</artifactId>
-            <version>4.6.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-fuseki-main</artifactId>
-            <version>4.6.1</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
+        <!--======================================-->
+        <!-- SPARQL - RDF processing dependencies -->
+        <!--======================================-->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
-            <version>4.6.1</version>
+            <version>${fuseki.version}</version>
         </dependency>
 
-
+        <!-- Fuseki, providing a SPARQL endpoint, is only needed during tests. -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.14.0</version>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki-core</artifactId>
+            <version>${fuseki.version}</version>
+            <scope>test</scope>
         </dependency>
-
-        <!-- RXJava for Flow implementation -->
         <dependency>
-            <groupId>io.reactivex.rxjava3</groupId>
-            <artifactId>rxjava</artifactId>
-            <version>3.1.5</version>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki-main</artifactId>
+            <version>${fuseki.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -248,7 +280,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <configuration>
                     <filters>
                         <filter>
@@ -273,16 +305,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>

@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -18,10 +17,6 @@ public interface Access extends Serializable {
      * @return the InputStream corresponding to the access.
      */
     InputStream getInputStream() throws Exception;
-
-    default InputStreamReader getInputStreamReader() throws Exception {
-        return new InputStreamReader(this.getInputStream());
-    }
 
     /**
      * This method returns a map of datatypes.

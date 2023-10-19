@@ -8,15 +8,13 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = -5824558388620967495L;
     private final Access access;
     private final CSVWConfiguration config;
@@ -30,6 +28,7 @@ public class CSVWSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
@@ -90,7 +89,7 @@ public class CSVWSourceIterator extends SourceIterator {
      * Checks if @record has a string value which is in the nulls list, if so sets this value to null in the data map.
      *
      * @param record record to be checked
-     * @return
+     * @return Checked record with defined null values replaced with {@code null}
      */
     public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
@@ -108,27 +107,14 @@ public class CSVWSourceIterator extends SourceIterator {
                 .toArray(String[]::new);
     }
 
-    public String applyTrim(String item, boolean trim) {
-        if (trim) {
-            return item.trim();
-        }
-
-        return item;
-    }
-
     public String applyTrim(String item, String trim) {
-        switch (trim) {
-            case "true":
-                return item.trim();
-            case "false":
-                return item;
-            case "start":
-                return item.stripLeading();
-            case "end":
-                return item.stripTrailing();
-            default:
-                throw new IllegalArgumentException("Unrecognized value for flag \"trim\"");
-        }
+        return switch (trim) {
+            case "true" -> item.trim();
+            case "false" -> item;
+            case "start" -> item.stripLeading();
+            case "end" -> item.stripTrailing();
+            default -> throw new IllegalArgumentException("Unrecognized value for flag \"trim\"");
+        };
     }
 
     @Override

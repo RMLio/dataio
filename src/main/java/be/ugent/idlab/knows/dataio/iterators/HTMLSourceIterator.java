@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * This class is a HTMLSourceIterator that creates HTML records.
  */
 public class HTMLSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = -79397539726939643L;
     private final Access access;
     private final String stringIterator;
@@ -50,6 +52,7 @@ public class HTMLSourceIterator extends SourceIterator {
         }
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         bootstrap();

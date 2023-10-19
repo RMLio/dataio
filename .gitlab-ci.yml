@@ -31,7 +31,7 @@ default:
 
 General:
   stage: unittests
-  image: maven:3-jdk-11
+  image: maven:3-eclipse-temurin-17
   retry: 2
   services:
     - name: docker:23.0.5-dind
@@ -62,6 +62,6 @@ General:
                 # Serializability
                 IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
         ]
-#  except:
-#    - master
-#    - development
+  except:
+    - master
+    - development

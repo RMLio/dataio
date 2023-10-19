@@ -1,7 +1,7 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -14,9 +14,10 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getInputStreamFromURL;
  */
 public class RemoteFileAccess implements Access {
 
+    @Serial
     private static final long serialVersionUID = -681410592061545964L;
-    private String location;
-    private String contentType;
+    private final String location;
+    private final String contentType;
 
     public RemoteFileAccess(String location) {
         this(location, "");
@@ -34,7 +35,7 @@ public class RemoteFileAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws MalformedURLException {
+    public InputStream getInputStream() throws Exception {
         return getInputStreamFromURL(new URL(location), contentType);
     }
 
@@ -51,8 +52,7 @@ public class RemoteFileAccess implements Access {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof RemoteFileAccess) {
-            RemoteFileAccess access = (RemoteFileAccess) o;
+        if (o instanceof RemoteFileAccess access) {
             return location.equals(access.getLocation()) && contentType.equals(access.getContentType());
         } else {
             return false;

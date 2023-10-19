@@ -4,11 +4,11 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.record.Record;
 
 import java.io.*;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class JSONLinesSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = -6863412600310339167L;
     private final Access access;
     private final String iteratorPath;
@@ -25,6 +25,7 @@ public class JSONLinesSourceIterator extends SourceIterator {
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      */
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();

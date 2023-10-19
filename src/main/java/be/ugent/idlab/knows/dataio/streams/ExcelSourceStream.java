@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -21,6 +22,7 @@ import java.util.stream.StreamSupport;
  * Stream of Excel records.
  */
 public class ExcelSourceStream implements SourceStream {
+    @Serial
     private static final long serialVersionUID = -5883688877961394710L;
     private final Access access;
     private transient Iterator<Sheet> iterator;
@@ -40,6 +42,7 @@ public class ExcelSourceStream implements SourceStream {
         }
     }
 
+    @Serial
     private void readObject(ObjectInputStream in) throws Exception {
         in.defaultReadObject();
         this.bootstrap();

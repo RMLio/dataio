@@ -43,23 +43,21 @@ public class ExcelRecord extends Record {
     /**
      * Convert a CellType to a XSD datatype URI
      *
-     * @param cell
-     * @return
+     * @param cell The cell whose content to convert.
+     * @return The IRI if found, or an empty string if not found.
      */
-    public static String getIRI(Cell cell) {
+    private static String getIRI(Cell cell) {
         if (cell == null) {
             return "";
         }
 
         CellType cellType = cell.getCellType();
-        switch (cellType) {
-            case NUMERIC:
-                return cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
-            case BOOLEAN:
-                return XSDDatatype.XSDboolean.getURI();
-            default:
-                return XSDDatatype.XSDstring.getURI();
-        }
+        return switch (cellType) {
+            case NUMERIC ->
+                    cell.getNumericCellValue() % 1 == 0 ? XSDDatatype.XSDinteger.getURI() : XSDDatatype.XSDdouble.getURI();
+            case BOOLEAN -> XSDDatatype.XSDboolean.getURI();
+            default -> XSDDatatype.XSDstring.getURI();
+        };
     }
 
     /**
@@ -134,16 +132,17 @@ public class ExcelRecord extends Record {
             }
             return obj;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Could not get cell value. Returning null.", e);
             return null;
         }
     }
 
-    public void printString() {
-        for (String value : this.data.keySet()) {
-            System.out.print(value + ": ");
-            System.out.println(this.get(value));
-        }
+    @Override
+    public String toString() {
+        return "ExcelRecord{" +
+                "data=" + data +
+                ", data_types=" + data_types +
+                '}';
     }
 }
 

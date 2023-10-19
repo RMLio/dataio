@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.Callable;
  * @param <T> parameter subclassing Record
  */
 public abstract class SourceObservable<T extends Record> extends Observable<T> implements AutoCloseable, Serializable {
+    @Serial
     private static final long serialVersionUID = 2571726576202799037L;
     protected Access access;
     protected SourceStream stream;

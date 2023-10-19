@@ -9,11 +9,9 @@ import org.odftoolkit.simple.SpreadsheetDocument;
 import org.odftoolkit.simple.table.Row;
 import org.odftoolkit.simple.table.Table;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +21,7 @@ import java.util.List;
  * Warning: Loads the entire document into memory, not suitable for large ODS documents!
  */
 public class ODSSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = 4036007304900261485L;
     private final Access access;
     private transient Iterator<ODSRecord> records;
@@ -32,6 +31,7 @@ public class ODSSourceIterator extends SourceIterator {
         bootstrap();
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();
@@ -40,8 +40,7 @@ public class ODSSourceIterator extends SourceIterator {
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
+     * @throws Exception  can be thrown due to the consumption of the input stream.
      */
     private void bootstrap() throws Exception {
         List<ODSRecord> sources = new ArrayList<>();

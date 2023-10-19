@@ -35,7 +35,7 @@ public class RemoteFileAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws MalformedURLException {
+    public InputStream getInputStream() throws Exception {
         return getInputStreamFromURL(new URL(location), contentType);
     }
 

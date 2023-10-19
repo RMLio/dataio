@@ -20,35 +20,31 @@ public class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public static InputStream getInputStreamFromURL(URL url, String contentType) {
+    public static InputStream getInputStreamFromURL(URL url, String contentType) throws Exception {
         return getInputStreamFromURL(url, contentType, Collections.emptyMap());
     }
 
-    public static InputStream getInputStreamFromURL(URL url, String contentType, Map<String, String> headers) {
-        InputStream inputStream = null;
-        try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setInstanceFollowRedirects(true);
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", contentType);
-            // Set encoding if not set before
-            if (!headers.containsKey("charset")) {
-                connection.setRequestProperty("charset", "utf-8");
-            }
-            // Apply all headers
-            headers.forEach((name, value) -> {
-                logger.debug("{}: {}", name, value);
-                connection.setRequestProperty(name, value);
-            });
-            logger.debug("trying to connect");
-            connection.connect();
-            logger.debug("getting inputstream");
-            inputStream = connection.getInputStream();
-            logger.debug("got inputstream");
-        } catch (IOException ex) {
-            logger.warn("Cannot get InputStream from {} and content type {}", url, contentType, ex);
+    public static InputStream getInputStreamFromURL(URL url, String contentType, Map<String, String> headers) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setDoOutput(true);
+        connection.setInstanceFollowRedirects(true);
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", contentType);
+        // Set encoding if not set before
+        if (!headers.containsKey("charset")) {
+            connection.setRequestProperty("charset", "utf-8");
         }
+        // Apply all headers
+        headers.forEach((name, value) -> {
+            logger.debug("{}: {}", name, value);
+            connection.setRequestProperty(name, value);
+        });
+        logger.debug("trying to connect");
+        connection.connect();
+        if (connection.getResponseCode() == 401) throw new Exception("not authenticated");
+        logger.debug("getting inputstream");
+        InputStream inputStream = connection.getInputStream();
+        logger.debug("got inputstream");
         return inputStream;
     }
 

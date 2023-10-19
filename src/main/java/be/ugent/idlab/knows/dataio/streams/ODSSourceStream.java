@@ -4,8 +4,7 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.ODSSourceIterator;
 import be.ugent.idlab.knows.dataio.record.Record;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.io.Serial;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -17,6 +16,7 @@ import java.util.stream.StreamSupport;
  * Warning: this class consumes the entire source into memory.
  */
 public class ODSSourceStream implements SourceStream {
+    @Serial
     private static final long serialVersionUID = -8550401945125763790L;
     private final ODSSourceIterator iterator;
 

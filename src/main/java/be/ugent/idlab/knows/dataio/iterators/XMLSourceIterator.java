@@ -10,12 +10,14 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.NoSuchElementException;
 
 /**
  * This class is a XMLSourceIterator that allows the iteration of a XML file
  */
 public class XMLSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = 5027462468699419883L;
     private final Access access;
     private final String stringIterator;
@@ -50,6 +52,7 @@ public class XMLSourceIterator extends SourceIterator {
         }
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         bootstrap();

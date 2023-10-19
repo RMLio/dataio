@@ -5,7 +5,7 @@ import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
 import be.ugent.idlab.knows.dataio.record.Record;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.Serial;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -15,6 +15,7 @@ import java.util.stream.StreamSupport;
  * Internally relies on JSONSourceIterator for record generation.
  */
 public class JSONSourceStream implements SourceStream {
+    @Serial
     private static final long serialVersionUID = -4481189880575751432L;
     private final JSONSourceIterator iterator;
 

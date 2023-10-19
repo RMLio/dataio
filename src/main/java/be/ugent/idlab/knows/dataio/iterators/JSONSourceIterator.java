@@ -1,12 +1,12 @@
 package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.access.Access;
-import be.ugent.idlab.knows.dataio.access.VirtualAccess;
 import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.Configuration;
+import org.jopendocument.util.StringInputStream;
 import org.jsfr.json.JsonSurfer;
 import org.jsfr.json.JsonSurferJackson;
 import org.jsfr.json.ResumableParser;
@@ -15,7 +15,7 @@ import org.jsfr.json.SurfingConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
+import java.io.Serial;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
  * This class is a JSONSourceIterator that allows the iteration of JSON data.
  */
 public class JSONSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = 5727357114356164542L;
     private final Access access;
     private final String iterationPath;
@@ -34,14 +35,25 @@ public class JSONSourceIterator extends SourceIterator {
 
     public JSONSourceIterator(Access access, String iterationPath) throws Exception {
         this.access = access;
-        // replace any occurences of .[ (e.g. $.[*]) with [ (such that we get $[*])
+        // replace any occurrences of .[ (e.g. $.[*]) with [ (such that we get $[*])
         this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
 
     public JSONSourceIterator(String json, String iterationPath) throws Exception {
         // small hack to use the existing constructor
-        this(new VirtualAccess(json.getBytes()), iterationPath);
+        this(new Access() {
+            @Override
+            public InputStream getInputStream() {return new StringInputStream(json);}
+            @Override
+            public Map<String, String> getDataTypes() {return null;}
+
+            @Override
+            public String getContentType() {return null;}
+
+            @Override
+            public String getAccessPath() {return null;}
+        }, iterationPath);
     }
 
 
@@ -58,8 +70,7 @@ public class JSONSourceIterator extends SourceIterator {
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
-     * @throws SQLException
+     * @throws Exception  can be thrown due to the consumption of the input stream.
      */
     private void bootstrap() throws Exception {
         this.inputStream = access.getInputStream();
@@ -79,6 +90,7 @@ public class JSONSourceIterator extends SourceIterator {
         this.parser.parse();
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         this.bootstrap();

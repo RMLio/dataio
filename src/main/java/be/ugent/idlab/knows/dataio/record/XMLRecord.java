@@ -15,8 +15,8 @@ import java.util.Objects;
  */
 public class XMLRecord extends Record {
 
-    private XdmItem item;
-    private XPathCompiler compiler;
+    private final XdmItem item;
+    private final XPathCompiler compiler;
 
     public XMLRecord(XdmItem item, XPathCompiler compiler) {
         this.item = item;

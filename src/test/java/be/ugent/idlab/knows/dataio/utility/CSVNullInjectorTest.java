@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.dataio.utility;
 
 import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
-import be.ugent.idlab.knows.dataio.utils.CSVNullInjector2;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -11,69 +10,105 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CSVNullInjectorTest {
+    private String getProcessedString(String inputString) throws IOException {
+        InputStream input = new ByteArrayInputStream(inputString.getBytes());
+        return new String(new CSVNullInjector(input, 1024 * 128, ',', '"').readAllBytes());
+    }
 
     /**
-     * Simple test to replace the value in between two commas
+     * Tests a simple insertion in between two delimiters
+     * @throws IOException
      */
     @Test
     public void testInsertion() throws IOException {
         String testString = "ID,,Foo";
-        InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector2(input);
-
-        // read out the injector
-        String output = new String(injector.readAllBytes());
-        assertEquals("ID,DATAIO_INJECTED_NULL_VALUE,Foo", output);
+        String output = getProcessedString(testString);
+        String expected = "ID,%s,Foo".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
     }
 
+    /**
+     * Tests an insertion between two custom delimiters
+     * @throws IOException
+     */
     @Test
     public void customDelimiter() throws IOException {
         String testString = "ID;;Foo";
-        InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector2(input, ';', '"');
-
-        // read out the injector
+        InputStream in = new ByteArrayInputStream(testString.getBytes());
+        CSVNullInjector injector = new CSVNullInjector(in, 1024 * 128,';', '"');
         String output = new String(injector.readAllBytes());
-        assertEquals("ID;DATAIO_INJECTED_NULL_VALUE;Foo", output);
-    }
-
-    /**
-     * Tests ignoring quoted separators.
-     */
-    @Test
-    public void ignoreQuotedSeparator() throws IOException {
-        String testString = "ID,\",, ,\",Foo";
-        InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector2(input);
-
-        String output = new String(injector.readAllBytes());
-        assertEquals( testString, output);
-    }
-
-    /**
-     * Tests correct injection for escaped quotes
-     */
-    @Test
-    public void escapedQuote() throws IOException {
-        String testString = "\"aaa\",\"b\"\",,bb\",,\"ccc\"";
-        InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector2(input);
-
-        String output = new String(injector.readAllBytes());
-        assertEquals("\"aaa\",\"b\"\",,bb\",DATAIO_INJECTED_NULL_VALUE,\"ccc\"", output);
+        String expected = "ID;%s;Foo".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
     }
 
     /**
      * Tests injection of null value at the start of the string
+     * @throws IOException
      */
     @Test
     public void emptyStart() throws IOException {
         String testString = ",Foo,Bar";
-        InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector2(input);
+        String output = getProcessedString(testString);
+        String expected = "%s,Foo,Bar".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
+    }
 
-        String output = new String(injector.readAllBytes());
-        assertEquals("DATAIO_INJECTED_NULL_VALUE,Foo,Bar", output);
+    /**
+     * Tests insertion of null value at the end of the string
+     * @throws IOException
+     */
+    @Test
+    public void emptyEnd() throws IOException {
+        String testString = "Foo,Bar,";
+        String output = getProcessedString(testString);
+        String expected = "Foo,Bar,%s".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
+    }
 
+    /**
+     * Tests ignoring of quoted separators
+     */
+    @Test
+    public void ignoreQuotedSeparator() throws IOException {
+        String testString = "ID,\",, ,\",Foo";
+        String output = getProcessedString(testString);
+        assertEquals(testString, output);
+    }
+
+    /**
+     * Tests correct injection for escaped quotes
+     * Input: "aaa","b"",,bb",,"ccc"
+     * Output: "aaa","b"",,bb",${nullValue},"ccc"
+     */
+    @Test
+    public void escapedQuote() throws IOException {
+        String testString = "\"aaa\",\"b\"\",,bb\",,\"ccc\"";
+        String output = getProcessedString(testString);
+        String expected = "\"aaa\",\"b\"\",,bb\",%s,\"ccc\"".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
+    }
+
+    /**
+     * Tests the injector's correct recognition of Linux newlines.
+     * @throws IOException
+     */
+    @Test
+    public void unixNewLine() throws IOException {
+        String testString = "Foo,,Bar\n,B";
+        String output = getProcessedString(testString);
+        String expected = "Foo,%s,Bar\n%s,B".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
+    }
+
+    /**
+     * Tests the injector's correct recognition of Windows newlines.
+     * @throws IOException
+     */
+    @Test
+    public void windowsNewLine() throws IOException {
+        String testString = "Foo,,Bar\r\n,B";
+        String output = getProcessedString(testString);
+        String expected = "Foo,%s,Bar\r\n%s,B".replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        assertEquals(expected, output);
     }
 }

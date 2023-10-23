@@ -4,7 +4,6 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
-import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator2;
 import be.ugent.idlab.knows.dataio.iterators.SourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;

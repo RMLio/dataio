@@ -1,10 +1,8 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
 
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
 import org.simpleflatmapper.lightningcsv.CsvParser;
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ public final class CSVWConfiguration implements Serializable {
         this.header = header;
 
         List<String> nullValues = new ArrayList<>(nulls);
-        nullValues.add("DATAIO_INJECTED_NULL_VALUE"); // add our special null value
+        nullValues.add(CSVNullInjector.NULL_VALUE); // add our special null value
 
         this.nulls = nullValues;
         this.encoding = encoding;
@@ -104,14 +102,5 @@ public final class CSVWConfiguration implements Serializable {
                 .escape(this.escapeCharacter)
                 .quote(this.quoteCharacter)
                 .bufferSize(bufferSize);
-    }
-
-    public CSVParser getOpenCSVParser() {
-        return new CSVParserBuilder()
-                .withSeparator(this.delimiter)
-                .withEscapeChar(this.escapeCharacter)
-                .withQuoteChar(this.quoteCharacter)
-                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                .build();
     }
 }

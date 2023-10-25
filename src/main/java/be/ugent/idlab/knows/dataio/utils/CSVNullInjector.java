@@ -17,7 +17,6 @@ public class CSVNullInjector extends InputStream {
     private final char quoteCharacter;
     private boolean quoteMode = false;
     private boolean newLine = true;
-    private byte lastByte = 0;
 
     public CSVNullInjector(InputStream inputStream, int bufferSize, char delimiter, char quoteCharacter) throws IOException {
         this.nullBuffer = ByteBuffer.allocate(NULL_VALUE.length());
@@ -78,8 +77,7 @@ public class CSVNullInjector extends InputStream {
      */
     private ReadingResult getNextByte() throws IOException {
         if (this.nullBuffer.hasRemaining()) {
-            this.lastByte = this.nullBuffer.get();
-            return new ReadingResult(true, this.lastByte);
+            return new ReadingResult(true, this.nullBuffer.get());
         }
 
         if (!this.ensureInput()) {
@@ -123,8 +121,8 @@ public class CSVNullInjector extends InputStream {
             }
             // not the last byte, check the next
             byte b1 = this.inputBuffer.get(this.inputBuffer.position());
-            if (b1 == this.delimiter) {
-                // two delimiters, add a null value
+            if (b1 == this.delimiter || b1 == '\n') {
+                // two delimiters or a newline => dangling delimiter, add a null value
                 this.nullBuffer.flip();
                 return new ReadingResult(true, currentByte); // return the original
             }
@@ -142,9 +140,8 @@ public class CSVNullInjector extends InputStream {
             return false;
         }
 
-        this.inputBuffer.limit(count);
-
         this.inputBuffer.flip();
+        this.inputBuffer.limit(count);
 
         return true;
     }
@@ -154,6 +151,11 @@ public class CSVNullInjector extends InputStream {
         this.inputStream.close();
     }
 
+    /**
+     * Record to communicate the result of the byte read and it's success
+     * @param valid true if the reading of the byte was successful and the result byte is usable, false otherwise
+     * @param result the result of reading
+     */
     private record ReadingResult(boolean valid, byte result) {
     }
 }

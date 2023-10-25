@@ -63,21 +63,22 @@ public class CSVWSourceIterator extends SourceIterator {
                 return null;
             }
 
+            // replace any occurrence of an escaped quote with a single quote
+            for (int i = 0; i < r.length; i++) {
+                String s = r[i];
+                // trim the string that is quoted
+                if (s.startsWith("\"") && s.endsWith("\"")) {
+                    s = s.substring(1, s.length() - 1);
+                }
+
+                s = s.replaceAll("\"\"", "\"");
+
+                r[i] = s;
+            }
+
             return r;
         }
         return null;
-    }
-
-    /**
-     * Checks if the passed line corresponds to the filters set
-     * A line is considered valid if it doesn't start with the comment prefix
-     * If the first value is null, the line is accepted
-     *
-     * @param line line to be checked
-     * @return true if the line passes all checks
-     */
-    private boolean invalidLine(String[] line) {
-        return line[0] != null && line[0].startsWith(this.config.getCommentPrefix());
     }
 
     /**

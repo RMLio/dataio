@@ -9,6 +9,7 @@ import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.NoSuchFileException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class LocalAccessTest extends LocalAccessTestCore {
     @Test
     public void nonExistentFile() {
         Access access = new LocalFileAccess("", "not_existing_file.csv", "csv", "utf-8");
-        assertThrows(FileNotFoundException.class, () -> access.getInputStream());
+        assertThrows(NoSuchFileException.class, access::getInputStream);
     }
 
     @EnabledOnOs(OS.WINDOWS)

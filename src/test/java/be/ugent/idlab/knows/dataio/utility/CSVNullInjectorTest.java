@@ -3,10 +3,7 @@ package be.ugent.idlab.knows.dataio.utility;
 import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -64,6 +61,22 @@ public class CSVNullInjectorTest {
         String output = getProcessedString(testString);
         String expected = "Foo,Bar,%s".replaceAll("%s", CSVNullInjector.NULL_VALUE);
         assertEquals(expected, output);
+    }
+
+    @Test
+    public void danglingSeparator() throws IOException {
+        String testString = """
+                "ID","Name","DateOfBirth"
+                "1","Alice",
+                "2","Bob","September, 2010"
+                """;
+        String expected = """
+                "ID","Name","DateOfBirth"
+                "1","Alice",%s
+                "2","Bob","September, 2010"
+                """.replaceAll("%s", CSVNullInjector.NULL_VALUE);
+        String actual = getProcessedString(testString);
+        assertEquals(expected, actual);
     }
 
     /**

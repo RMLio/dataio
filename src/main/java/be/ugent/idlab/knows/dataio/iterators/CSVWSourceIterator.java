@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
     private static final long serialVersionUID = -5824558388620967495L;
+    private static final int BUFFER_SIZE = 1024 * 128; // 128 KiB
     private final Access access;
     private final CSVWConfiguration config;
     private transient String[] header;
@@ -37,9 +38,9 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        int bufferSize = 1024 * 128; // 128 KiB
-        this.inputReader = new InputStreamReader(new CSVNullInjector(this.access.getInputStream(), bufferSize, this.config.getDelimiter(), this.config.getQuoteCharacter()));
-        CsvParser.DSL parser = config.getSFMParser(bufferSize);
+        CSVNullInjector injector = new CSVNullInjector(this.access.getInputStream(), BUFFER_SIZE, this.config.getDelimiter(), this.config.getQuoteCharacter());
+        this.inputReader = new InputStreamReader(injector, this.config.getEncoding());
+        CsvParser.DSL parser = config.getSFMParser(BUFFER_SIZE);
         this.iterator = parser.iterator(this.inputReader);
 
         if (this.config.isSkipHeader()) {

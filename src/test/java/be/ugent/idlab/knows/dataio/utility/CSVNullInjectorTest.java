@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,8 +35,8 @@ public class CSVNullInjectorTest {
     @Test
     public void customDelimiter() throws IOException {
         String testString = "ID;;Foo";
-        InputStream in = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(in, 1024 * 128,';', '"');
+        InputStream input = new ByteArrayInputStream(testString.getBytes());
+        CSVNullInjector injector = new CSVNullInjector(input, 1024 * 128,';', '"');
         String output = new String(injector.readAllBytes());
         String expected = "ID;%s;Foo".replaceAll("%s", CSVNullInjector.NULL_VALUE);
         assertEquals(expected, output);

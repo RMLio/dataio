@@ -34,7 +34,7 @@ public enum DatabaseType {
     private final String driverSubstring;
     private final String driver;
 
-    private DatabaseType(String name, String jdbcPrefix, String driverSubstring, String driver) {
+    DatabaseType(String name, String jdbcPrefix, String driverSubstring, String driver) {
         this.name = name;
         this.jdbcPrefix = jdbcPrefix;
         this.driverSubstring = driverSubstring;

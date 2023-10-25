@@ -6,17 +6,18 @@ import be.ugent.idlab.knows.dataio.record.Record;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class ExcelSourceIterator extends SourceIterator {
+    @Serial
     private static final long serialVersionUID = 5223150147849184514L;
     private final Access access;
     private transient Iterator<ExcelRecord> iterator;
@@ -49,6 +50,7 @@ public class ExcelSourceIterator extends SourceIterator {
         this.iterator = sources.iterator();
     }
 
+    @Serial
     private void readObject(ObjectInputStream inputStream) throws Exception {
         inputStream.defaultReadObject();
         boostrap();

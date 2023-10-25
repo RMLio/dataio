@@ -5,7 +5,7 @@ import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.dataio.record.Record;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.Serial;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -16,6 +16,7 @@ import java.util.stream.StreamSupport;
  * Internally relies on the CSVSourceIterator for record generation.
  */
 public class CSVSourceStream implements SourceStream {
+    @Serial
     private static final long serialVersionUID = 7550892039319544071L;
     private final CSVSourceIterator iterator;
 

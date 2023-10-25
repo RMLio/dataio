@@ -1,10 +1,13 @@
 package be.ugent.idlab.knows.dataio.exceptions;
 
+import java.io.Serial;
+
 /**
  * Exception to be thrown when the header and the row element count don't line up
  */
 public class UnequalHeaderRowLengthException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -6181007946867658312L;
 
     /**

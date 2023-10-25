@@ -5,15 +5,16 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SaxNamespaceResolver {
+    private static final Logger log = LoggerFactory.getLogger(SaxNamespaceResolver.class);
 
     /**
      * Hackish method to extract all available namespace definitions
      * using a XPath expression and declaring them into a XPath Compiler.
-     * 
-     * This should be handled similarly to how it is done in {@link NamespaceResolver},
-     * but in this case by implementing the {@link net.sf.saxon.om.NamespaceResolver} interface
+     * Uses the {@link net.sf.saxon.om.NamespaceResolver} interface
      * relying on saxon-based utility classes. 
      */
     public static void registerNamespaces(XPathCompiler compiler, XdmNode node) {
@@ -32,7 +33,7 @@ public class SaxNamespaceResolver {
             compiler.declareNamespace("array", "http://www.w3.org/2005/xpath-functions/array");
 
         } catch (SaxonApiException e) {
-            e.printStackTrace();
+            log.warn("Could not register namespaces.", e);
         }
     }
 }

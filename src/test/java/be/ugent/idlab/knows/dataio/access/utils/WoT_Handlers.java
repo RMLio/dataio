@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +51,7 @@ public class WoT_Handlers {
         public void handle(HttpExchange t) throws IOException {
             String response = "couldn't load trashcan JSON file";
             try {
-                response = Utils.fileToString(Utils.getFile("src/test/resources/wot/iot-sensors.json"));
+                response = Files.readString(Path.of("src/test/resources/wot/iot-sensors.json"), StandardCharsets.UTF_8);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -96,7 +99,7 @@ public class WoT_Handlers {
         public void handle(HttpExchange t) throws IOException {
             String response = "couldn't load iRail stations JSON file";
             try {
-                response = Utils.fileToString(Utils.getFile("src/test/resources/wot/stations.json"));
+                response = Files.readString(Path.of("src/test/resources/wot/stations.json"), StandardCharsets.UTF_8);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -119,7 +122,7 @@ public class WoT_Handlers {
             String response = "Couldn't load JSON file";
             try {
                 String filePath = "src/test/resources/wot/bearer_security_input.json";
-                response = Utils.fileToString(Utils.getFile(filePath));
+                response = Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -153,7 +156,7 @@ public class WoT_Handlers {
             String response = "Couldn't load JSON file";
             try {
                 String filePath = "src/test/resources/wot/oauth_input.json";
-                response = Utils.fileToString(Utils.getFile(filePath));
+                response = Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -187,7 +190,7 @@ public class WoT_Handlers {
             if (this.validateRequestHeaders(exchange.getRequestHeaders())) {
                 try {
                     String filePath = "src/test/resources/wot/oauth_input.json";
-                    response = Utils.fileToString(Utils.getFile(filePath));
+                    response = Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

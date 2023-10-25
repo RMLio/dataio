@@ -50,7 +50,7 @@ public class CSVRecord extends Record {
              */
             if (datatype == null) {
                 value = value.replaceFirst("^\"", "").replaceFirst("\"$", "");
-                value = value.replaceFirst("^\'", "").replaceFirst("\'$", "");
+                value = value.replaceFirst("^'", "").replaceFirst("'$", "");
                 datatype = datatypes.get(value);
             }
         }

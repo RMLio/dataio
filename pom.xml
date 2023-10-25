@@ -3,8 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.ugent.idlab.knows</groupId>
     <artifactId>dataio</artifactId>
-    <packaging>jar</packaging>
     <version>v0.1.3-SNAPSHOT</version>
+    <name>dataio</name>
+    <packaging>jar</packaging>
+    <url>https://github.com/RMLio/dataio</url>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
@@ -14,6 +17,7 @@
         <poi.version>5.2.3</poi.version>
         <fuseki.version>4.9.0</fuseki.version>
     </properties>
+
     <repositories>
         <repository>
             <id>repo.maven.apache.org</id>
@@ -24,8 +28,18 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
-    <name>dataio</name>
-    <url>http://maven.apache.org</url>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
 
         <!--======================-->
@@ -332,7 +346,83 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </build>
+
+    <profiles>
+
+        <!-- Profile used to release to Maven central repo -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Publish on Maven central repository -->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.13</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Generate Source jar -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Generate Javadoc jar -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Sign components with GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>6861488FA42A028D5378AF8833C4D74DDB5F1B28</keyname>
+                                    <passphraseServerId>6861488FA42A028D5378AF8833C4D74DDB5F1B28</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

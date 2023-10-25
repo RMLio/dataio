@@ -1,12 +1,17 @@
 stages:
   - lint
   - unittests
+  - deploy
 
 include:
   # Make sure the CHANGELOG is always updated
   - project: 'rml/util/ci-templates'
     ref: main
     file: 'CHANGELOG.gitlab-ci.yml'
+  - project: 'rml/util/ci-templates'
+    ref: main
+    file: 'Maven-Central.gitlab-ci.yml'
+
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.

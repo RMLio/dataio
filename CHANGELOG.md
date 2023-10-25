@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Prepare for publishing on the Maven central repository.
+
 ### Changed
 - Require Java 17 (or more recent)
 

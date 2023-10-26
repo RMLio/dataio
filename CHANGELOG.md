@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Require Java 17 (or more recent)
+- Use SFM for CSV parsing
 
 ### Fixed
 - Updated Maven Surefire plugin to 3.1.2

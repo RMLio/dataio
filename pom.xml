@@ -71,6 +71,11 @@
             <artifactId>opencsv</artifactId>
             <version>5.8</version>
         </dependency>
+        <dependency>
+            <groupId>org.simpleflatmapper</groupId>
+            <artifactId>sfm-csv</artifactId>
+            <version>8.2.3</version>
+        </dependency>
 
         <!--======================================-->
         <!-- Microsoft document format processing -->
@@ -279,18 +284,6 @@
             <version>${fuseki.version}</version>
             <scope>test</scope>
         </dependency>
-      <!-- RXJava for Flow implementation -->
-      <dependency>
-          <groupId>io.reactivex.rxjava3</groupId>
-          <artifactId>rxjava</artifactId>
-          <version>3.1.5</version>
-      </dependency>
-
-      <dependency>
-          <groupId>org.simpleflatmapper</groupId>
-          <artifactId>sfm-csv</artifactId>
-          <version>8.2.3</version>
-      </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-fuseki-main</artifactId>

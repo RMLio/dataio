@@ -37,7 +37,7 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        CSVNullInjector injector = new CSVNullInjector(this.access.getInputStream(), BUFFER_SIZE, this.config.getDelimiter(), this.config.getQuoteCharacter());
+        CSVNullInjector injector = new CSVNullInjector(this.access.getInputStream(), BUFFER_SIZE, (byte) this.config.getDelimiter(), (byte) this.config.getQuoteCharacter());
         this.inputReader = new InputStreamReader(injector, this.config.getEncoding());
         CsvParser.DSL parser = config.getSFMParser(BUFFER_SIZE);
         this.iterator = parser.iterator(this.inputReader);
@@ -72,7 +72,6 @@ public class CSVWSourceIterator extends SourceIterator {
                 }
 
                 s = s.replaceAll("\"\"", "\"");
-
                 r[i] = s;
             }
 
@@ -90,7 +89,7 @@ public class CSVWSourceIterator extends SourceIterator {
     public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (value != null && this.config.getNulls().contains(value)) {
+            if (this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });

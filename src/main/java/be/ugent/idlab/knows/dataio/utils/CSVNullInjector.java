@@ -13,12 +13,12 @@ public class CSVNullInjector extends InputStream {
     private final ByteBuffer nullBuffer;
     private final ByteBuffer inputBuffer;
     private final InputStream inputStream;
-    private final char delimiter;
-    private final char quoteCharacter;
+    private final byte delimiter;
+    private final byte quoteCharacter;
     private boolean quoteMode = false;
     private boolean newLine = true;
 
-    public CSVNullInjector(InputStream inputStream, int bufferSize, char delimiter, char quoteCharacter) throws IOException {
+    public CSVNullInjector(InputStream inputStream, int bufferSize, byte delimiter, byte quoteCharacter) throws IOException {
         this.nullBuffer = ByteBuffer.allocate(NULL_VALUE.length());
         this.inputBuffer = ByteBuffer.allocate(bufferSize);
         this.inputStream = inputStream;
@@ -36,7 +36,7 @@ public class CSVNullInjector extends InputStream {
     }
 
     public CSVNullInjector(InputStream inputStream, int bufferSize) throws IOException {
-        this(inputStream, bufferSize, ',', '"');
+        this(inputStream, bufferSize, (byte) ',', (byte) '"');
     }
 
     @Override

@@ -21,7 +21,7 @@ public class CSVWSourceIterator extends SourceIterator {
     private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
-    private transient Reader inputReader;
+    private transient InputStreamReader inputReader;
     private transient Iterator<String[]> iterator;
 
     public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
@@ -37,10 +37,11 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        CSVNullInjector injector = new CSVNullInjector(this.access.getInputStream(), BUFFER_SIZE, (byte) this.config.getDelimiter(), (byte) this.config.getQuoteCharacter());
-        this.inputReader = new InputStreamReader(injector, this.config.getEncoding());
+        this.inputReader = new InputStreamReader(access.getInputStream(), this.config.getEncoding());
+        CSVNullInjector injector = new CSVNullInjector(inputReader, BUFFER_SIZE, this.config.getDelimiter(), this.config.getQuoteCharacter());
+
         CsvParser.DSL parser = config.getSFMParser(BUFFER_SIZE);
-        this.iterator = parser.iterator(this.inputReader);
+        this.iterator = parser.iterator(injector.reader());
 
         if (this.config.isSkipHeader()) {
             this.header = config.getHeader().toArray(new String[0]);

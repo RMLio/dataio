@@ -2,50 +2,72 @@ package be.ugent.idlab.knows.dataio.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Injects a known NULL value between two commas in CSV.
+ * CSVNullInjector will inject a specific null value (defined below in NULL_VALUE) between two delimiters and between a delimiter and a newline.
  * Inspired by <a href="https://stackoverflow.com/a/4588005">this answer on SO</a>, written with Java's native buffers.
  */
 public class CSVNullInjector extends InputStream {
     public static final String NULL_VALUE = "DATAIO_NULL";
-    private final ByteBuffer nullBuffer;
-    private final ByteBuffer inputBuffer;
-    private final InputStream inputStream;
-    private final byte delimiter;
-    private final byte quoteCharacter;
+    private final CharBuffer nullBuffer;
+    private final CharBuffer inputBuffer;
+    private final InputStreamReader reader;
+    private final char delimiter;
+    private final char quoteCharacter;
     private boolean quoteMode = false;
     private boolean newLine = true;
 
-    public CSVNullInjector(InputStream inputStream, int bufferSize, byte delimiter, byte quoteCharacter) throws IOException {
-        this.nullBuffer = ByteBuffer.allocate(NULL_VALUE.length());
-        this.inputBuffer = ByteBuffer.allocate(bufferSize);
-        this.inputStream = inputStream;
+    /**
+     * Constructor for CSVNullInjector
+     * Will initialise buffers and read the first amount of chars from the reader.
+     *
+     * @param reader         InputStreamReader containing the stream to consume
+     * @param bufferSize     buffer size to pre-allocate for the inputBuffer and keep during reading
+     * @param delimiter      used delimiter
+     * @param quoteCharacter used quote character
+     * @throws IOException when an I/O error occurs
+     */
+    public CSVNullInjector(InputStreamReader reader, int bufferSize, char delimiter, char quoteCharacter) throws IOException {
+        this.nullBuffer = CharBuffer.allocate(NULL_VALUE.length());
+        this.inputBuffer = CharBuffer.allocate(bufferSize);
+        this.reader = reader;
         this.delimiter = delimiter;
         this.quoteCharacter = quoteCharacter;
 
         // initialise null buffer
-        this.nullBuffer.put(NULL_VALUE.getBytes());
+        this.nullBuffer.put(NULL_VALUE);
 
         // initialise input buffer
-        int count = this.inputStream.read(this.inputBuffer.array());
+        int count = this.reader.read(this.inputBuffer.array());
+        this.inputBuffer.flip();
         if (count > 0) {
             this.inputBuffer.limit(count);
         }
     }
 
-    public CSVNullInjector(InputStream inputStream, int bufferSize) throws IOException {
-        this(inputStream, bufferSize, (byte) ',', (byte) '"');
+    /**
+     * Constructor with default values for CSV
+     *
+     * @param reader     reader to consume
+     * @param bufferSize size of the buffer to keep
+     * @throws IOException when an I/O error occurs
+     */
+    public CSVNullInjector(InputStreamReader reader, int bufferSize) throws IOException {
+        this(reader, bufferSize, ',', '"');
     }
 
     @Override
     public int read() throws IOException {
         ReadingResult rr = getNextByte();
-        if (rr.valid) {
-            return rr.result & 0xFF; // sign extend the byte
+        if (rr.valid()) {
+            return rr.result();
         }
-        return -1; // nothing could be read
+        return -1;
     }
 
     @Override
@@ -56,7 +78,7 @@ public class CSVNullInjector extends InputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int i = off;
-        for (; i < len; i++) {
+        while (i < len) {
             ReadingResult rr = getNextByte();
             if (!rr.valid()) {
                 if (i == off) {
@@ -64,32 +86,37 @@ public class CSVNullInjector extends InputStream {
                 }
                 break;
             }
-            b[i] = rr.result();
+            byte[] bytes = String.valueOf(rr.result()).getBytes();
+            for (byte b1 : bytes) {
+                b[i] = b1;
+                i++;
+            }
         }
         return i - off;
     }
 
     /**
-     * Fetches next byte to be returned in by the injector.
-     * This byte could come from either the nullBuffer or the inputBuffer, depending on the state of the injector
+     * Fetches the next character to be returned by the injector.
+     * This character could come from either the nullBuffer or the inputBuffer, depending on the state of the injector
      *
-     * @return the next byte
+     * @return the next character
      */
     private ReadingResult getNextByte() throws IOException {
         if (this.nullBuffer.hasRemaining()) {
             return new ReadingResult(true, this.nullBuffer.get());
         }
 
-        if (!this.ensureInput()) {
+        if (this.noMoreInput()) {
             // nothing more in the inputBuffer
-            return new ReadingResult(false, (byte) -1);
+            return new ReadingResult(false, 'f');
         }
 
-        byte currentByte = this.inputBuffer.get();
+        char currentChar = this.inputBuffer.get();
 
         // specific case when we're on a new line and first character is the delimiter
         // -> there's a missing null value that must be injected
-        if (this.newLine && currentByte == this.delimiter) {
+        if (this.newLine && currentChar == this.delimiter) {
+            // move the inputBuffer back to original position
             this.inputBuffer.position(this.inputBuffer.position() - 1);
             this.nullBuffer.flip();
             this.newLine = false;
@@ -98,64 +125,74 @@ public class CSVNullInjector extends InputStream {
 
         this.newLine = false;
 
-        if (currentByte == this.quoteCharacter) {
+        if (currentChar == this.quoteCharacter) {
             // toggle quote mode
             this.quoteMode = !this.quoteMode;
         }
 
-        if (currentByte == '\n') {
-            this.newLine = true;
-            return new ReadingResult(true, currentByte);
-        }
-
         if (quoteMode) { // if in quote mode, immediately return
-            return new ReadingResult(true, currentByte);
+            return new ReadingResult(true, currentChar);
         }
 
-        if (currentByte == this.delimiter) {
+        if (currentChar == '\n') { // encountered end of line, return
+            this.newLine = true;
+            return new ReadingResult(true, currentChar);
+        }
+
+        if (currentChar == this.delimiter) {
             // look for second delimiter
-            if (!this.ensureInput()) {
+            if (this.noMoreInput()) {
                 // last byte of the input is a delimiter, add one last null value
                 this.nullBuffer.flip();
-                return new ReadingResult(true, currentByte);
+                return new ReadingResult(true, currentChar);
             }
             // not the last byte, check the next
-            byte b1 = this.inputBuffer.get(this.inputBuffer.position());
+            char b1 = this.inputBuffer.get(this.inputBuffer.position());
             if (b1 == this.delimiter || b1 == '\n') {
                 // two delimiters or a newline => dangling delimiter, add a null value
                 this.nullBuffer.flip();
-                return new ReadingResult(true, currentByte); // return the original
+                return new ReadingResult(true, currentChar); // return the original
             }
         }
 
-        return new ReadingResult(true, currentByte);
+        return new ReadingResult(true, currentChar);
     }
 
-    private boolean ensureInput() throws IOException {
+    private boolean noMoreInput() throws IOException {
         if (this.inputBuffer.hasRemaining()) {
-            return true;
-        }
-        int count = this.inputStream.read(this.inputBuffer.array());
-        if (count < 1) { // no bytes available
             return false;
+        }
+        int count = this.reader.read(this.inputBuffer);
+        if (count < 1) { // no bytes available
+            return true;
         }
 
         this.inputBuffer.flip();
         this.inputBuffer.limit(count);
 
-        return true;
+        return false;
     }
 
     @Override
     public void close() throws IOException {
-        this.inputStream.close();
+        this.reader.close();
     }
 
     /**
-     * Record to communicate the result of the byte read and it's success
-     * @param valid true if the reading of the byte was successful and the result byte is usable, false otherwise
-     * @param result the result of reading
+     * A convenience method for getting an InputStreamReader
+     *
+     * @return an InputStreamReader that consumes this null injector
      */
-    private record ReadingResult(boolean valid, byte result) {
+    public InputStreamReader reader() {
+        return new InputStreamReader(this);
+    }
+
+    /**
+     * Record to communicate the result of the byte read and its success
+     *
+     * @param valid  true if the reading of the byte was successful and the result byte is usable, false otherwise
+     * @param result the character produced by the read. If valid == false, its value does not matter
+     */
+    private record ReadingResult(boolean valid, char result) {
     }
 }

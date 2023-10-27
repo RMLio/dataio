@@ -3,19 +3,22 @@ package be.ugent.idlab.knows.dataio.utility;
 import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CSVNullInjectorTest {
     private String getProcessedString(String inputString) throws IOException {
         InputStream input = new ByteArrayInputStream(inputString.getBytes());
-        return new String(new CSVNullInjector(input, 1024 * 128).readAllBytes());
+        InputStreamReader reader = new InputStreamReader(input);
+        return new String(new CSVNullInjector(reader, 1024 * 128).readAllBytes());
     }
 
     /**
      * Tests a simple insertion in between two delimiters
-     * @throws IOException
      */
     @Test
     public void testInsertion() throws IOException {
@@ -27,13 +30,13 @@ public class CSVNullInjectorTest {
 
     /**
      * Tests an insertion between two custom delimiters
-     * @throws IOException
      */
     @Test
     public void customDelimiter() throws IOException {
         String testString = "ID;;Foo";
         InputStream input = new ByteArrayInputStream(testString.getBytes());
-        CSVNullInjector injector = new CSVNullInjector(input, 1024 * 128,(byte) ';', (byte) '"');
+        InputStreamReader reader = new InputStreamReader(input);
+        CSVNullInjector injector = new CSVNullInjector(reader, 1024 * 128, ';', '"');
         String output = new String(injector.readAllBytes());
         String expected = "ID;%s;Foo".replaceAll("%s", CSVNullInjector.NULL_VALUE);
         assertEquals(expected, output);
@@ -41,7 +44,6 @@ public class CSVNullInjectorTest {
 
     /**
      * Tests injection of null value at the start of the string
-     * @throws IOException
      */
     @Test
     public void emptyStart() throws IOException {
@@ -53,7 +55,6 @@ public class CSVNullInjectorTest {
 
     /**
      * Tests insertion of null value at the end of the string
-     * @throws IOException
      */
     @Test
     public void emptyEnd() throws IOException {
@@ -63,6 +64,9 @@ public class CSVNullInjectorTest {
         assertEquals(expected, output);
     }
 
+    /**
+     * Tests the insertion in between a delimiter and a newline
+     */
     @Test
     public void danglingSeparator() throws IOException {
         String testString = """
@@ -104,7 +108,6 @@ public class CSVNullInjectorTest {
 
     /**
      * Tests the injector's correct recognition of Linux newlines.
-     * @throws IOException
      */
     @Test
     public void unixNewLine() throws IOException {
@@ -116,7 +119,6 @@ public class CSVNullInjectorTest {
 
     /**
      * Tests the injector's correct recognition of Windows newlines.
-     * @throws IOException
      */
     @Test
     public void windowsNewLine() throws IOException {

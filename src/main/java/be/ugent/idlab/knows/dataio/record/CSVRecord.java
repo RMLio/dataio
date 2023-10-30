@@ -15,7 +15,7 @@ public class CSVRecord extends Record {
     private final Map<String, String> datatypes;
 
     public CSVRecord(String[] header, String[] data, Map<String, String> datatypes) {
-        this.data = new HashMap<>();
+        this.data = new HashMap<>(header.length);
         if (header.length > data.length) {
             logger.warn("Header has more columns than this row");
         }
@@ -26,7 +26,7 @@ public class CSVRecord extends Record {
             if (i < data.length) {
                 this.data.put(header[i], data[i]);
             } else {
-                this.data.put(header[i], "");
+                this.data.put(header[i], null);
             }
         }
         this.datatypes = datatypes;

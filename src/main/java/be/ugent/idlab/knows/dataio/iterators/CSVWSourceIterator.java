@@ -4,23 +4,25 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvValidationException;
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class CSVWSourceIterator extends SourceIterator {
     @Serial
     private static final long serialVersionUID = -5824558388620967495L;
+    private static final int BUFFER_SIZE = 1024 * 128; // 128 KiB
     private final Access access;
     private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
-    private transient CSVReader reader;
+    private transient InputStreamReader inputReader;
+    private transient Iterator<String[]> iterator;
 
     public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
         this.access = access;
@@ -34,55 +36,49 @@ public class CSVWSourceIterator extends SourceIterator {
         this.bootstrap();
     }
 
-    /**
-     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
-     */
     private void bootstrap() throws Exception {
-        this.reader = new CSVReaderBuilder(new InputStreamReader(access.getInputStream(), config.getEncoding()))
-                .withCSVParser(this.config.getParser())
-                .withSkipLines(this.config.isSkipHeader() ? 1 : 0)
-                .build();
+        this.inputReader = new InputStreamReader(access.getInputStream(), this.config.getEncoding());
+        CSVNullInjector injector = new CSVNullInjector(inputReader, BUFFER_SIZE, this.config.getDelimiter(), this.config.getQuoteCharacter());
+
+        CsvParser.DSL parser = config.getSFMParser(BUFFER_SIZE);
+        this.iterator = parser.iterator(injector.reader());
 
         if (this.config.isSkipHeader()) {
             this.header = config.getHeader().toArray(new String[0]);
         } else {
-            this.header = readLine();
-
-            if (header == null) {
-                throw new IllegalStateException("Unable to read the file!");
-            }
+            this.header = nextLine();
         }
 
-        this.next = readLine();
+        this.next = nextLine();
     }
 
-    private String[] readLine() throws IOException {
-        String[] line;
-        do {
-            try {
-                line = this.reader.readNext();
-
-                if (line == null) {
-                    return null;
-                }
-            } catch (CsvValidationException e) {
-                throw new IllegalArgumentException(String.format("File does not conform to configuration! Offending line: %s", Arrays.toString(this.reader.peek())));
+    private String[] nextLine() {
+        if (this.iterator.hasNext()) {
+            String[] r = this.iterator.next();
+            // go over the lines till uncommented line found
+            while (r[0].startsWith(config.getCommentPrefix()) && this.iterator.hasNext()) {
+                r = this.iterator.next();
             }
-        } while (invalidLine(line));
 
-        return line;
-    }
+            if (r[0].startsWith(config.getCommentPrefix())) {
+                return null;
+            }
 
-    /**
-     * Checks if the passed line corresponds to the filters set
-     * A line is considered valid if it doesn't start with the comment prefix
-     * If the first value is null, the line is accepted
-     *
-     * @param line line to be checked
-     * @return true if the line passes all checks
-     */
-    private boolean invalidLine(String[] line) {
-        return line[0] != null && line[0].startsWith(this.config.getCommentPrefix());
+            // replace any occurrence of an escaped quote with a single quote
+            for (int i = 0; i < r.length; i++) {
+                String s = r[i];
+                // trim the string that is quoted
+                if (s.startsWith("\"") && s.endsWith("\"")) {
+                    s = s.substring(1, s.length() - 1);
+                }
+
+                s = s.replaceAll("\"\"", "\"");
+                r[i] = s;
+            }
+
+            return r;
+        }
+        return null;
     }
 
     /**
@@ -94,7 +90,7 @@ public class CSVWSourceIterator extends SourceIterator {
     public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (value != null && this.config.getNulls().contains(value)) {
+            if (this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });
@@ -122,13 +118,9 @@ public class CSVWSourceIterator extends SourceIterator {
         if (this.next == null) {
             throw new NoSuchElementException();
         }
-
         String[] line = this.next;
-        try {
-            this.next = readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        this.next = nextLine();
 
         if (!config.getTrim().equals("false")) {
             line = applyTrimArray(line, config.getTrim());
@@ -144,6 +136,6 @@ public class CSVWSourceIterator extends SourceIterator {
 
     @Override
     public void close() throws IOException {
-        this.reader.close();
+        this.inputReader.close();
     }
 }

@@ -1,11 +1,12 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
+
+import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +50,11 @@ public final class CSVWConfiguration implements Serializable {
         this.skipHeader = skipHeader;
         this.commentPrefix = commentPrefix;
         this.header = header;
-        this.nulls = nulls;
+
+        List<String> nullValues = new ArrayList<>(nulls);
+        nullValues.add(CSVNullInjector.NULL_VALUE); // add our special null value
+
+        this.nulls = nullValues;
         this.encoding = encoding;
     }
 
@@ -93,12 +98,11 @@ public final class CSVWConfiguration implements Serializable {
         return encoding;
     }
 
-    public CSVParser getParser() {
-        return new CSVParserBuilder()
-                .withSeparator(this.delimiter)
-                .withEscapeChar(this.escapeCharacter)
-                .withQuoteChar(this.quoteCharacter)
-                .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                .build();
+    public CsvParser.DSL getSFMParser(int bufferSize) {
+        return CsvParser
+                .separator(this.delimiter)
+                .escape(this.escapeCharacter)
+                .quote(this.quoteCharacter)
+                .bufferSize(bufferSize);
     }
 }

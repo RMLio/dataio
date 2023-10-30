@@ -248,36 +248,4 @@ public class CSVWIteratorTest extends TestCore {
             }
         }
     }
-
-    private long getExecTime(SourceIterator iterator) {
-        long start = System.currentTimeMillis();
-
-        iterator.forEachRemaining(new Consumer<>() {
-            int count = 0;
-
-            @Override
-            public void accept(Record source) {
-                if (count < 10) {
-                    System.out.println(((CSVRecord) source).getData());
-                }
-                count++;
-            }
-        });
-
-        long end = System.currentTimeMillis();
-        return end - start;
-    }
-
-
-    @Test
-    @Disabled
-    public void execTime() throws Exception {
-        Access access = new LocalFileAccess("/home/messik/Work/large_files/large_csv/taxonmappings/joined.tsv", "", "tsv", "UTF-8");
-        CSVWConfiguration config = CSVWConfiguration.builder().withDelimiter('\t').build();
-
-        try(SourceIterator iterator = new CSVWSourceIterator(access, config)) {
-            long execTime = getExecTime(iterator);
-            System.out.printf("Execution took %f seconds", execTime / 1000.0);
-        }
-    }
 }

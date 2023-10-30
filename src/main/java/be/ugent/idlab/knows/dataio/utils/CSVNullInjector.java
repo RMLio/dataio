@@ -3,9 +3,7 @@ package be.ugent.idlab.knows.dataio.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Injects a known NULL value between two commas in CSV.
@@ -158,6 +156,13 @@ public class CSVNullInjector extends InputStream {
         return new ReadingResult(true, currentChar);
     }
 
+    /**
+     * Method for checking if there's input to be consumed.
+     * Input will be read into inputBuffer should the buffer be empty.
+     *
+     * @return true if the input is exhausted, false otherwise
+     * @throws IOException when an I/O error occurs
+     */
     private boolean noMoreInput() throws IOException {
         if (this.inputBuffer.hasRemaining()) {
             return false;

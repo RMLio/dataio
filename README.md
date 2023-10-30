@@ -4,6 +4,20 @@ The DataIO library opens the given files and allows to read them using an Iterat
 This library doesn't load the full file in memory (this is not the case for XML and ODS files).
 
 ## Setup
+The easiest is to include DataIO as a maven dependency:
+
+```xml
+<dependency>
+    <groupId>be.ugent.idlab.knows</groupId>
+    <artifactId>dataio</artifactId>
+    <version>v1.0.0</version>
+</dependency>
+```
+Check the [maven central repository](https://central.sonatype.com/search?q=be.ugent.idlab.knows&namespace=be.ugent.idlab.knows&name=dataio)
+for the latest version.
+
+Or if you want to build & install locally:
+
 Run the following command:
 
     mvn install

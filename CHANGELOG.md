@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## [1.0.1] - 2023-10-31
+
+### Fixed
+- Maven central deployment
+
 ## [1.0.0] - 2023-10-30
 
 ### Added
@@ -43,4 +50,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[1.0.1]: https://github.com/RMLio/dataio/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/RMLio/dataio/releases/tag/v1.0.0

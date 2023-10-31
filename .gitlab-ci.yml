@@ -68,5 +68,5 @@ General:
                 IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
         ]
   except:
-    - master
+    - main
     - development

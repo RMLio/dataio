@@ -3,10 +3,50 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.ugent.idlab.knows</groupId>
     <artifactId>dataio</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
     <name>dataio</name>
     <packaging>jar</packaging>
     <url>https://github.com/RMLio/dataio</url>
+    <description>
+        DataIO allows iterating over different kinds of data sources.
+    </description>
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>https://raw.githubusercontent.com/RMLio/dataio/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:ssh://git@github.com:RMLio/dataio.git</connection>
+        <url>https://github.com/RMLio/dataio</url>
+    </scm>
+    <developers>
+        <developer>
+            <id>ghsnd</id>
+            <name>Gerald Haesendonck</name>
+            <email>gerald.haesendonck@ugent.be</email>
+        </developer>
+        <developer>
+            <id>jjankaj</id>
+            <name>Jozef Jankaj</name>
+            <email>jozef.jankaj@ugent.be</email>
+        </developer>
+        <developer>
+            <id>rvrijsse</id>
+            <name>Robbe Van Rijsselberghe</name>
+        </developer>
+        <developer>
+            <id>thabils</id>
+            <name>Tibe Habils</name>
+            <email>tibe.habils@ugent.be</email>
+        </developer>
+        <developer>
+            <id>anemchyn</id>
+            <name>Aliaksandra Nemchynava</name>
+            <email>aliaksandra.nemchynava@ugent.be</email>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

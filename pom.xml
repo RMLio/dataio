@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.ugent.idlab.knows</groupId>
     <artifactId>dataio</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <name>dataio</name>
     <packaging>jar</packaging>
     <url>https://github.com/RMLio/dataio</url>
@@ -69,16 +69,6 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <dependencies>
 

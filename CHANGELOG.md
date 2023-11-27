@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- JSONRecord: if reference starts with a dot, but not with '$' no longer adding an extra dot
+
+### Added
+- Test case for JSONPath starting with two dots and no '$'
+
 ## [1.0.4] - 2023-10-31
 
 ### Fixed

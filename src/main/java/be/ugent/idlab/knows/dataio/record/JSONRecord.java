@@ -67,12 +67,7 @@ public class JSONRecord extends Record {
         }
 
         if (!reference.contains("$")) {
-            if(reference.startsWith(".")){
-                reference = String.format("$%s", reference);
-            }
-            else{
-                reference = String.format("$.%s", reference);
-            }
+            reference = reference.startsWith(".") ? String.format("$%s", reference) : String.format("$.%s", reference);
         }
 
         if (reference.equals("@")) {

@@ -7,6 +7,8 @@ import be.ugent.idlab.knows.dataio.iterators.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IteratorSerializabilityTest extends TestCore {
@@ -37,7 +39,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testExcelIterator() throws Exception {
-        Access access = new LocalFileAccess("excel/0001.xlsx", "src/test/resources", "xlsx", "utf-8");
+        Access access = new LocalFileAccess("excel/0001.xlsx", "src/test/resources", "xlsx", StandardCharsets.UTF_8);
         try (ExcelSourceIterator iterator = new ExcelSourceIterator(access)) {
             runSerializabilityTest(iterator);
         }
@@ -45,7 +47,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testHTMLIterator() throws Exception {
-        Access access = new LocalFileAccess("html/0001.html", "src/test/resources", "html", "utf-8");
+        Access access = new LocalFileAccess("html/0001.html", "src/test/resources", "html", StandardCharsets.UTF_8);
         try (HTMLSourceIterator iterator = new HTMLSourceIterator(access, "table tbody tr")) {
             runSerializabilityTest(iterator);
         }
@@ -53,7 +55,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testJSONIterator() throws Exception {
-        Access access = new LocalFileAccess("json/0001.json", "src/test/resources", "json", "utf-8");
+        Access access = new LocalFileAccess("json/0001.json", "src/test/resources", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.pubs[*]")) {
             runSerializabilityTest(iterator);
         }
@@ -61,7 +63,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testJSONLinesIterator() throws Exception {
-        Access access = new LocalFileAccess("json/data.jsonl", "src/test/resources", "jsonl", "utf-8");
+        Access access = new LocalFileAccess("json/data.jsonl", "src/test/resources", "jsonl", StandardCharsets.UTF_8);
         try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
             runSerializabilityTest(iterator);
         }
@@ -69,7 +71,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testODSIterator() throws Exception {
-        Access access = new LocalFileAccess("ods/0001.ods", "src/test/resources", "ods", "utf-8");
+        Access access = new LocalFileAccess("ods/0001.ods", "src/test/resources", "ods", StandardCharsets.UTF_8);
         try (ODSSourceIterator iterator = new ODSSourceIterator(access)) {
             runSerializabilityTest(iterator);
         }
@@ -77,7 +79,7 @@ public class IteratorSerializabilityTest extends TestCore {
 
     @Test
     public void testXMLIterator() throws Exception {
-        Access access = new LocalFileAccess("xml/0001.xml", "src/test/resources", "xml", "utf-8");
+        Access access = new LocalFileAccess("xml/0001.xml", "src/test/resources", "xml", StandardCharsets.UTF_8);
         try (XMLSourceIterator iterator = new XMLSourceIterator(access, "pubs/pub")) {
             runSerializabilityTest(iterator);
         }

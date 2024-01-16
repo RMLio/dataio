@@ -1,0 +1,91 @@
+package be.ugent.idlab.knows.dataio.utils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+public class NewCSVNullInjector extends InputStream {
+
+    public final static String NULL_VALUE = "DATAIO_NULL";
+    private final BufferedReader reader;
+    private final char delimiter;
+    private final Character quoteChar;
+    private byte[] currentLine;         // Bytes of the "current" line, after replacing empty values with `NULL_VALUE`.
+    private boolean firstLine = true;   // becomes `false` after reading the first line.
+    private int pos = 0;                // current position of the "cursor" in `currentLine`. Used by the `read()` method.
+
+    public NewCSVNullInjector(InputStream in,
+                              char delimiter,
+                              Character quoteChar,
+                              Charset charset) {
+        this.reader = new BufferedReader(new InputStreamReader(in, charset));
+        this.delimiter = delimiter;
+        this.quoteChar = quoteChar;
+        currentLine = new byte[0];
+    }
+
+    @Override
+    public int read() throws IOException {
+        if (currentLine.length == pos) {
+            String nextLine = reader.readLine();
+            if (nextLine == null) {
+                return -1;
+            }
+            currentLine = replaceNulls(nextLine).getBytes(StandardCharsets.UTF_8);
+            pos = 0;
+            if (!firstLine) {
+                return '\n';
+            } else {
+                firstLine = false;
+            }
+        }
+        return currentLine[pos++];
+    }
+
+    String replaceNulls(final String input) {
+        if (input.isEmpty()) {
+            return NULL_VALUE;
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean insideQuotes = false;
+        boolean checkQuotes = quoteChar != null;
+
+        char[] inputChars = input.toCharArray();
+        for (char inputChar : inputChars) {
+            switch (inputChar) {    // ignore BOM characters
+                case '\uFFEF', '\uFEFF': continue;
+            }
+            if (insideQuotes) {     // then we can add whatever character, unless it's a quote again.
+                if (inputChar == quoteChar) {
+                    insideQuotes = false;
+                }
+            } else {                // If not inside quotes, check for empty values by checking subsequent delimiters
+                if (inputChar == delimiter) {
+                    // check if last char in buffer is also delimiter
+                    if (result.isEmpty() || result.charAt(result.length() - 1) == delimiter) {
+                        result.append(NULL_VALUE);
+                    }
+                } else if (checkQuotes && inputChar == quoteChar) {
+                    insideQuotes = true;
+                }
+            }
+            result.append(inputChar);
+        }
+
+        // final check: if last character of buffer is separator, then it's a null value
+        if (result.charAt(result.length() - 1) == delimiter) {
+            result.append(NULL_VALUE);
+        }
+
+        return result.toString();
+    }
+
+    @Override
+    public void close() throws IOException {
+        reader.close();
+    }
+}

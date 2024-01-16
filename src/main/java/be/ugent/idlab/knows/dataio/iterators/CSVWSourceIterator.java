@@ -4,10 +4,13 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
-import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import be.ugent.idlab.knows.dataio.utils.NewCSVNullInjector;
 import org.simpleflatmapper.lightningcsv.CsvParser;
 
-import java.io.*;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,7 +24,6 @@ public class CSVWSourceIterator extends SourceIterator {
     private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
-    private transient InputStreamReader inputReader;
     private transient Iterator<String[]> iterator;
 
     public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
@@ -37,11 +39,15 @@ public class CSVWSourceIterator extends SourceIterator {
     }
 
     private void bootstrap() throws Exception {
-        this.inputReader = new InputStreamReader(access.getInputStream(), this.config.getEncoding());
-        CSVNullInjector injector = new CSVNullInjector(inputReader, BUFFER_SIZE, this.config.getDelimiter(), this.config.getQuoteCharacter());
+        NewCSVNullInjector injector = new NewCSVNullInjector(
+                access.getInputStream(),
+                config.getDelimiter(),
+                config.getQuoteCharacter(),
+                config.getEncoding()
+        );
 
         CsvParser.DSL parser = config.getSFMParser(BUFFER_SIZE);
-        this.iterator = parser.iterator(injector.reader());
+        this.iterator = parser.iterator(new InputStreamReader(injector, StandardCharsets.UTF_8));
 
         if (this.config.isSkipHeader()) {
             this.header = config.getHeader().toArray(new String[0]);
@@ -132,10 +138,5 @@ public class CSVWSourceIterator extends SourceIterator {
     @Override
     public boolean hasNext() {
         return this.next != null;
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.inputReader.close();
     }
 }

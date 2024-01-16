@@ -7,6 +7,8 @@ import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.streams.*;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 public class StreamSerializabilityTest extends StreamTestCore {
 
     private void runSerializabilityTest(SourceStream stream) throws Exception {
@@ -17,7 +19,7 @@ public class StreamSerializabilityTest extends StreamTestCore {
 
     @Test
     public void testCSVStream() throws Exception {
-        Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv", "UTF-8");
+        Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv", StandardCharsets.UTF_8);
         try (CSVSourceStream stream = new CSVSourceStream(access)) {
             runSerializabilityTest(stream);
         }

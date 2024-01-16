@@ -9,6 +9,7 @@ import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JSONIteratorTest extends TestCore {
     @Test
     public void evaluate_0000_JSON() throws Exception {
-        Access access = makeLocalAccess("/json/0000.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/0000.json", "", "json", StandardCharsets.UTF_8);
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.students[*]");
 
         assertTrue(evaluate_0000(jsonSourceIterator));
@@ -27,7 +28,7 @@ public class JSONIteratorTest extends TestCore {
 
     @Test
     public void evaluate_0001_JSON() throws Exception {
-        Access access = makeLocalAccess("/json/0001.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/0001.json", "", "json", StandardCharsets.UTF_8);
         JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.pubs[*]");
 
         assertTrue(evaluate_0001(jsonSourceIterator));
@@ -46,7 +47,7 @@ public class JSONIteratorTest extends TestCore {
             put("Name", "Demi Moore");
         }};
 
-        Access access = makeLocalAccess("/json/multiple_sources.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/multiple_sources.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.students[*]")) {
             assertTrue(compareIterator(iterator, List.of(e1, e2)));
         }
@@ -54,7 +55,7 @@ public class JSONIteratorTest extends TestCore {
 
     @Test
     public void evaluate_empty_array() throws Exception {
-        Access access = makeLocalAccess("/json/empty_array.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/empty_array.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*]")) {
             assertFalse(iterator.hasNext());
         }
@@ -82,7 +83,7 @@ public class JSONIteratorTest extends TestCore {
 
     @Test
     public void evaluate_quoted_multiword_keys() throws Exception {
-        Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Record s1 = iterator.next();
             assertEquals("BO", s1.get("ISO 3166").get(0));
@@ -94,7 +95,7 @@ public class JSONIteratorTest extends TestCore {
 
     @Test
     public void evaluate_path_to_array() throws Exception {
-        Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/array.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*].ingredients[*]")) {
             Record s = iterator.next();
             assertEquals("garlic", s.get("@").get(0));
@@ -106,7 +107,7 @@ public class JSONIteratorTest extends TestCore {
      */
     @Test
     public void evaluate_path_replacement() throws Exception {
-        Access access = makeLocalAccess("/json/array.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/array.json", "", "json", StandardCharsets.UTF_8);
         try (
                 JSONSourceIterator it1 = new JSONSourceIterator(access, "$.[*]");
                 JSONSourceIterator it2 = new JSONSourceIterator(access, "$[*]")
@@ -124,7 +125,7 @@ public class JSONIteratorTest extends TestCore {
     @Test
     public void evaluate_json_lines() throws Exception {
         List<Object> expected = List.of("10", "Venus", "11", "null", "12", "Serena");
-        Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", "utf-8");
+        Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", StandardCharsets.UTF_8);
         try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
             List<Object> actual = new ArrayList<>();
             iterator.forEachRemaining(s -> actual.add(s.get("@").get(0)));
@@ -153,7 +154,7 @@ public class JSONIteratorTest extends TestCore {
 
     @Test
     public void evaluate_nested_array() throws Exception {
-        Access access = makeLocalAccess("/json/nested_array.json", "", "json", "utf-8");
+        Access access = makeLocalAccess("/json/nested_array.json", "", "json", StandardCharsets.UTF_8);
         try(JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.main_array[*]")) {
             while (jsonSourceIterator.hasNext()) {
                 Record source = jsonSourceIterator.next();

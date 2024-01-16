@@ -9,8 +9,7 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +18,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void evaluate_0000_ods() throws Exception {
-        Access access = makeLocalAccess("/ods/0000.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/0000.ods", "", "ods", StandardCharsets.UTF_8);
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_0000(odsSourceIterator));
         }
@@ -27,7 +26,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void evaluate_0001_ods() throws Exception {
-        Access access = makeLocalAccess("/ods/0001.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/0001.ods", "", "ods", StandardCharsets.UTF_8);
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_0001(odsSourceIterator));
         }
@@ -35,7 +34,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void evaluate_1001_header_col_missing_CSV() {
-        Access access = makeLocalAccess("/ods/1001_header_col_missing.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/1001_header_col_missing.ods", "", "ods", StandardCharsets.UTF_8);
         assertThrows(HeaderEmptyValuesException.class, () -> {
             ODSSourceIterator iterator = new ODSSourceIterator(access);
             iterator.close();
@@ -44,7 +43,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void evaluate_1001_header_long_CSV() throws Exception {
-        Access access = makeLocalAccess("/ods/1001_header_long.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/1001_header_long.ods", "", "ods", StandardCharsets.UTF_8);
         try (ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access)) {
             Assertions.assertTrue(evaluate_1001_header_long(odsSourceIterator));
         }
@@ -52,7 +51,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void evaluate_1001_header_short_CSV() {
-        Access access = makeLocalAccess("/ods/1001_header_short.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/1001_header_short.ods", "", "ods", StandardCharsets.UTF_8);
         assertThrows(HeaderEmptyValuesException.class, () -> {
             ODSSourceIterator odsSourceIterator = new ODSSourceIterator(access);
             odsSourceIterator.close();
@@ -61,7 +60,7 @@ public class ODSIteratorTest extends TestCore {
 
     @Test
     public void test_value_types() throws Exception {
-        Access access = makeLocalAccess("/ods/value_types.ods", "", "ods", "utf-8");
+        Access access = makeLocalAccess("/ods/value_types.ods", "", "ods", StandardCharsets.UTF_8);
         try (ODSSourceIterator iterator = new ODSSourceIterator(access)) {
             ODSRecord record = (ODSRecord) iterator.next();
 

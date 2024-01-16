@@ -2,6 +2,7 @@ package be.ugent.idlab.knows.dataio.iterators;
 
 import be.ugent.idlab.knows.dataio.record.Record;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -24,4 +25,6 @@ public abstract class SourceIterator implements Iterator<Record>, Serializable, 
         while (hasNext())
             action.accept(next());
     }
+
+    public void close() throws IOException {}
 }

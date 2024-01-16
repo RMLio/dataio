@@ -1,11 +1,12 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
 
-import be.ugent.idlab.knows.dataio.utils.CSVNullInjector;
+import be.ugent.idlab.knows.dataio.utils.NewCSVNullInjector;
 import org.simpleflatmapper.lightningcsv.CsvParser;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public final class CSVWConfiguration implements Serializable {
     private final List<String> nulls;
     private final String encoding;
 
-    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, List<String> nulls, String encoding) {
+    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, List<String> nulls, Charset encoding) {
         // opencsv parser options
         this.delimiter = delimiter;
         this.escapeCharacter = escapeCharacter;
@@ -52,10 +53,10 @@ public final class CSVWConfiguration implements Serializable {
         this.header = header;
 
         List<String> nullValues = new ArrayList<>(nulls);
-        nullValues.add(CSVNullInjector.NULL_VALUE); // add our special null value
+        nullValues.add(NewCSVNullInjector.NULL_VALUE); // add our special null value
 
         this.nulls = nullValues;
-        this.encoding = encoding;
+        this.encoding = encoding.name();
     }
 
     public static CSVWConfigurationBuilder builder() {
@@ -94,8 +95,8 @@ public final class CSVWConfiguration implements Serializable {
         return this.nulls;
     }
 
-    public String getEncoding() {
-        return encoding;
+    public Charset getEncoding() {
+        return Charset.forName(encoding);
     }
 
     public CsvParser.DSL getSFMParser(int bufferSize) {

@@ -4,18 +4,15 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.record.Record;
 import org.apache.commons.lang3.SerializationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class TestCore {
-
-    protected static final Logger logger = LoggerFactory.getLogger(TestCore.class);
 
     public boolean evaluate_0000(Iterator<Record> iterator) {
         Map<String, Object> expected = Map.of(
@@ -127,7 +124,7 @@ public class TestCore {
         return expectedRecords.size() == counter;
     }
 
-    public Access makeLocalAccess(String inputFile, String base, String type, String encoding) {
+    public Access makeLocalAccess(String inputFile, String base, String type, Charset encoding) {
         return new LocalFileAccess(getClass().getResource(inputFile).getPath(), base, type, encoding);
     }
 

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -41,7 +42,7 @@ public class LocalFileAccess implements Access {
      * @param type     type of the file
      * @param encoding encoding of the file
      */
-    public LocalFileAccess(String path, String base, String type, String encoding) {
+    public LocalFileAccess(String path, String base, String type, Charset encoding) {
         if (base != null && !base.isEmpty()) {
             Path basePath = Path.of(base);
             this.path = basePath.resolve(path).toString();
@@ -49,10 +50,7 @@ public class LocalFileAccess implements Access {
             this.path = Path.of(path).toString();
         }
 
-        if (!Charset.isSupported(encoding)) {
-            throw new IllegalArgumentException("Passed encoding not supported.");
-        }
-        this.encoding = encoding;
+        this.encoding = encoding.name();
         this.type = type;
 
          fileTypeMap = new MimetypesFileTypeMap();
@@ -61,7 +59,7 @@ public class LocalFileAccess implements Access {
     }
 
     public LocalFileAccess(String path, String basePath, String type) {
-        this(path, basePath, type, "utf-8");
+        this(path, basePath, type, StandardCharsets.UTF_8);
     }
 
     /**
@@ -144,7 +142,7 @@ public class LocalFileAccess implements Access {
         return Path.of(path).toAbsolutePath().toString();
     }
 
-    public String getEncoding() {
-        return encoding;
+    public Charset getEncoding() {
+        return Charset.forName(encoding);
     }
 }

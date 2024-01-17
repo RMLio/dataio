@@ -8,6 +8,7 @@ import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.streams.CSVWSourceStream;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class CSVWStreamTest extends StreamTestCore {
 
     @Test
     public void eval_0000() throws Exception {
-        Access access = new LocalFileAccess("csv/0000.csv", "src/test/resources", "csv", "UTF-8");
+        Access access = new LocalFileAccess("csv/0000.csv", "src/test/resources", "csv", StandardCharsets.UTF_8);
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_0000);
         }
@@ -26,7 +27,7 @@ public class CSVWStreamTest extends StreamTestCore {
 
     @Test
     public void eval_0001() throws Exception {
-        Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv", "UTF-8");
+        Access access = new LocalFileAccess("csv/0001.csv", "src/test/resources", "csv", StandardCharsets.UTF_8);
         try (CSVWSourceStream stream = new CSVWSourceStream(access, default_config)) {
             runTest(stream, this::evaluate_0001);
         }

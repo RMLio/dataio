@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.iterators.csvw;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -13,14 +14,14 @@ public class CSVWConfigurationBuilder {
     private List<String> header = List.of();
     private List<String> nulls = List.of();
 
-    private String encoding = StandardCharsets.UTF_8.toString();
+    private Charset encoding = StandardCharsets.UTF_8;
 
     public CSVWConfigurationBuilder withDelimiter(char delimiter) {
         this.delimiter = delimiter;
         return this;
     }
 
-    public CSVWConfigurationBuilder withEncoding(String encoding) {
+    public CSVWConfigurationBuilder withEncoding(Charset encoding) {
         this.encoding = encoding;
         return this;
     }

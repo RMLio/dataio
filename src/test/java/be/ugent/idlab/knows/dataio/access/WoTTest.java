@@ -12,8 +12,12 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -32,7 +36,7 @@ public class WoTTest {
             String target = String.format("http://localhost:%d/%s", server.getAddress().getPort(), entrypoint);
 
             Access wot = new WoTAccess(target, "application/json", headers, auth);
-            Access local = new LocalFileAccess("", inputFile, "json", "utf-8");
+            Access local = new LocalFileAccess("", inputFile, "json", StandardCharsets.UTF_8);
 
             List<Record> expected = getJsonSources(local, iterator);
             List<Record> actual = getJsonSources(wot, iterator);

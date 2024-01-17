@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.stream.Stream;
 
 public class LocalAccessTestCore extends TestCore {
@@ -45,7 +44,7 @@ public class LocalAccessTestCore extends TestCore {
             throw new RuntimeException(e);
         }
 
-        Charset charset = Charset.forName(((LocalFileAccess) access).getEncoding());
+        Charset charset = ((LocalFileAccess) access).getEncoding();
 
         return new String(b, charset);
     }

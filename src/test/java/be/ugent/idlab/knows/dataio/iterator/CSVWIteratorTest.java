@@ -4,32 +4,28 @@ import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVWSourceIterator;
-import be.ugent.idlab.knows.dataio.iterators.SourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
-import be.ugent.idlab.knows.dataio.record.Record;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CSVWIteratorTest extends TestCore {
 
     private CSVWSourceIterator defaultIterator(String path) throws Exception {
-        Access access = makeLocalAccess(path, "", "csvw", "utf-8");
+        Access access = makeLocalAccess(path, "", "csvw", StandardCharsets.UTF_8);
         CSVWConfiguration config = CSVWConfiguration.DEFAULT;
         return new CSVWSourceIterator(access, config);
     }
 
     @Test
     public void evaluate_1000_nulls() throws Exception {
-        Access access = makeLocalAccess("/csvw/1000_nulls.csv", "", "csvw", "utf-8");
+        Access access = makeLocalAccess("/csvw/1000_nulls.csv", "", "csvw", StandardCharsets.UTF_8);
         CSVWConfiguration config = CSVWConfiguration.builder().withNulls(List.of("NULL")).build();
         String[] header = new String[]{"ID", "Name"};
 
@@ -120,8 +116,8 @@ public class CSVWIteratorTest extends TestCore {
 
         @Test
         public void test_00002a_encoding() throws Exception {
-            Access access = new LocalFileAccess("", "src/test/resources/csvw/mapper/encoding.csv", "csv", "utf-16be");
-            CSVWConfiguration config = CSVWConfiguration.builder().withEncoding(StandardCharsets.UTF_16.toString()).build();
+            Access access = new LocalFileAccess("", "src/test/resources/csvw/mapper/encoding.csv", "csv", StandardCharsets.UTF_16BE);
+            CSVWConfiguration config = CSVWConfiguration.builder().withEncoding(StandardCharsets.UTF_16BE).build();
 
             runMapperTest(access, config);
         }
@@ -196,7 +192,7 @@ public class CSVWIteratorTest extends TestCore {
     public class TrimTests {
         @Test
         public void evaluate_0000_trim_true() throws Exception {
-            Access access = makeLocalAccess("/csvw/0000_trim.csv", "", "csvw", "utf-8");
+            Access access = makeLocalAccess("/csvw/0000_trim.csv", "", "csvw", StandardCharsets.UTF_8);
             CSVWConfiguration config = CSVWConfiguration.builder().withTrim("true").build();
             try (CSVWSourceIterator csvwSourceIterator = new CSVWSourceIterator(access, config)) {
                 assertTrue(evaluate_0000(csvwSourceIterator));

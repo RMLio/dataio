@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CSVWSourceIterator stopped after a certain number of bytes were parsed (GitLab [issue 21](https://gitlab.ilabt.imec.be/rml/proc/dataio/-/issues/21)). 
   The bug originated from `CSVNullInjector`, it has completely been rewritten into `NewCSVNullInjector`.
 
+### Changed
+- JSONRecord: if reference starts with a dot, but not with '$' no longer adding an extra dot
+
+### Added
+- Test case for JSONPath starting with two dots and no '$'
+
 ## [1.0.4] - 2023-10-31
 
 ### Fixed

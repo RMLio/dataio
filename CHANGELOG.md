@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Added small change for mimetypes in new RML.
+
 ## [1.2.0] - 2024-05-14
 
 ### Fixed

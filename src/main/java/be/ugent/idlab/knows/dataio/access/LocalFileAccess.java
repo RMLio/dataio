@@ -1,6 +1,8 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.jena.util.FileUtils;
 import org.apache.tika.parser.txt.CharsetDetector;
 import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
@@ -56,10 +58,27 @@ public class LocalFileAccess implements Access {
          fileTypeMap = new MimetypesFileTypeMap();
          fileTypeMap.addMimeTypes("application/json json JSON");
          fileTypeMap.addMimeTypes("application/jsonl jsonl JSONL");
+         fileTypeMap.addMimeTypes("text/csv csv CSV");
+         fileTypeMap.addMimeTypes("text/csvw csvw CSVW");
+         fileTypeMap.addMimeTypes("application/xml xml XML");
+         fileTypeMap.addMimeTypes("application/vnd.oasis.opendocument.spreadsheet ods ODS");
+         fileTypeMap.addMimeTypes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx XLSX");
+         fileTypeMap.addMimeTypes("text/html html HTML");
+         fileTypeMap.addMimeTypes("application/ttl ttl TTL");
     }
 
     public LocalFileAccess(String path, String basePath, String type) {
         this(path, basePath, type, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Constructor in which filetype doesn't need to be specified.
+     * Filetype is derived from the extension.
+     * @param path
+     * @param basePath
+     */
+    public LocalFileAccess(String path, String basePath) {
+        this(path, basePath, null);
     }
 
     /**
@@ -104,7 +123,14 @@ public class LocalFileAccess implements Access {
     @Override
     public boolean equals(Object o) {
         if (o instanceof LocalFileAccess access) {
-            return path.equals(access.path) && type.equals(access.type) && encoding.equals(access.encoding);
+            boolean sameType;
+            if (this.type == null) {
+                sameType = access.type == null;
+            } else {
+                sameType = this.type.equals(access.type);
+            }
+
+            return path.equals(access.path) && sameType && encoding.equals(access.encoding);
         } else {
             return false;
         }
@@ -131,7 +157,11 @@ public class LocalFileAccess implements Access {
 
     @Override
     public String getContentType() {
-        return fileTypeMap.getContentType(path);
+        if (this.type == null) {
+            return this.fileTypeMap.getContentType(this.path);
+        }
+
+        return this.type;
     }
 
     /**

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Exclude `xml-apis` from pom file.
+- Updated `mysql-connector-j` to 8.2.0
+- Updated `ojdbc11` to 23.3.0.23.09
+
+### Changed
+- Removed Maven shade plugin.
 
 ## [1.1.0] - 2024-01-17
 

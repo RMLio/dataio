@@ -5,15 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unversioned
+## Unreleased
 
 ### Fixed
-- Exclude `xml-apis` from pom file.
+- Exclude `xml-apis` from pom file (See GitHub [issue 2](https://github.com/RMLio/dataio/issues/2)).
 - Updated `mysql-connector-j` to 8.2.0
 - Updated `ojdbc11` to 23.3.0.23.09
 
 ### Changed
-- Removed Maven shade plugin.
+- Removed Maven shade plugin See GitHub [issue 2](https://github.com/RMLio/dataio/issues/2)).
 
 ## [1.1.0] - 2024-01-17
 

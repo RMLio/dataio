@@ -69,4 +69,3 @@ General:
         ]
   except:
     - main
-    - development

@@ -47,7 +47,7 @@ public class RemoteFileAccess implements Access {
      */
     @Override
     public Map<String, String> getDataTypes() {
-        return null;
+        return Map.of();
     }
 
     @Override

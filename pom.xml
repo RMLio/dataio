@@ -285,9 +285,14 @@
             <version>1.3</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.any23</groupId>
-            <artifactId>apache-any23-encoding</artifactId>
-            <version>2.7</version>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers-standard-package</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

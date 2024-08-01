@@ -16,6 +16,7 @@ public class NewCSVNullInjector extends InputStream {
     private byte[] currentLine;         // Bytes of the "current" line, after replacing empty values with `NULL_VALUE`.
     private boolean firstLine = true;   // becomes `false` after reading the first line.
     private int pos = 0;                // current position of the "cursor" in `currentLine`. Used by the `read()` method.
+    private boolean insideQuote = false;
 
     public NewCSVNullInjector(InputStream in,
                               char delimiter,
@@ -46,12 +47,11 @@ public class NewCSVNullInjector extends InputStream {
     }
 
     String replaceNulls(final String input) {
-        if (input.isEmpty()) {
+        if (input.isEmpty() && !insideQuote) {
             return NULL_VALUE;
         }
 
         StringBuilder result = new StringBuilder();
-        boolean insideQuotes = false;
         boolean checkQuotes = quoteChar != null;
 
         char[] inputChars = input.toCharArray();
@@ -59,9 +59,9 @@ public class NewCSVNullInjector extends InputStream {
             switch (inputChar) {    // ignore BOM characters
                 case '\uFFEF', '\uFEFF': continue;
             }
-            if (insideQuotes) {     // then we can add whatever character, unless it's a quote again.
+            if (insideQuote) {     // then we can add whatever character, unless it's a quote again.
                 if (inputChar == quoteChar) {
-                    insideQuotes = false;
+                    insideQuote = false;
                 }
             } else {                // If not inside quotes, check for empty values by checking subsequent delimiters
                 if (inputChar == delimiter) {
@@ -70,14 +70,14 @@ public class NewCSVNullInjector extends InputStream {
                         result.append(NULL_VALUE);
                     }
                 } else if (checkQuotes && inputChar == quoteChar) {
-                    insideQuotes = true;
+                    insideQuote = true;
                 }
             }
             result.append(inputChar);
         }
 
         // final check: if last character of buffer is separator, then it's a null value
-        if (result.charAt(result.length() - 1) == delimiter) {
+        if (!insideQuote && result.charAt(result.length() - 1) == delimiter) {
             result.append(NULL_VALUE);
         }
 

@@ -140,4 +140,12 @@ public class CSVNullInjectorTest {
         assertEquals(NewCSVNullInjector.NULL_VALUE + "," + NewCSVNullInjector.NULL_VALUE, injector.replaceNulls(","));
         assertEquals(NewCSVNullInjector.NULL_VALUE + "," + NewCSVNullInjector.NULL_VALUE + ',' + NewCSVNullInjector.NULL_VALUE, injector.replaceNulls(",,"));
     }
+
+    @Test
+    public void testNewlineNull() throws IOException {
+        String testString = "9,\"Vice President, N/A Strategic Accounts\",9,\"VP STRATEGIC ACCOUNTS, NA\n\nBeamery \n***truncated***\"";
+        String output = getProcessedString(testString);
+        String expected = "9,\"Vice President, N/A Strategic Accounts\",9,\"VP STRATEGIC ACCOUNTS, NA\n\nBeamery \n***truncated***\"";
+        assertEquals(expected, output);
+    }
 }

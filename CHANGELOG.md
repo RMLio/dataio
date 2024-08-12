@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - DATAIO_NULL value when CSV quoted string has multiple new lines (GitHub [issue 238](https://github.com/RMLio/rmlmapper-java/issues/238)).
+- Typo in `bump-version.sh`
 
 ## [1.3.0] - 2024-05-21
 

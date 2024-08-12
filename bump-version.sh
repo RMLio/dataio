@@ -5,7 +5,7 @@ set -e
 
 if [ -z "$1" ]
 then
-	echo 'Version parameter not given. Invoke as e.g. ./bunmp-version.sh 1.0.0'.
+	echo 'Version parameter not given. Invoke as e.g. ./bump-version.sh 1.0.0'.
 	exit 1
 fi
 

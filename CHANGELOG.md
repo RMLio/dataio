@@ -8,7 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Fixed
-- Upgraded dependencies for security (jsonpath, postgresql).
+- Updated excel-streaming-reader to 5.0.2
+- Updated fuseki to 5.0.0
+- Updated json-path to 2.9.0
+- Updated junit to 5.10.2
+- Updated log4j-to-slf4j 2.23.1
+- Updated mssql-jdbc to 12.6.3.jre11
+- Updated mysql-connector-j to 9.0.0
+- Updated ojdbc11 to 23.4.0.24.05
+- Updated opencsv to 5.9
+- Updated poi to 5.3.0
+- Updated postgresql to 42.7.3
+- Updated rxjava to 3.1.8
+- Updated SaxonHE to 12.5
+- Updated sfm-csv to 9.0.2
+- Updated slf4j to 2.0.12
+- Updated testcontainers to 1.19.8
+- Updated tika-parsers-standard-package to 2.9.2
+
 
 ## [1.3.1] - 2024-08-12
 

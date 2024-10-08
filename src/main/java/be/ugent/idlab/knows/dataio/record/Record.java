@@ -11,7 +11,7 @@ import java.util.Map;
  * Every source contains references to values. This is done differently per Source type.
  */
 public abstract class Record {
-    public static final Logger logger = LoggerFactory.getLogger(Record.class);
+    public final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * This method returns the objects for a reference in the source.

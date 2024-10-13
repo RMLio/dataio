@@ -80,7 +80,8 @@ public class CSVRecord extends Record {
             toDatabaseCase = reference;
         }
         if (!this.data.containsKey(toDatabaseCase)) {
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
+            logger.warn("Mapping for {} not found, expected one of {}", toDatabaseCase, data.keySet());
+            return List.of();
         }
         String obj = this.data.get(toDatabaseCase);
 

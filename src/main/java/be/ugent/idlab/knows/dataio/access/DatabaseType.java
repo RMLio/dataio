@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
-    NOTE: The Oracle driver has to be installed manually, because it's not on Maven due to licensing.
+    NOTE: The Oracle, Denodo Platform and Athena drivers have to be installed manually, because they are not on Maven due to licensing.
  */
 public enum DatabaseType {
 
@@ -27,7 +27,23 @@ public enum DatabaseType {
     DB2("IBM DB2",
             "as400:",
             "ibm",
-            "com.ibm.as400.access.AS400JDBCDriver");
+            "com.ibm.as400.access.AS400JDBCDriver"),
+    H2("H2",
+            "h2:tcp:",
+            "h2",
+            "org.h2.Driver"),
+    DENODO("Denodo",
+            "vdb:",
+            "denodo",
+            "com.denodo.vdp.jdbc.Driver"),
+    ATHENA("Athena",
+            "awsathena:",
+            "athena",
+            "com.simba.athena.jdbc.Driver"),
+    SNOWFLAKE("Snowflake",
+            "snowflake:",
+            "snowflake",
+            "net.snowflake.client.jdbc.SnowflakeDriver");
 
     private final String name;
     private final String jdbcPrefix;

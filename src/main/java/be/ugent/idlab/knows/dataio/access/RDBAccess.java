@@ -21,6 +21,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * This class represents the access to a relational database.
@@ -45,9 +46,30 @@ public class RDBAccess implements Access {
     private final String query;
     private final String contentType;
     private final Map<String, String> datatypes = new HashMap<>();
+    private final Properties connectionProperties;
+
 
     private final static Logger log = LoggerFactory.getLogger(RDBAccess.class);
 
+
+    /**
+     * This constructor takes as arguments the dsn, database, username, password, query, content type
+     *
+     * @param dsn          the data source name.
+     * @param databaseType the database type.
+     * @param connectionProperties     the connection properties to the database. This would include a user and a password.
+     * @param query        the SQL query to use.
+     * @param contentType  the content type of the results.
+     */
+    public RDBAccess(String dsn, DatabaseType databaseType, Properties connectionProperties, String query, String contentType) {
+        this.dsn = dsn;
+        this.databaseType = databaseType;
+        this.connectionProperties = connectionProperties;
+        this.query = query;
+        this.username = (String) connectionProperties.get("user");
+        this.password = (String) connectionProperties.get("password");
+        this.contentType = contentType;
+    }
 
     /**
      * This constructor takes as arguments the dsn, database, username, password, query, content type
@@ -60,12 +82,13 @@ public class RDBAccess implements Access {
      * @param contentType  the content type of the results.
      */
     public RDBAccess(String dsn, DatabaseType databaseType, String username, String password, String query, String contentType) {
-        this.dsn = dsn;
-        this.databaseType = databaseType;
-        this.username = username;
-        this.password = password;
-        this.query = query;
-        this.contentType = contentType;
+        this(dsn, databaseType, createConnectionProperties(username, password), query, contentType);
+    }
+    private static Properties createConnectionProperties(String username, String password) {
+        Properties connectionProperties = new Properties();
+        connectionProperties.put("user", username);
+        connectionProperties.put("password", password);
+        return connectionProperties;
     }
 
     /**
@@ -93,7 +116,7 @@ public class RDBAccess implements Access {
     private static String normalizeData(String data, String dataType) {
         if (DOUBLE.equals(dataType)) {
             // remove trailing decimal points (Quirk from MySQL, see issue 203)
-            return data.replace(".0", "");
+            return data != null ? data.replace(".0", "") : null;
         }
         return data;
     }
@@ -125,7 +148,7 @@ public class RDBAccess implements Access {
 
         try (
                 // Open connection
-                Connection connection = DriverManager.getConnection(dsn, username, password);
+                Connection connection = DriverManager.getConnection(dsn, connectionProperties);
                 Statement statement = connection.createStatement()
         ) {
             try (ResultSet rs = statement.executeQuery(query)) {

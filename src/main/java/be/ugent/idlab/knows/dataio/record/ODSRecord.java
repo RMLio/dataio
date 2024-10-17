@@ -5,9 +5,7 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.odftoolkit.simple.table.Cell;
 import org.odftoolkit.simple.table.Row;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ODSRecord extends Record {
@@ -20,7 +18,6 @@ public class ODSRecord extends Record {
         if (header.getCellCount() != row.getCellCount()) {
             throw new UnequalHeaderRowLengthException(header.toString(), row.toString());
         }
-
 
         for (int i = 0; i < header.getCellCount(); i++) {
             Cell headerCell = header.getCellByIndex(i);
@@ -54,21 +51,15 @@ public class ODSRecord extends Record {
     }
 
     @Override
-    public List<Object> get(String reference) {
-        List<Object> result = new ArrayList<>();
-
+    public RecordValue get(String reference) {
         Cell cell = this.values.get(reference);
-
-        // if the reference is unknown or if the cell is empty, return an empty list
-        // Empty cell can be recognized by Cell::getValueType returning null
-        if (cell == null || cell.getValueType() == null) {
-            return result;
+        if (cell == null) { // unknown reference
+            return RecordValue.error("Cell not found for reference: " + reference);
+        } else if (cell.getValueType() == null) {   // null cell
+            return RecordValue.empty();
+        } else {
+            return RecordValue.ok(getValueFromCell(cell));
         }
-
-        Object out = getValueFromCell(cell);
-        result.add(out);
-
-        return result;
     }
 
     @Override

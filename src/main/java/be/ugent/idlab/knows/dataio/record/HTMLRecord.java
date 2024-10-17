@@ -27,21 +27,22 @@ public class HTMLRecord extends Record {
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String reference) {
+    public RecordValue get(String reference) {
         int index = headers.indexOf(reference);
         if (index == -1) {
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", reference, headers));
+            return RecordValue.error(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements tr = element.select("tr");
         if (tr.isEmpty()) {
             // TODO decent exception
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", reference, headers));
+            return RecordValue.error(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements td = tr.get(0).select("td");
         if (td.size() <= index) {
-            return List.of();
+            return RecordValue.empty();
+        } else {
+            return RecordValue.ok(td.get(index).text());
         }
-        return List.of(td.get(index).text());
     }
 
     @Override

@@ -71,12 +71,12 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // sanity check
-            assertEquals("John", record.get("firstName").get(0));
+            assertEquals("John", record.get("firstName").getValue());
 
             // grab the whole path
-            assertEquals("[0,people]", record.get("\\_PATH").get(0));
+            assertEquals("[0,people]", record.get("\\_PATH").getValue());
             // index the path
-            assertEquals("people", record.get("\\_PATH[1]").get(0));
+            assertEquals("people", record.get("\\_PATH[1]").getValue());
             assertFalse(iterator.hasNext());
         }
     }
@@ -86,10 +86,10 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Record s1 = iterator.next();
-            assertEquals("BO", s1.get("ISO 3166").get(0));
+            assertEquals("BO", s1.get("ISO 3166").getValue());
 
             Record s2 = iterator.next();
-            assertEquals("IE", s2.get("\"ISO 3166\"").get(0));
+            assertEquals("IE", s2.get("\"ISO 3166\"").getValue());
         }
     }
 
@@ -98,7 +98,7 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/array.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*].ingredients[*]")) {
             Record s = iterator.next();
-            assertEquals("garlic", s.get("@").get(0));
+            assertEquals("garlic", s.get("@").getValue());
         }
     }
 
@@ -128,7 +128,7 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", StandardCharsets.UTF_8);
         try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
             List<Object> actual = new ArrayList<>();
-            iterator.forEachRemaining(s -> actual.add(s.get("@").get(0)));
+            iterator.forEachRemaining(s -> actual.add(s.get("@").getValue()));
 
             assertEquals(expected, actual);
         }
@@ -145,10 +145,10 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // real property
-            assertEquals("foo", record.get("_PATH").get(0));
+            assertEquals("foo", record.get("_PATH").getValue());
             // magic property
-            assertEquals("[0,people]", record.get("\\_PATH").get(0));
-            assertEquals(0, record.get("\\\\_PATH").size());
+            assertEquals("[0,people]", record.get("\\_PATH").getValue());
+            assertTrue(record.get("\\\\_PATH").isError());
         }
     }
 
@@ -158,9 +158,9 @@ public class JSONIteratorTest extends TestCore {
         try(JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.main_array[*]")) {
             while (jsonSourceIterator.hasNext()) {
                 Record source = jsonSourceIterator.next();
-                List<Object> names = source.get("names");
-                List<List<String>> expected = List.of(List.of("Jos", "Jef"));
-                assertEquals(names, expected);
+                List<?> names = (List<?>) source.get("names").getValue();
+                List<String> expected = List.of("Jos", "Jef");
+                assertEquals(expected, names);
                 System.out.println();
             }
         }

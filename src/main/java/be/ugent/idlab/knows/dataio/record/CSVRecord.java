@@ -1,7 +1,6 @@
 package be.ugent.idlab.knows.dataio.record;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,7 +69,7 @@ public class CSVRecord extends Record {
      * @return a list of objects for the column.
      */
     @Override
-    public List<Object> get(String reference) {
+    public RecordValue get(String reference) {
         String toDatabaseCase;
         if (this.data.containsKey(reference.toUpperCase())) {
             toDatabaseCase = reference.toUpperCase();
@@ -80,12 +79,12 @@ public class CSVRecord extends Record {
             toDatabaseCase = reference;
         }
         if (!this.data.containsKey(toDatabaseCase)) {
-            throw new IllegalArgumentException(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
+            return RecordValue.error(String.format("Mapping for %s not found, expected one of %s", toDatabaseCase, data.keySet()));
         }
         String obj = this.data.get(toDatabaseCase);
 
-        if (obj == null) return List.of();
-        return List.of(obj);
+        if (obj == null) return RecordValue.empty();
+        return RecordValue.ok(obj);
     }
 
     public Map<String, String> getData() {

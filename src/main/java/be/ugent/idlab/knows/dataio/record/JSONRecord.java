@@ -44,17 +44,15 @@ public class JSONRecord extends Record {
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String reference) {
+    public RecordValue get(String reference) {
         if (reference.startsWith("\\_")) {
             return processMagicProperty(reference);
         }
 
-        List<Object> results = new ArrayList<>();
-
         // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
         if (this.document instanceof ValueNode && reference.equals("@")) {
             String v = ((ValueNode) this.document).asText();
-            return List.of(v);
+            return RecordValue.ok(v);
         }
 
         if (reference.startsWith("\"") && reference.endsWith("\"")) {
@@ -75,23 +73,24 @@ public class JSONRecord extends Record {
         }
 
         try {
-            Object t = JsonPath.read(this.document, reference);
-            if (t != null) {
-                results.add(t);
+            Object result = JsonPath.read(this.document, reference);
+            if (result != null) {
+                return RecordValue.ok(result);
+            } else {
+                return RecordValue.empty();
             }
         } catch (JsonPathException e) {
             logger.warn("{} for path {} ", e.getMessage(), this.path + reference, e);
+            return RecordValue.error("JSONPath '" + this.path + reference + "': " + e.getMessage());
         }
-
-        return results;
     }
 
-    private List<Object> processMagicProperty(String reference) {
+    private RecordValue processMagicProperty(String reference) {
         if (reference.startsWith("\\_PATH")) {
             return processPath(reference);
+        } else {
+            return RecordValue.error(String.format("Unknown magic property %s", reference));
         }
-
-        throw new IllegalArgumentException(String.format("Unknown magic property %s", reference));
     }
 
     /**
@@ -102,9 +101,9 @@ public class JSONRecord extends Record {
      * @param reference reference of form _PATH[{index}]
      * @return the specific path, possibly indexed.
      */
-    private List<Object> processPath(String reference) {
+    private RecordValue processPath(String reference) {
         if (this.path.isEmpty()) {
-            return List.of(""); // early empty return if no specific path was given
+            return RecordValue.empty(); // early empty return if no specific path was given
         }
 
         // ensure path is only compiled ONCE
@@ -126,7 +125,7 @@ public class JSONRecord extends Record {
      *
      * @return magic property _PATH in required format.
      */
-    private List<Object> constructPath() {
+    private RecordValue constructPath() {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
         builder.append(this.compiledPath.get(0));
@@ -137,7 +136,7 @@ public class JSONRecord extends Record {
 
         builder.append("]");
 
-        return List.of(builder.toString());
+        return RecordValue.ok(builder.toString());
     }
 
     /**
@@ -166,8 +165,8 @@ public class JSONRecord extends Record {
      * @param index index in path
      * @return the element at _PATH[index]
      */
-    private List<Object> processPathIndex(int index) {
-        return List.of(this.compiledPath.get(index));
+    private RecordValue processPathIndex(int index) {
+        return RecordValue.ok(this.compiledPath.get(index));
     }
 
     public String getTag() {

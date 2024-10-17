@@ -25,7 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated slf4j to 2.0.12
 - Updated testcontainers to 1.19.8
 - Updated tika-parsers-standard-package to 2.9.2
+- Log name of subclass in log messages of Record.
+- Consistent behaviour of the `Record.get(<reference>)` method 
 
+### Changed
+- `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result. 
+  It also provides methods to check for an empty (null) value or an error. This is a breaking change to the API.
 
 ## [1.3.1] - 2024-08-12
 

@@ -35,9 +35,9 @@ public class JSONObservableTest extends ObservableTestCore {
         try (JSONObservable observable = new JSONObservable(access, "$.people[*]")) {
             JSONRecord source = observable.blockingSingle();
             // grab the whole path
-            Assertions.assertEquals("[0,people]", source.get("\\_PATH").get(0));
+            Assertions.assertEquals("[0,people]", source.get("\\_PATH").getValue());
             // index the path
-            Assertions.assertEquals("people", source.get("\\_PATH[1]").get(0));
+            Assertions.assertEquals("people", source.get("\\_PATH[1]").getValue());
         }
     }
 }

@@ -3,7 +3,6 @@ package be.ugent.idlab.knows.dataio.record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +18,7 @@ public abstract class Record {
      * @param reference the reference for which objects need to be returned.
      * @return a list of objects for the reference.
      */
-    public abstract List<Object> get(String reference);
+    public abstract RecordValue get(String reference);
 
     public Map<String, String> getDataTypes() {
         return null;

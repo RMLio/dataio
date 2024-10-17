@@ -5,6 +5,7 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
+import be.ugent.idlab.knows.dataio.record.RecordValue;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -121,8 +122,8 @@ public class CSVIteratorTest extends TestCore {
         Access access = new LocalFileAccess("csv/tripleQuotes.csv", "src/test/resources", "csv");
         try (CSVSourceIterator iterator = new CSVSourceIterator(access)) {
             CSVRecord record = (CSVRecord) iterator.next();
-
-            assertEquals("BO", record.get("\"ISO 3166\"").get(0));
+            RecordValue result = record.get("\"ISO 3166\"");
+            assertEquals("BO", result.getValue());
         }
     }
 

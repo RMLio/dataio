@@ -31,18 +31,19 @@ public class XMLRecord extends Record {
      * @return a list of objects for the reference.
      */
     @Override
-    public List<Object> get(String reference) {
-        List<Object> results = new ArrayList<>();
-
+    public RecordValue get(String reference) {
         try {
             XdmValue result = compiler.evaluate(reference, item);
-            result.forEach((node) -> results.add(node.getStringValue()));
+            if (result.isEmpty()) {
+                return RecordValue.empty();
+            } else {
+                List<String> results = new ArrayList<>();
+                result.forEach((node) -> results.add(node.getStringValue()));
+                return RecordValue.ok(results);
+            }
         } catch (SaxonApiException e1) {
-            throw new RuntimeException(e1);
+            return RecordValue.error(e1.getMessage());
         }
-
-
-        return results;
     }
 
     @Override

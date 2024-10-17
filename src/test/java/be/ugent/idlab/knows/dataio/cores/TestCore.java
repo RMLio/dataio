@@ -3,6 +3,7 @@ package be.ugent.idlab.knows.dataio.cores;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.record.Record;
+import be.ugent.idlab.knows.dataio.record.RecordValue;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -172,16 +173,18 @@ public class TestCore {
      */
     private boolean compareMapParticular(Record record, Map<String, Object> map) {
         for (String key : map.keySet()) {
-            List<Object> values = record.get(key);
+            RecordValue recordValue = record.get(key);
 
-            if (values.isEmpty()) { // empty list returned, value not in source
+            if (recordValue.isEmpty()) { // empty list returned, value not in source
                 if (!map.get(key).equals("")) { // no value expected here
                     return false;
                 }
             } else {
-                String value = String.valueOf(values.get(0)); // we're evaluating everything as strings
-
-                if (!value.equals(map.get(key))) {
+                Object value = recordValue.getValue();
+                if (value instanceof List<?>) {
+                    value = ((List<?>) value).get(0);
+                }
+                if (!value.toString().equals(map.get(key))) {   // Everything is treated as String here
                     return false;
                 }
             }

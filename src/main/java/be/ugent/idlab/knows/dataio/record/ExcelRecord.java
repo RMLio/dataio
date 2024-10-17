@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -102,10 +101,10 @@ public class ExcelRecord extends Record {
      * @return a list of objects for the column.
      */
     @Override
-    public List<Object> get(String reference) {
+    public RecordValue get(String reference) {
         Object obj = data.getOrDefault(reference, null);
-        if (obj == null) return List.of();
-        return List.of(obj);
+        if (obj == null) return RecordValue.empty();
+        return RecordValue.ok(obj);
     }
 
     private Object getCellValue(Cell cell) {

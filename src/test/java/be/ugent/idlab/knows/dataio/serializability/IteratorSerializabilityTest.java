@@ -5,6 +5,7 @@ import be.ugent.idlab.knows.dataio.access.LocalFileAccess;
 import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.*;
 import be.ugent.idlab.knows.dataio.iterators.csvw.CSVWConfiguration;
+import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

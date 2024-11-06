@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Log name of subclass in log messages of Record.
 - `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result. 
   It also provides methods to check for an empty (null) value or an error. This is a breaking change to the API.
+- Cleaned up dependencies
 
 ## [1.3.1] - 2024-08-12
 

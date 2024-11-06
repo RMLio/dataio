@@ -1,22 +1,20 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.jena.util.FileUtils;
-import org.apache.tika.parser.txt.CharsetDetector;
-import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.MimetypesFileTypeMap;
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Map;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 
@@ -30,10 +28,8 @@ public class LocalFileAccess implements Access {
     @Serial
     private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
-    private final String type;
+    private String type;
     private final String encoding;
-
-    transient private final MimetypesFileTypeMap fileTypeMap;
 
     /**
      * This constructor takes the path and the base path of a file.
@@ -55,16 +51,6 @@ public class LocalFileAccess implements Access {
         this.encoding = encoding.name();
         this.type = type;
 
-         fileTypeMap = new MimetypesFileTypeMap();
-         fileTypeMap.addMimeTypes("application/json json JSON");
-         fileTypeMap.addMimeTypes("application/jsonl jsonl JSONL");
-         fileTypeMap.addMimeTypes("text/csv csv CSV");
-         fileTypeMap.addMimeTypes("text/csvw csvw CSVW");
-         fileTypeMap.addMimeTypes("application/xml xml XML");
-         fileTypeMap.addMimeTypes("application/vnd.oasis.opendocument.spreadsheet ods ODS");
-         fileTypeMap.addMimeTypes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx XLSX");
-         fileTypeMap.addMimeTypes("text/html html HTML");
-         fileTypeMap.addMimeTypes("application/ttl ttl TTL");
     }
 
     public LocalFileAccess(String path, String basePath, String type) {
@@ -90,22 +76,9 @@ public class LocalFileAccess implements Access {
     @Override
     public InputStream getInputStream() throws IOException {
         Path path = Path.of(this.path);
-        encodingCheck(path);
-        return new BOMInputStream(Files.newInputStream(path, StandardOpenOption.READ));
-    }
-
-    private void encodingCheck(Path path) throws IOException {
-        try (InputStream in = new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)) ) {
-            List<CharsetMatch> matches = Arrays.stream(new CharsetDetector().setText(in).detectAll()).toList();
-            Set<String> matchesNames = matches.stream().map(CharsetMatch::getName).collect(Collectors.toSet());
-            if (!matchesNames.contains(this.encoding)) {
-                // only warn if high confidence
-                if (matches.get(0).getConfidence() > CONFIDENCE_LIMIT) {
-                    // matches are sorted based on confidence
-                    logger.warn("Detected encoding doesn't match the passed encoding! Most likely encoding of {} is {}, got passed {}", path, matches.get(0).getName(), this.encoding);
-                }
-            }
-        }
+        return BOMInputStream.builder()
+                .setInputStream(Files.newInputStream(path, StandardOpenOption.READ))
+                .get();
     }
 
     /**
@@ -158,7 +131,11 @@ public class LocalFileAccess implements Access {
     @Override
     public String getContentType() {
         if (this.type == null) {
-            return this.fileTypeMap.getContentType(this.path);
+            try {
+                type = Files.probeContentType(Path.of(path));
+            } catch (IOException e) {
+                logger.warn("Could not get content type for path {}", path, e);
+            }
         }
 
         return this.type;

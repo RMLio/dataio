@@ -17,18 +17,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated mysql-connector-j to 9.0.0
 - Updated ojdbc11 to 23.4.0.24.05
 - Updated opencsv to 5.9
-- Updated poi to 5.3.0
 - Updated postgresql to 42.7.3
 - Updated rxjava to 3.1.8
 - Updated SaxonHE to 12.5
 - Updated sfm-csv to 9.0.2
 - Updated slf4j to 2.0.12
 - Updated testcontainers to 1.19.8
-- Updated tika-parsers-standard-package to 2.9.2
 - Log name of subclass in log messages of Record.
 - `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result. 
   It also provides methods to check for an empty (null) value or an error. This is a breaking change to the API.
-- Cleaned up dependencies
+- Removed direct dependency on poi
+- Removed dependency on xlsx-streamer
+- Removed direct dependency on tika-parsers-standard-package
+- Removed dependency on javax.activation-api
 
 ## [1.3.1] - 2024-08-12
 

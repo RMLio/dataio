@@ -123,11 +123,6 @@
             <artifactId>excel-streaming-reader</artifactId>
             <version>5.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.monitorjbl</groupId>
-            <artifactId>xlsx-streamer</artifactId>
-            <version>2.2.0</version>
-        </dependency>
 
         <!--==============================================-->
         <!-- Open document format processing dependencies -->
@@ -140,6 +135,10 @@
                 <exclusion>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -319,6 +318,40 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <version>${fuseki.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-collections4</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Fuseki, providing a SPARQL endpoint, is only needed during tests. -->

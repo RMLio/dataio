@@ -24,8 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated slf4j to 2.0.12
 - Updated testcontainers to 1.20.3
 - Log name of subclass in log messages of Record.
-- `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result. 
-  It also provides methods to check for an empty (null) value or an error. This is a breaking change to the API.
 - Removed direct dependency on poi
 - Removed dependency on xlsx-streamer
 - Removed direct dependency on tika-parsers-standard-package

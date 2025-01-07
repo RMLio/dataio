@@ -26,7 +26,7 @@ public class CSVNullInjectorTest {
     public void testInsertion() throws IOException {
         String testString = "ID,,Foo";
         String output = getProcessedString(testString);
-        String expected = "ID,%s,Foo".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "ID,DATAIO_NULL_1,Foo";
         assertEquals(expected, output);
     }
 
@@ -40,7 +40,7 @@ public class CSVNullInjectorTest {
         NewCSVNullInjector injector = new NewCSVNullInjector(input, ';', '"', StandardCharsets.UTF_8);
 
         String output = new String(injector.readAllBytes());
-        String expected = "ID;%s;Foo".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "ID;DATAIO_NULL_1;Foo";
         assertEquals(expected, output);
     }
 
@@ -51,7 +51,7 @@ public class CSVNullInjectorTest {
     public void emptyStart() throws IOException {
         String testString = ",Foo,Bar";
         String output = getProcessedString(testString);
-        String expected = "%s,Foo,Bar".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "DATAIO_NULL_1,Foo,Bar";
         assertEquals(expected, output);
     }
 
@@ -62,7 +62,7 @@ public class CSVNullInjectorTest {
     public void emptyEnd() throws IOException {
         String testString = "Foo,Bar,";
         String output = getProcessedString(testString);
-        String expected = "Foo,Bar,%s".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "Foo,Bar,DATAIO_NULL_1";
         assertEquals(expected, output);
     }
 
@@ -78,9 +78,8 @@ public class CSVNullInjectorTest {
                 """;
         String expected = """
                 "ID","Name","DateOfBirth"
-                "1","Alice",%s
-                "2","Bob","September, 2010\""""
-                .replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+                "1","Alice",DATAIO_NULL_1
+                "2","Bob","September, 2010\"""";
         String actual = getProcessedString(testString);
         assertEquals(expected, actual);
     }
@@ -104,7 +103,7 @@ public class CSVNullInjectorTest {
     public void escapedQuote() throws IOException {
         String testString = "\"aaa\",\"b\"\",,bb\",,\"ccc\"";
         String output = getProcessedString(testString);
-        String expected = "\"aaa\",\"b\"\",,bb\",%s,\"ccc\"".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "\"aaa\",\"b\"\",,bb\",DATAIO_NULL_1,\"ccc\"";
         assertEquals(expected, output);
     }
 
@@ -115,7 +114,7 @@ public class CSVNullInjectorTest {
     public void unixNewLine() throws IOException {
         String testString = "Foo,,Bar\n,B";
         String output = getProcessedString(testString);
-        String expected = "Foo,%s,Bar\n%s,B".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "Foo,DATAIO_NULL_1,Bar\nDATAIO_NULL_2,B";
         assertEquals(expected, output);
     }
 
@@ -126,19 +125,19 @@ public class CSVNullInjectorTest {
     public void windowsNewLine() throws IOException {
         String testString = "Foo,,Bar\r\n,B";
         String output = getProcessedString(testString);
-        String expected = "Foo,%s,Bar\n%s,B".replaceAll("%s", NewCSVNullInjector.NULL_VALUE);
+        String expected = "Foo,DATAIO_NULL_1,Bar\nDATAIO_NULL_2,B";
         assertEquals(expected, output);
     }
 
     @Test
     public void testReplaceNulls() {
         NewCSVNullInjector injector = new NewCSVNullInjector(new ByteArrayInputStream(new byte[0]), ',', null, StandardCharsets.UTF_8);
-        assertEquals(NewCSVNullInjector.NULL_VALUE, injector.replaceNulls(""));
+        assertEquals("DATAIO_NULL_1", injector.replaceNulls(""));
         assertEquals("test", injector.replaceNulls("test"));
-        assertEquals(NewCSVNullInjector.NULL_VALUE + ",test", injector.replaceNulls(",test"));
-        assertEquals("test," + NewCSVNullInjector.NULL_VALUE, injector.replaceNulls("test,"));
-        assertEquals(NewCSVNullInjector.NULL_VALUE + "," + NewCSVNullInjector.NULL_VALUE, injector.replaceNulls(","));
-        assertEquals(NewCSVNullInjector.NULL_VALUE + "," + NewCSVNullInjector.NULL_VALUE + ',' + NewCSVNullInjector.NULL_VALUE, injector.replaceNulls(",,"));
+        assertEquals("DATAIO_NULL_2" + ",test", injector.replaceNulls(",test"));
+        assertEquals("test,DATAIO_NULL_3", injector.replaceNulls("test,"));
+        assertEquals("DATAIO_NULL_4,DATAIO_NULL_5", injector.replaceNulls(","));
+        assertEquals("DATAIO_NULL_6,DATAIO_NULL_7,DATAIO_NULL_8", injector.replaceNulls(",,"));
     }
 
     @Test

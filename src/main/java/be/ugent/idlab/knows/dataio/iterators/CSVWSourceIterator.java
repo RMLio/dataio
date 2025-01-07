@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static be.ugent.idlab.knows.dataio.utils.NewCSVNullInjector.NULL_VALUE;
+
 public class CSVWSourceIterator extends SourceIterator {
     @Serial
     private static final long serialVersionUID = -5824558388620967495L;
@@ -96,7 +98,7 @@ public class CSVWSourceIterator extends SourceIterator {
     public CSVRecord replaceNulls(CSVRecord record) {
         Map<String, String> data = record.getData();
         data.forEach((key, value) -> {
-            if (this.config.getNulls().contains(value)) {
+            if (value == null || value.startsWith(NULL_VALUE) || this.config.getNulls().contains(value)) {
                 data.put(key, null);
             }
         });

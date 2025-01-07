@@ -6,7 +6,6 @@ import be.ugent.idlab.knows.dataio.cores.TestCore;
 import be.ugent.idlab.knows.dataio.iterators.CSVSourceIterator;
 import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import be.ugent.idlab.knows.dataio.record.RecordValue;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -35,11 +34,10 @@ public class CSVIteratorTest extends TestCore {
     }
 
     @Test
-    @Disabled
     public void evaluate_1001_header_col_missing_CSV() throws Exception {
         Access access = makeLocalAccess("/csv/1001_header_col_missing.csv", "", "csv", StandardCharsets.UTF_8);
         try (CSVSourceIterator csvSourceIterator = new CSVSourceIterator(access)) {
-            //TODO should fail, check if it does
+            assertTrue(evaluate_1001_header_col_missing(csvSourceIterator));
         }
     }
 

@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 public class NewCSVNullInjector extends InputStream {
 
     public final static String NULL_VALUE = "DATAIO_NULL";
+    public long NULL_VALUE_COUNTER = 0; // used to append a number to a null value.
+
     private final BufferedReader reader;
     private final char delimiter;
     private final Character quoteChar;
@@ -48,7 +50,7 @@ public class NewCSVNullInjector extends InputStream {
 
     String replaceNulls(final String input) {
         if (input.isEmpty() && !insideQuote) {
-            return NULL_VALUE;
+            return nullValue();
         }
 
         StringBuilder result = new StringBuilder();
@@ -60,14 +62,14 @@ public class NewCSVNullInjector extends InputStream {
                 case '\uFFEF', '\uFEFF': continue;
             }
             if (insideQuote) {     // then we can add whatever character, unless it's a quote again.
-                if (inputChar == quoteChar) {
+                if (checkQuotes && inputChar == quoteChar) {
                     insideQuote = false;
                 }
             } else {                // If not inside quotes, check for empty values by checking subsequent delimiters
                 if (inputChar == delimiter) {
                     // check if last char in buffer is also delimiter
                     if (result.isEmpty() || result.charAt(result.length() - 1) == delimiter) {
-                        result.append(NULL_VALUE);
+                        result.append(nullValue());
                     }
                 } else if (checkQuotes && inputChar == quoteChar) {
                     insideQuote = true;
@@ -78,10 +80,15 @@ public class NewCSVNullInjector extends InputStream {
 
         // final check: if last character of buffer is separator, then it's a null value
         if (!insideQuote && result.charAt(result.length() - 1) == delimiter) {
-            result.append(NULL_VALUE);
+            result.append(nullValue());
         }
 
         return result.toString();
+    }
+
+    private String nullValue() {
+        NULL_VALUE_COUNTER++;
+        return NULL_VALUE + '_' + NULL_VALUE_COUNTER;
     }
 
     @Override

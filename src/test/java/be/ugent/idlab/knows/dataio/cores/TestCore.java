@@ -67,6 +67,27 @@ public class TestCore {
         return compareIterator(iterator, List.of(r1, r2, r3));
     }
 
+    public boolean evaluate_1001_header_col_missing(Iterator<Record> iterator) {
+        Map<String, Object> expectedRecord1 = Map.of(
+                "name", "Trollekelder",
+                "DATAIO_NULL_1", "Beer café in the shadows of the St James' church",
+                "address", "Bij Sint-Jacobs 17 9000 Gent Belgium"
+        );
+
+        Map<String, Object> expectedRecord2 = Map.of(
+                "name", "Hot Club Gent",
+                "DATAIO_NULL_1", "Live jazz concerts in an intimate setting",
+                "address", "Schuddevisstraatje 2 - Groentenmarkt 9000 Gent Belgium"
+        );
+        Map<String, Object> expectedRecord3 = Map.of(
+                "name", "Jan van Gent",
+                "DATAIO_NULL_1", "Quirky local pub with a popular summer terrace",
+                "address", "Annonciadenstraat 1 9000 Gent Belgium"
+        );
+
+        return compareIterator(iterator, List.of(expectedRecord1, expectedRecord2, expectedRecord3));
+    }
+
     public boolean evaluate_1001_header_long(Iterator<Record> iterator) {
         Map<String, Object> expected1 = Map.of(
                 "name", "Trollekelder",

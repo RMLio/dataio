@@ -54,7 +54,7 @@ public class ODSRecord extends Record {
     public RecordValue get(String reference) {
         Cell cell = this.values.get(reference);
         if (cell == null) { // unknown reference
-            return RecordValue.error("Cell not found for reference: " + reference);
+            return RecordValue.notFound("Cell not found for reference: " + reference);
         } else if (cell.getValueType() == null) {   // null cell
             return RecordValue.empty();
         } else {

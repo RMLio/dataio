@@ -30,12 +30,12 @@ public class HTMLRecord extends Record {
     public RecordValue get(String reference) {
         int index = headers.indexOf(reference);
         if (index == -1) {
-            return RecordValue.error(String.format("Mapping for %s not found, expected one of %s", reference, headers));
+            return RecordValue.notFound(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements tr = element.select("tr");
         if (tr.isEmpty()) {
             // TODO decent exception
-            return RecordValue.error(String.format("Mapping for %s not found, expected one of %s", reference, headers));
+            return RecordValue.notFound(String.format("Mapping for %s not found, expected one of %s", reference, headers));
         }
         Elements td = tr.get(0).select("td");
         if (td.size() <= index) {

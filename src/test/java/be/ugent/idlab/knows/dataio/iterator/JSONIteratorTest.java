@@ -148,7 +148,7 @@ public class JSONIteratorTest extends TestCore {
             assertEquals("foo", record.get("_PATH").getValue());
             // magic property
             assertEquals("[0,people]", record.get("\\_PATH").getValue());
-            assertTrue(record.get("\\\\_PATH").isError());
+            assertTrue(record.get("\\\\_PATH").isNotFound());
         }
     }
 

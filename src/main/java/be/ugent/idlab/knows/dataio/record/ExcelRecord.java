@@ -102,7 +102,10 @@ public class ExcelRecord extends Record {
      */
     @Override
     public RecordValue get(String reference) {
-        Object obj = data.getOrDefault(reference, null);
+        if (!data.containsKey(reference)) {
+            return RecordValue.notFound(String.format("Mapping for %s not found", reference));
+        }
+        Object obj = data.get(reference);
         if (obj == null) return RecordValue.empty();
         return RecordValue.ok(obj);
     }

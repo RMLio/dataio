@@ -3,6 +3,7 @@ package be.ugent.idlab.knows.dataio.record;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.PathNotFoundException;
 import org.jsfr.json.compiler.JsonPathCompiler;
 import org.jsfr.json.path.PathOperator;
 import org.slf4j.Logger;
@@ -79,9 +80,15 @@ public class JSONRecord extends Record {
             } else {
                 return RecordValue.empty();
             }
+
+        } catch (PathNotFoundException e) {
+            String message = "JSONPath '" + this.path + reference + "': " + e.getMessage();
+            logger.warn(message, e);
+            return RecordValue.notFound(message);
         } catch (JsonPathException e) {
-            logger.warn("{} for path {} ", e.getMessage(), this.path + reference, e);
-            return RecordValue.error("JSONPath '" + this.path + reference + "': " + e.getMessage());
+            String message = "JSONPath '" + this.path + reference + "': " + e.getMessage();
+            logger.warn(message, e);
+            return RecordValue.error(message);
         }
     }
 

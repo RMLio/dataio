@@ -28,10 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed dependency on xlsx-streamer
 - Removed direct dependency on tika-parsers-standard-package
 - Removed dependency on javax.activation-api
+- ExcelRecord.get: give error when reference is not found
 
 ### Changed
 - `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result.
-  It also provides methods to check for an empty (null) value or an error. This is a breaking change to the API.
+  It also provides methods to check for an empty (null) value, a 'reference not found' or an error. This is a breaking change to the API.
+- A DATAIO_NULL value gets a number appended to avoid multiple null header clashes. E.g., DATAIO_NULL_12.
 
 ## [1.3.1] - 2024-08-12
 

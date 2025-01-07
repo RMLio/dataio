@@ -5,22 +5,23 @@ import java.util.Objects;
 enum Status {
     OK,
     EMPTY,
+    NOT_FOUND,
     ERROR
 }
 
 public class RecordValue {
     private final Status status;
     private final Object value;
-    private final String errorMessage;
+    private final String message;
 
-    private RecordValue(Status status, Object value, final String errorMessage) {
+    private RecordValue(Status status, Object value, final String message) {
         this.status = status;
         this.value = value;
-        this.errorMessage = errorMessage;
+        this.message = message;
     }
 
     /**
-     * Creates an empty RecordValue. This is the result of an unknown reference or one that returns NULL.
+     * Creates an empty RecordValue. This is the result of a reference that returns NULL.
      * @return An Empty RecordValue
      */
     public static RecordValue empty() {
@@ -37,12 +38,21 @@ public class RecordValue {
     }
 
     /**
+     * Creates an empty RecordValue. This is the result of a reference that cannot be found in the data.
+     * @param message The reason why the reference could not be found.
+     * @return an Empty RecordValue
+     */
+    public static RecordValue notFound(final String message) {
+        return new RecordValue(Status.NOT_FOUND, null, message);
+    }
+
+    /**
      * Creates a RecordValue indicating an error.
      * This is the result of an error occurring when the reference is being resolved.
      * @param message A description of the error.
      * @return A RecordValue that represents an error.
      */
-    public static RecordValue error(String message) {
+    public static RecordValue error(final String message) {
         return new RecordValue(Status.ERROR, null, message);
     }
 
@@ -55,7 +65,7 @@ public class RecordValue {
     }
 
     /**
-     * Checks if this RecordValue represents an error. In this case {@link #getErrorMessage()} can be invoked
+     * Checks if this RecordValue represents an error. In this case {@link #getMessage()} can be invoked
      * to get more information about the error.
      * @return {@code true} if not OK.
      */
@@ -72,9 +82,17 @@ public class RecordValue {
     }
 
     /**
+     * Checks if this RecordValue represents an empty (null) value because the reference could not be found.
+     * @return {@code true} if no error occurred but the value is empty (null).
+     */
+    public boolean isNotFound() {
+        return status == Status.NOT_FOUND;
+    }
+
+    /**
      * Gets the value contained in this RecordValue.
-     * @return A non-null object when {@link #isOk()} returns {@code true}, or {@code null} if {@link #isError()}
-     * or {@link #isEmpty()} return true.
+     * @return A non-null object when {@link #isOk()} returns {@code true}, or {@code null} if {@link #isError()},
+     * {@link #isEmpty()} or {@link #isNotFound()} return true.
      */
     public Object getValue() {
         return value;
@@ -82,11 +100,11 @@ public class RecordValue {
 
     /**
      * Get the error message if this RecordValue represents an error.
-     * @return The description of the error if {@link #isError()} returns {@code true},
-     * or {@code null} if {@link #isError()} returns {@code false}.
+     * @return The description of the error if {@link #isError()} or {@link #isNotFound()} returns {@code true},
+     * or {@code false} otherwise.
      */
-    public String getErrorMessage() {
-        return errorMessage;
+    public String getMessage() {
+        return message;
     }
 
     @Override
@@ -94,11 +112,11 @@ public class RecordValue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RecordValue that = (RecordValue) o;
-        return status == that.status && Objects.equals(value, that.value) && Objects.equals(errorMessage, that.errorMessage);
+        return status == that.status && Objects.equals(value, that.value) && Objects.equals(message, that.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(status, value, errorMessage);
+        return Objects.hash(status, value, message);
     }
 }

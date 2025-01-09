@@ -28,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed dependency on xlsx-streamer
 - Removed direct dependency on tika-parsers-standard-package
 - Removed dependency on javax.activation-api
-- ExcelRecord.get: give error when reference is not found
 
 ### Changed
 - `Record.get(<reference>)` now returns a `RecordValue` object which wraps the actual result.

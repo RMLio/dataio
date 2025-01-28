@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serial;
 import java.net.MalformedURLException;
@@ -35,7 +36,7 @@ public class RemoteFileAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
+    public InputStream getInputStream() throws IOException {
         return getInputStreamFromURL(new URL(location), contentType);
     }
 

@@ -32,7 +32,7 @@ public class VirtualAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
+    public InputStream getInputStream() {
         return new ByteArrayInputStream(this.data);
     }
 

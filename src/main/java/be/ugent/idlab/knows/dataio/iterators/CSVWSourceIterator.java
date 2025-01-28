@@ -7,10 +7,14 @@ import be.ugent.idlab.knows.dataio.record.Record;
 import be.ugent.idlab.knows.dataio.utils.NewCSVNullInjector;
 import org.simpleflatmapper.lightningcsv.CsvParser;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,19 +32,19 @@ public class CSVWSourceIterator extends SourceIterator {
     private transient String[] next;
     private transient Iterator<String[]> iterator;
 
-    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws Exception {
+    public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.access = access;
         this.config = config;
         this.bootstrap();
     }
 
     @Serial
-    private void readObject(ObjectInputStream inputStream) throws Exception {
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, ParserConfigurationException, TransformerException {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    private void bootstrap() throws Exception {
+    private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
         NewCSVNullInjector injector = new NewCSVNullInjector(
                 access.getInputStream(),
                 config.getDelimiter(),

@@ -3,7 +3,10 @@ package be.ugent.idlab.knows.dataio.iterators;
 import be.ugent.idlab.knows.dataio.access.Access;
 import be.ugent.idlab.knows.dataio.record.Record;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -26,12 +29,12 @@ public class JSONLinesSourceIterator extends SourceIterator {
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      */
     @Serial
-    private void readObject(ObjectInputStream inputStream) throws Exception {
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, ParserConfigurationException, TransformerException {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
 
-    private void bootstrap() throws Exception {
+    private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.lineIterator = new LineIterator(access.getInputStream());
     }
 

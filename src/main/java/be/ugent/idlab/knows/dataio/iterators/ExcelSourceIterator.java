@@ -8,10 +8,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serial;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +33,7 @@ public class ExcelSourceIterator extends SourceIterator {
     /**
      * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
      */
-    private void boostrap() throws Exception {
+    private void boostrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
         List<ExcelRecord> sources = new ArrayList<>();
         try (InputStream in = access.getInputStream();
              Workbook wb = new XSSFWorkbook(in)) {
@@ -51,7 +54,7 @@ public class ExcelSourceIterator extends SourceIterator {
     }
 
     @Serial
-    private void readObject(ObjectInputStream inputStream) throws Exception {
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, ParserConfigurationException, TransformerException {
         inputStream.defaultReadObject();
         boostrap();
     }

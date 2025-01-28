@@ -1,7 +1,11 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -16,7 +20,7 @@ public interface Access extends Serializable {
      * @throws Exception when something goes wrong with reading / construction of the input stream
      * @return the InputStream corresponding to the access.
      */
-    InputStream getInputStream() throws Exception;
+    InputStream getInputStream() throws IOException, SQLException, ParserConfigurationException, TransformerException;
 
     /**
      * This method returns a map of datatypes.

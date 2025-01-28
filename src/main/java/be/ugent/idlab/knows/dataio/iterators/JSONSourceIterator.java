@@ -12,6 +12,8 @@ import org.jsfr.json.JsonSurferJackson;
 import org.jsfr.json.ResumableParser;
 import org.jsfr.json.SurfingConfiguration;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -32,15 +34,14 @@ public class JSONSourceIterator extends SourceIterator {
     private transient Object match = null;
     private boolean hasMatch = false;
 
-    public JSONSourceIterator(Access access, String iterationPath) throws Exception {
+    public JSONSourceIterator(Access access, String iterationPath) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.access = access;
         // replace any occurences of .[ (e.g. $.[*]) with [ (such that we get $[*])
         this.iterationPath = iterationPath.replaceAll("\\.\\[", "[");
         this.bootstrap();
     }
 
-    public JSONSourceIterator(String json, String iterationPath) throws Exception {
-        // small hack to use the existing constructor
+    public JSONSourceIterator(String json, String iterationPath) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this(new VirtualAccess(json.getBytes()), iterationPath);
     }
 
@@ -61,7 +62,7 @@ public class JSONSourceIterator extends SourceIterator {
      * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
      * @throws SQLException
      */
-    private void bootstrap() throws Exception {
+    private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.inputStream = access.getInputStream();
 
         JsonSurfer surfer = JsonSurferJackson.INSTANCE;

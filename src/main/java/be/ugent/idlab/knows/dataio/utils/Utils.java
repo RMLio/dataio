@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.utils;
 
+import net.snowflake.client.jdbc.internal.google.api.client.http.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpConnectTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -20,11 +22,11 @@ public class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public static InputStream getInputStreamFromURL(URL url, String contentType) throws Exception {
+    public static InputStream getInputStreamFromURL(URL url, String contentType) throws IOException {
         return getInputStreamFromURL(url, contentType, Collections.emptyMap());
     }
 
-    public static InputStream getInputStreamFromURL(URL url, String contentType, Map<String, String> headers) throws Exception {
+    public static InputStream getInputStreamFromURL(URL url, String contentType, Map<String, String> headers) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setInstanceFollowRedirects(true);
@@ -41,7 +43,7 @@ public class Utils {
         });
         logger.debug("trying to connect");
         connection.connect();
-        if (connection.getResponseCode() == 401) throw new Exception("not authenticated");
+        if (connection.getResponseCode() == 401) throw new IOException("HTTP 401: Not Authenticated");
         logger.debug("getting inputstream");
         InputStream inputStream = connection.getInputStream();
         logger.debug("got inputstream");

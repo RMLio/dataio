@@ -5,10 +5,12 @@ import com.jayway.jsonpath.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serial;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public class WoTAccess implements Access {
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
+    public InputStream getInputStream() throws IOException {
         logger.debug("get input stream");
         if (auth.get("data").containsKey("refresh")) {
             try {
@@ -113,7 +115,7 @@ public class WoTAccess implements Access {
         return this.location;
     }
 
-    private void refreshToken() throws Exception {
+    private void refreshToken() throws IOException {
         StringBuilder data = new StringBuilder();
         data.append("{\"grant_type\": \"refresh_token\"");
         for (String name : auth.get("data").keySet()) {
@@ -126,7 +128,7 @@ public class WoTAccess implements Access {
         this.headers.put(auth.get("info").get("name"), "Bearer " + jsonResponse.get("access_token"));
     }
 
-    private InputStream getPostRequestResponse(URL url, String contentType, byte[] auth) throws Exception {
+    private InputStream getPostRequestResponse(URL url, String contentType, byte[] auth) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setInstanceFollowRedirects(true);

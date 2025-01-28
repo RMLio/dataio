@@ -9,9 +9,13 @@ import org.odftoolkit.simple.SpreadsheetDocument;
 import org.odftoolkit.simple.table.Row;
 import org.odftoolkit.simple.table.Table;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serial;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,13 +30,13 @@ public class ODSSourceIterator extends SourceIterator {
     private final Access access;
     private transient Iterator<ODSRecord> records;
 
-    public ODSSourceIterator(Access access) throws Exception {
+    public ODSSourceIterator(Access access) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.access = access;
         bootstrap();
     }
 
     @Serial
-    private void readObject(ObjectInputStream inputStream) throws Exception {
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, ParserConfigurationException, TransformerException {
         inputStream.defaultReadObject();
         this.bootstrap();
     }
@@ -42,7 +46,7 @@ public class ODSSourceIterator extends SourceIterator {
      *
      * @throws Exception  can be thrown due to the consumption of the input stream.
      */
-    private void bootstrap() throws Exception {
+    private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
         List<ODSRecord> sources = new ArrayList<>();
         try (InputStream is = this.access.getInputStream()) {
             Document document;

@@ -53,6 +53,12 @@ public class LocalFileAccess implements Access {
 
     }
 
+    /**
+     * Constructor with default charset UTF-8
+     * @param path      the relative path of the file
+     * @param basePath  base for the path. If path is not absolute, path is used relative to base to find the file
+     * @param type      type of the file
+     */
     public LocalFileAccess(String path, String basePath, String type) {
         this(path, basePath, type, StandardCharsets.UTF_8);
     }
@@ -60,8 +66,8 @@ public class LocalFileAccess implements Access {
     /**
      * Constructor in which filetype doesn't need to be specified.
      * Filetype is derived from the extension.
-     * @param path
-     * @param basePath
+     * @param path      the relative path of the file
+     * @param basePath  base for the path. If path is not absolute, then path is used relative to basePath to find the file
      */
     public LocalFileAccess(String path, String basePath) {
         this(path, basePath, null);
@@ -128,6 +134,11 @@ public class LocalFileAccess implements Access {
         return getAccessPath();
     }
 
+    /**
+     * Returns the content type reported by the underlying resource
+     *
+     * @return the content type as String
+     */
     @Override
     public String getContentType() {
         if (this.type == null) {

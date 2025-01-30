@@ -13,12 +13,15 @@ import java.util.Map;
  * For example, a local file, a remote file, a relational database, and so on.
  */
 public interface Access extends Serializable {
-
     /**
-     * This method returns an InputStream for the access.
+     * This method returns an InputStream for the access. This method
      *
-     * @throws Exception when something goes wrong with reading / construction of the input stream
-     * @return the InputStream corresponding to the access.
+     * @return An InputStream from the respective source
+     *
+     * @throws IOException when something goes wrong with reading a file from disk
+     * @throws SQLException when something goes wrong in communication with database
+     * @throws ParserConfigurationException when something goes wrong with XML reading
+     * @throws TransformerException when something goes wrong with XML reading
      */
     InputStream getInputStream() throws IOException, SQLException, ParserConfigurationException, TransformerException;
 
@@ -30,10 +33,17 @@ public interface Access extends Serializable {
      */
     Map<String, String> getDataTypes();
 
+    /**
+     * Returns the content type reported by the underlying resource
+     *
+     * @return the content type as String
+     */
     String getContentType();
 
     /**
      * Path to the resource the Access represents, be it the URL, remote address, filepath...
+     *
+     * @return a path to the resource
      */
     String getAccessPath();
 }

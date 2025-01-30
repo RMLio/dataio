@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [2.0.2] - 2025-01-30
 - Explicitly declare checked exceptions instead of generic `Exception`.
 
 ## [2.0.1] - 2025-01-22
@@ -136,6 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.0.2]: https://github.com/RMLio/dataio/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/RMLio/dataio/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/RMLio/dataio/compare/v1.3.1...v2.0.0
 [1.3.1]: https://github.com/RMLio/dataio/compare/v1.3.0...v1.3.1

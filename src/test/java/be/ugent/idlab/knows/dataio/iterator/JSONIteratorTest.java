@@ -182,7 +182,7 @@ public class JSONIteratorTest extends TestCore {
             RecordValue value = first.get("[\"key 2\"][\"key 3\"]");
             assertTrue(value.isOk());
 
-            System.out.println(value.getValue());
+            assertEquals("value 3", value.getValue());
         }
     }
 }

@@ -56,12 +56,6 @@ public class JSONRecord extends Record {
             return RecordValue.ok(v);
         }
 
-        // normalize the reference
-
-        if (reference.startsWith("$.?")) {
-            reference = reference.substring(3);
-        }
-
         if (reference.startsWith("\"") && reference.endsWith("\"")) {
             reference = reference.substring(1, reference.length() - 1);
         }
@@ -75,7 +69,6 @@ public class JSONRecord extends Record {
                 reference = "";
             }
         }
-
 
         if (!reference.contains("$")) {
             reference = reference.startsWith(".") ? String.format("$%s", reference) : String.format("$.%s", reference);

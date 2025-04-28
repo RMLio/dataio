@@ -193,6 +193,20 @@
             <version>1.6.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20250107</version>
+        </dependency>
+
+        <!-- Library for generating JWTs -->
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>0.9.6</version>
+        </dependency>
+
+
         <!--=============================-->
         <!-- SQL processing dependencies -->
         <!--=============================-->
@@ -247,7 +261,6 @@
             <artifactId>snowflake-jdbc</artifactId>
             <version>3.21.0</version>
         </dependency>
-
 
 
         <!--=======================-->

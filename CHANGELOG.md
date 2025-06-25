@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.3] - 2025-01-30
 
+## Added
+- Support for getting data from HTTP servers, with optional Solid authentication
+
 ### Fixed
 - Update Javadoc
 

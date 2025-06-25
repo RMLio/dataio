@@ -67,7 +67,7 @@ public class HTTPRequestTest {
         @Container
         GenericContainer<?> solid = new GenericContainer<>(DockerImageName.parse("solidproject/community-server:7"))
                 .withEnv(Map.of(
-                        "CSS_BASE_URL", "http://localhost:3000/",
+//                        "CSS_BASE_URL", "http://localhost:3000/",
                         "CSS_SEED_CONFIG", "/seed.json",
                         "CSS_CONFIG", "/config/playground.json",
                         "CSS_SHOW_STACK_TRACE", "true"))
@@ -81,16 +81,27 @@ public class HTTPRequestTest {
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
         @Test
-        public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException {
+        public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
             // set up user1 folder
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.csv"), "/data/user1/dataio/data.csv");
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.acl"), "/data/user1/dataio/data.acl");
 
-            String requestURL = "http://localhost:3000/user1/dataio/data.csv";
-            String email = "user1@localhost";
+            String ip = solid.getHost();
+
+
+            HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+            HttpRequest r = HttpRequest.newBuilder().uri(new URI("http://" + ip + ":3000/")).GET().build();
+
+            HttpResponse<String> response = client.send(r, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println(response.body());
+
+
+            String requestURL = String.format("http://%s:3000/user1/dataio/data.csv", ip);
+            String email = String.format("user1@%s", ip);
             String password = "user1";
-            String oidcIssuer = "http://localhost:3000/";
-            String authWebId = "http://localhost:3000/user1/profile/card#me";
+            String oidcIssuer = String.format("http://%s:3000/", ip);
+            String authWebId = String.format("http://%s:3000/user1/profile/card#me", ip);
 
             HTTPRequestAccess access = new HTTPRequestAccess(requestURL, "GET");
             access.setAuthSolid(email, password, oidcIssuer, authWebId);

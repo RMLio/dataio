@@ -9,6 +9,8 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.EllipticCurves;
 import org.jose4j.lang.JoseException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,41 +30,34 @@ import java.util.Map;
 
 /**
  * Implements an HTTP request to support <a href="https://rml.io/specs/access/httprequest/">HTTP REQUEST ACCESS</a>
+ * <p>
+ * Code adapted and modified from its original implementation in RMLMapper
  */
 public class HTTPRequestAccess implements Access {
 
-    //    private static final Map<String, String> referenceFormulationToContentType = new HashMap<>() {{
-//        put(NAMESPACES.RML + "CSV", "text/plain");
-//        put(NAMESPACES.RML + "JSONPath", "application/json");
-//        put(NAMESPACES.RML + "XPath", "application/xml");
-//        put(NAMESPACES.RML + "XPathReferenceFormulation", "application/xml");
-//        put(NAMESPACES.FORMATS + "SPARQL_Results_CSV", "text/plain");
-//        put(NAMESPACES.FORMATS + "SPARQL_Results_TSV", "text/plain");
-//        put(NAMESPACES.FORMATS + "SPARQL_Results_JSON", "application/json");
-//        put(NAMESPACES.FORMATS + "SPARQL_Results_XML", "application/xml");
-//    }};
+    private static final Logger log = LoggerFactory.getLogger(HTTPRequestAccess.class);
+    private final Map<String, String> credentialsCache = new HashMap<>();
+    private final Map<String, JSONObject> accessTokenCache = new HashMap<>();
     protected String requestURL;
     protected String methodName;
     protected String methodBody;
     protected Map<String, String> auth;
     protected Map<String, String> headers;
     protected HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-
-    private Map<String, String> credentialsCache = new HashMap<>();
-    private Map<String, JSONObject> accessTokenCache = new HashMap<>();
     private EllipticCurveJsonWebKey jwk;
 
-    private HTTPRequestAccess() {
-    }
-
     /**
-     * Default constructor with method GET, empty authentication and empty headers, operating fully within memory
+     * Constructor with method GET, empty authentication and empty headers
+     *
+     * @param requestURL URL to perform request to
      */
     public HTTPRequestAccess(String requestURL) {
         this(requestURL, "GET", null, Map.of(), Map.of());
     }
 
     /**
+     * Main constructor.
+     *
      * @param requestURL URL of the resource to consume
      * @param methodName name of the method to use during request
      * @param auth       authentication properties to use for the request
@@ -71,8 +66,8 @@ public class HTTPRequestAccess implements Access {
     public HTTPRequestAccess(String requestURL,
                              String methodName,
                              String methodBody,
-                             Map<String, String> auth,
-                             Map<String, String> headers) {
+                             Map<String, String> headers,
+                             Map<String, String> auth) {
         this.requestURL = requestURL;
         this.methodName = methodName;
         this.auth = auth;
@@ -85,8 +80,25 @@ public class HTTPRequestAccess implements Access {
         }
     }
 
-    public static HTTPRequestAccessBuilder builder() {
-        return new HTTPRequestAccessBuilder();
+    /**
+     * Constructor with empty body, no headers and no auth
+     *
+     * @param url    URL to perform request to
+     * @param method HTTP method of the request
+     */
+    public HTTPRequestAccess(String url, String method) {
+        this(url, method, null, Map.of(), Map.of());
+    }
+
+    /**
+     * Constructor with empty auth and no headers
+     *
+     * @param url    URL to perform request to
+     * @param method HTTP method of the request
+     * @param body   body to send with the request
+     */
+    public HTTPRequestAccess(String url, String method, String body) {
+        this(url, method, body, Map.of(), Map.of());
     }
 
     @Override
@@ -119,6 +131,28 @@ public class HTTPRequestAccess implements Access {
         }
     }
 
+    public void setAuth(Map<String, String> auth) {
+        this.auth = auth;
+    }
+
+    /**
+     * Sets the authentication map with credentials obtained through Solid authentication
+     *
+     * @param email      email for authentication
+     * @param password   password for authentication
+     * @param oidcIssuer issuer for authentication
+     * @param authWebID
+     * @throws JoseException when there's an error in generating the JWT
+     */
+    public void setAuthSolid(String email, String password, String oidcIssuer, String authWebID) throws JoseException {
+        this.auth = this.getAuthHeadersSolid(email, password, oidcIssuer, authWebID, this.requestURL, this.methodName);
+    }
+
+    /**
+     * It is impossible to tell what datatypes the
+     *
+     * @return null
+     */
     @Override
     public Map<String, String> getDataTypes() {
         return Map.of();
@@ -135,14 +169,23 @@ public class HTTPRequestAccess implements Access {
     }
 
     /**
-     * Generates Authorization headers for Community Solid Server
+     * Fetches the authentication headers for the specific request
      *
-     * @return
+     * @param email      email of the user
+     * @param password   password of the user
+     * @param oidcIssuer identity issuer
+     * @param webId      user's web identity
+     * @param uri        URI of the resource to fetch
+     * @param method     HTTP method to fetch the resource with
+     * @return a Map of credentials required for authenticated access to Solid pods
+     * @throws JoseException if the construction of JWT fails
      */
-    public Map<String, String> getAuthHeaders(String oidcIssuer, String webId, String email, String password, String uri, String method) throws JoseException {
+    public Map<String, String> getAuthHeadersSolid(String email, String password, String oidcIssuer, String webId, String uri, String method) throws JoseException {
+        log.debug("Fetching dpop access token");
         // get D-PoP access token
-        String dpop = getDpopAccessToken(oidcIssuer, webId, email, password);
+        String dpop = getDpopAccessToken(email, password, oidcIssuer, webId);
 
+        log.debug("Constructing jwt");
         // get jwt
         String dataJWT = generateJWT(uri, method);
 
@@ -152,12 +195,22 @@ public class HTTPRequestAccess implements Access {
         );
     }
 
-    private String getDpopAccessToken(String oidcIssuer, String webId, String email, String password) {
+    /**
+     * Fetches the D-PoP access token
+     *
+     * @param email      email of the user
+     * @param password   password of the user
+     * @param oidcIssuer issuer of user's identity
+     * @param webId      user's identity
+     * @return the D-PoP access token, or null if unable to get the token
+     */
+    private String getDpopAccessToken(String email, String password, String oidcIssuer, String webId) {
         String clientCredentials;
         if (credentialsCache.containsKey(oidcIssuer)) {
             clientCredentials = credentialsCache.get(oidcIssuer);
         } else {
-            clientCredentials = fetchClientCredentials(oidcIssuer, webId, email, password);
+            clientCredentials =
+                    fetchClientCredentials(email, password, oidcIssuer, webId);
         }
 
         String accessToken = null;
@@ -180,8 +233,16 @@ public class HTTPRequestAccess implements Access {
         return accessToken;
     }
 
+    /**
+     * Fetches access token for the pod using client's credentials
+     *
+     * @param oidcIssuer        issuer of the identity
+     * @param webId             web identification
+     * @param clientCredentials credentials obtained for the user's pod
+     * @return the access token
+     */
     private String fetchAccessToken(String oidcIssuer, String webId, String clientCredentials) {
-        try{
+        try {
             JSONObject creds = new JSONObject(clientCredentials);
             String id = creds.getString("id");
 
@@ -232,8 +293,17 @@ public class HTTPRequestAccess implements Access {
         }
     }
 
+    /**
+     * Generates the JWT to be used with the request
+     *
+     * @param url    URL to perform request to
+     * @param method HTTP method to perform the request with
+     * @return compact serialization of the generated JWT
+     * @throws JoseException when there's an error creating hte JWT
+     */
     private String generateJWT(String url, String method) throws JoseException {
         JwtClaims claims = new JwtClaims();
+        claims.setGeneratedJwtId();
         claims.setClaim("htm", method);
         claims.setClaim("htu", url);
         claims.setIssuedAtToNow();
@@ -249,8 +319,19 @@ public class HTTPRequestAccess implements Access {
         return jws.getCompactSerialization();
     }
 
-    private String fetchClientCredentials(String oidcIssuer, String webId, String email, String password) {
+    /**
+     * Obtains client credentials for the user's pod
+     *
+     * @param email      email of the user
+     * @param password   password of the user
+     * @param oidcIssuer identity issuer
+     * @param webId      web identity
+     * @return String representation of the credentials
+     */
+    private String fetchClientCredentials(String email, String password, String oidcIssuer, String webId) {
+        log.debug("Fetching client credentials");
         try {
+            log.debug("Fetching account info");
             // fetch account info about the user
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(oidcIssuer + ".account/"))
@@ -262,13 +343,15 @@ public class HTTPRequestAccess implements Access {
             }
 
             // parse the response for the password login URL
+            log.debug("Getting password login URL");
             JSONObject accountInfo = new JSONObject(response.body());
             String passwordURL = accountInfo.getJSONObject("controls")
                     .getJSONObject("password")
                     .getString("login");
 
             // perform login
-            String message = String.format("{\"email\": \"%s\", \"password\": \"%s\"}", email, password);
+            log.debug("Logging in");
+            String message = new JSONObject(Map.of("email", email, "password", password)).toString();
             request = HttpRequest.newBuilder()
                     .uri(URI.create(passwordURL))
                     .POST(HttpRequest.BodyPublishers.ofString(message, StandardCharsets.UTF_8))
@@ -282,6 +365,7 @@ public class HTTPRequestAccess implements Access {
             JSONObject loginInfo = new JSONObject(response.body());
             String authToken = loginInfo.getString("authorization");
 
+            log.debug("Got authorization token");
             request = HttpRequest.newBuilder()
                     .uri(URI.create(oidcIssuer + ".account/"))
                     .GET()
@@ -299,7 +383,7 @@ public class HTTPRequestAccess implements Access {
                     .getString("clientCredentials");
 
             // finally, get the useful credentials by POSTing to the credentials URL
-            message = String.format("\"name\": \"my-token\", \"webId\": \"%s\"}", webId);
+            message = new JSONObject(Map.of("name", "my-token", "webId", webId)).toString();
             request = HttpRequest.newBuilder()
                     .uri(URI.create(credentialsURL))
                     .POST(HttpRequest.BodyPublishers.ofString(message, StandardCharsets.UTF_8))
@@ -312,69 +396,14 @@ public class HTTPRequestAccess implements Access {
                 throw new IllegalStateException("Could not get OpenID Connect token info: " + response.body());
             }
 
+            log.debug("Obtained credentials");
+
             String credentials = response.body();
             credentialsCache.put(webId, credentials);
 
             return credentials;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * A utility builder to make constructing the Access easier.
-     */
-    public static class HTTPRequestAccessBuilder {
-        private final HTTPRequestAccess access;
-
-        public HTTPRequestAccessBuilder() {
-            this.access = new HTTPRequestAccess();
-        }
-
-        public HTTPRequestAccessBuilder withURL(String url) {
-            this.access.requestURL = url;
-            return this;
-        }
-
-        public HTTPRequestAccessBuilder withMethod(String method) {
-            this.access.methodName = method;
-            return this;
-        }
-
-        public HTTPRequestAccessBuilder withHeader(String key, String value) {
-            this.access.headers.put(key, value);
-            return this;
-        }
-
-        /**
-         * Fully replaces the headers map with the argument
-         *
-         * @param headers
-         * @return this
-         */
-        public HTTPRequestAccessBuilder withHeaders(Map<String, String> headers) {
-            this.access.headers = headers;
-            return this;
-        }
-
-        public HTTPRequestAccessBuilder withAuth(String key, String value) {
-            this.access.auth.put(key, value);
-            return this;
-        }
-
-        /**
-         * Fully replaces the auth map with the argument
-         *
-         * @param auth
-         * @return this
-         */
-        public HTTPRequestAccessBuilder withAuth(Map<String, String> auth) {
-            this.access.auth = auth;
-            return this;
-        }
-
-        public HTTPRequestAccess build() {
-            return this.access;
         }
     }
 }

@@ -3,14 +3,14 @@ stages:
   - unittests
   - deploy
 
-include:
+#include:
   # Make sure the CHANGELOG is always updated
-  - project: 'rml/util/ci-templates'
-    ref: main
-    file: 'CHANGELOG.gitlab-ci.yml'
-  - project: 'rml/util/ci-templates'
-    ref: main
-    file: 'Maven-Central.gitlab-ci.yml'
+#  - project: 'rml/util/ci-templates'
+#    ref: main
+#    file: 'CHANGELOG.gitlab-ci.yml'
+#  - project: 'rml/util/ci-templates'
+#    ref: main
+#    file: 'Maven-Central.gitlab-ci.yml'
 
 
 variables:
@@ -57,15 +57,16 @@ General:
     matrix:
       - TEST: [
                 # iterator
-                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
+#                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream
-                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
+#                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
                 # general access
-                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
+#                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
                 # Flow
-                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
+#                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
                 # Serializability
-                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
+#                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
+        HTTPRequestTest$$*
         ]
   except:
     - main

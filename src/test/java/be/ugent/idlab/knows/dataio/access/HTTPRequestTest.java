@@ -67,7 +67,7 @@ public class HTTPRequestTest {
         @Container
         GenericContainer<?> solid = new GenericContainer<>(DockerImageName.parse("solidproject/community-server:7"))
                 .withEnv(Map.of(
-//                        "CSS_BASE_URL", "http://localhost:3000/",
+//                        "CSS_BASE_URL", "http://docker:3000/",
                         "CSS_SEED_CONFIG", "/seed.json",
                         "CSS_CONFIG", "/config/playground.json",
                         "CSS_SHOW_STACK_TRACE", "true"))
@@ -76,12 +76,23 @@ public class HTTPRequestTest {
                 .withCopyToContainer(MountableFile.forClasspathResource("/community_solid_server/playground-pod-seed.json"), "/seed.json")
                 .withCopyToContainer(MountableFile.forClasspathResource("/community_solid_server/root-content/"), "/root-content/")
                 // bypass Testcontainers' random port assignment
-                .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(3000), new ExposedPort(3000))))
+                .withCreateContainerCmdModifier(cmd -> {
+                    cmd.getHostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(3000), new ExposedPort(3000)));
+                })
                 // wait for internal server to start running
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
         @Test
         public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
+            // a workaround for dynamically discovering the host
+            String host = solid.getHost();
+            solid.stop();
+            solid.addEnv("CSS_BASE_URL", String.format("http://%s:3000/", host));
+            solid.start();
+//            Thread.sleep(10000);
+
+            System.out.println(solid.getEnv());
+
             // set up user1 folder
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.csv"), "/data/user1/dataio/data.csv");
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.acl"), "/data/user1/dataio/data.acl");
@@ -89,16 +100,8 @@ public class HTTPRequestTest {
             String ip = solid.getHost();
 
 
-            HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-            HttpRequest r = HttpRequest.newBuilder().uri(new URI("http://" + ip + ":3000/")).GET().build();
-
-            HttpResponse<String> response = client.send(r, HttpResponse.BodyHandlers.ofString());
-
-            System.out.println(response.body());
-
-
-            String requestURL = String.format("http://%s:3000/user1/dataio/data.csv", ip);
-            String email = String.format("user1@%s", ip);
+            String requestURL = String.format("http://%s:3000/user1/profile/", ip);
+            String email = "user1@docker";
             String password = "user1";
             String oidcIssuer = String.format("http://%s:3000/", ip);
             String authWebId = String.format("http://%s:3000/user1/profile/card#me", ip);
@@ -107,6 +110,8 @@ public class HTTPRequestTest {
             access.setAuthSolid(email, password, oidcIssuer, authWebId);
 
             String actual = new String(access.getInputStream().readAllBytes());
+
+            System.out.println(actual);
 
             try (FileInputStream fis = new FileInputStream("src/test/resources/community_solid_server/user1_content/data.csv")) {
                 String expected = new String(fis.readAllBytes());

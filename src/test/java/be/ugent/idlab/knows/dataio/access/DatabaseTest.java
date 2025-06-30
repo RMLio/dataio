@@ -96,6 +96,7 @@ public class DatabaseTest {
 
         @Test
         public void testPostgres() {
+            System.out.println(postgreSQLContainer.getJdbcUrl());
             initializeDatabase("src/test/resources/db_setup/postgres_setup.sql", postgreSQLContainer);
             Access access = getRDBAccess(DatabaseType.POSTGRES, postgreSQLContainer);
 

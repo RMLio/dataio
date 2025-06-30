@@ -120,6 +120,8 @@ public class HTTPRequestAccess implements Access {
         }
 
         try {
+            HttpRequest request = requestBuilder.build();
+            System.out.println(request.uri());
             HttpResponse<String> response = this.httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException("Could not reach the server: " + response.body());
@@ -361,6 +363,9 @@ public class HTTPRequestAccess implements Access {
             if (response.statusCode() != HttpStatus.SC_OK) {
                 throw new IllegalStateException("Could not log in: " + response.body());
             }
+
+            System.out.println(email);
+            System.out.println(password);
 
             JSONObject loginInfo = new JSONObject(response.body());
             String authToken = loginInfo.getString("authorization");

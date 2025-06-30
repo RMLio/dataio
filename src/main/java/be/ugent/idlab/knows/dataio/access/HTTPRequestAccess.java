@@ -141,7 +141,7 @@ public class HTTPRequestAccess implements Access {
      * @param email      email for authentication
      * @param password   password for authentication
      * @param oidcIssuer issuer for authentication
-     * @param authWebID
+     * @param authWebID  user's web identity
      * @throws JoseException when there's an error in generating the JWT
      */
     public void setAuthSolid(String email, String password, String oidcIssuer, String authWebID) throws JoseException {
@@ -149,9 +149,9 @@ public class HTTPRequestAccess implements Access {
     }
 
     /**
-     * It is impossible to tell what datatypes the
+     * It is impossible to tell by the source alone what datatypes this Access type will provide
      *
-     * @return null
+     * @return empty map
      */
     @Override
     public Map<String, String> getDataTypes() {
@@ -299,7 +299,7 @@ public class HTTPRequestAccess implements Access {
      * @param url    URL to perform request to
      * @param method HTTP method to perform the request with
      * @return compact serialization of the generated JWT
-     * @throws JoseException when there's an error creating hte JWT
+     * @throws JoseException when there's an error creating the JWT
      */
     private String generateJWT(String url, String method) throws JoseException {
         JwtClaims claims = new JwtClaims();

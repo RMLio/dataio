@@ -6,11 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Support for getting data from HTTP servers, with optional Solid authentication
 
 ## [2.0.3] - 2025-01-30
 
 ## Added
-- Support for getting data from HTTP servers, with optional Solid authentication
 
 ### Fixed
 - Update Javadoc

@@ -219,8 +219,8 @@ public class HTTPRequestAccess implements Access {
             // check if the token is valid
             JSONObject token = new JSONObject(accessTokenCache.get(webId));
             long expiry = token.getLong("expires_on");
-            long now = ((new Date().getTime()) / 1000) + 10;
-            if (now < expiry) {
+            long now = (new Date().getTime()) / 1000;
+            if (now < expiry - 10) {
                 accessToken = token.getString("access_token");
                 isValidToken = true;
             }

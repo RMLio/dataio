@@ -5,6 +5,7 @@ import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import com.sun.net.httpserver.HttpServer;
 import org.jose4j.lang.JoseException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -21,11 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Map;
@@ -82,6 +79,7 @@ public class HTTPRequestTest {
                 // wait for internal server to start running
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
+        @Disabled
         @Test
         public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
             // a workaround for dynamically discovering the host

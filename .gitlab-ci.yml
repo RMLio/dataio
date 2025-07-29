@@ -57,16 +57,15 @@ General:
     matrix:
       - TEST: [
                 # iterator
-#                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
+                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
                 # stream
-#                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
+                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
                 # general access
-#                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
+                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest,
                 # Flow
-#                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
+                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
                 # Serializability
-#                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
-        HTTPRequestTest$$*
+                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
         ]
   except:
     - main

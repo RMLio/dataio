@@ -1,9 +1,9 @@
 package be.ugent.idlab.knows.dataio.record;
 
 import com.fasterxml.jackson.databind.node.ValueNode;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.JsonPathException;
-import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import org.jsfr.json.compiler.JsonPathCompiler;
 import org.jsfr.json.path.PathOperator;
 import org.slf4j.Logger;
@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,22 +21,50 @@ import java.util.regex.Pattern;
  * Every source corresponds with a JSON object in a data source.
  */
 public class JSONRecord extends Record {
+    // Configuration for Jayway to provide stable outputs
+    static {
+        Configuration.setDefaults(new Configuration.Defaults() {
+
+            private final JsonProvider jsonProvider = Configuration.defaultConfiguration().jsonProvider();
+            private final MappingProvider mappingProvider = Configuration.defaultConfiguration().mappingProvider();
+
+            @Override
+            public JsonProvider jsonProvider() {
+                return jsonProvider;
+            }
+
+            @Override
+            public Set<Option> options() {
+                return Set.of(Option.DEFAULT_PATH_LEAF_TO_NULL);
+            }
+
+            @Override
+            public MappingProvider mappingProvider() {
+                return mappingProvider;
+            }
+        });
+    }
+
     private final Object document; // JSON object
     private final String tag; // what iterator was used to obtain this.document
     private final String path; // what specific path was taken to arrive at this.document
-
+    private final int index; // what index in an array thee element is at
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private List<String> compiledPath;
-
 
     public JSONRecord(Object document, String tag) {
         this(document, tag, "");
     }
 
     public JSONRecord(Object document, String tag, String path) {
+        this(document, tag, path, -1);
+    }
+
+    public JSONRecord(Object document, String tag, String path, int index) {
         this.document = document;
         this.tag = tag;
         this.path = path;
+        this.index = index;
     }
 
     /**
@@ -178,6 +207,10 @@ public class JSONRecord extends Record {
 
     public String getTag() {
         return tag;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     @Override

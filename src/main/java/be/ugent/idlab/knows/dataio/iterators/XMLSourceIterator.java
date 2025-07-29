@@ -26,6 +26,7 @@ public class XMLSourceIterator extends SourceIterator {
     private final String stringIterator;
     private transient XdmSequenceIterator<XdmItem> iterator;
     private transient XPathCompiler compiler;
+    private int counter = 0;
 
     public XMLSourceIterator(Access access, String stringIterator) throws Exception {
         this.access = access;
@@ -64,7 +65,7 @@ public class XMLSourceIterator extends SourceIterator {
     @Override
     public Record next() {
         if (this.iterator.hasNext()) {
-            return new XMLRecord(iterator.next(), compiler);
+            return new XMLRecord(iterator.next(), compiler, counter++);
         } else {
             throw new NoSuchElementException();
         }

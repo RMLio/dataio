@@ -33,6 +33,7 @@ public class JSONSourceIterator extends SourceIterator {
     private transient String currentPath;
     private transient Object match = null;
     private boolean hasMatch = false;
+    private int arrayIndex = 0;
 
     public JSONSourceIterator(Access access, String iterationPath) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.access = access;
@@ -73,6 +74,7 @@ public class JSONSourceIterator extends SourceIterator {
                     this.match = value;
                     this.currentPath = context.getJsonPath();
                     this.hasMatch = true;
+                    this.arrayIndex = context.getCurrentArrayIndex();
                     context.pause();
                 })
                 .build();
@@ -104,7 +106,7 @@ public class JSONSourceIterator extends SourceIterator {
                 match = mapper.convertValue(match, Map.class);
             }
 
-            return new JSONRecord(match, this.iterationPath, path);
+            return new JSONRecord(match, this.iterationPath, path, this.arrayIndex);
         }
 
         throw new NoSuchElementException();

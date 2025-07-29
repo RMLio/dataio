@@ -63,7 +63,6 @@ public class HTTPRequestTest {
         }
     }
 
-    @Disabled("Due to issues with DinD and CSS container setup")
     @Nested
     @Testcontainers
     class SolidTests {
@@ -84,6 +83,7 @@ public class HTTPRequestTest {
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
         @Test
+        @Disabled("Due to issues with DinD and CSS container setup")
         public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
             // set up user1 folder
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.csv"), "/data/user1/dataio/data.csv");
@@ -116,26 +116,26 @@ public class HTTPRequestTest {
                 assertEquals(expected, actual);
             }
         }
-    }
-    @Test
-    public void solidAuthWebsite() throws JoseException {
-        // this endpoint is protected by authentication
-        String requestURL = "https://pod.playground.solidlab.be/user1/profile/";
-        String email = "user1@pod.playground.solidlab.be";
-        String password = "user1";
-        String oidcIssuer = "https://pod.playground.solidlab.be/";
-        String authWebId = "https://pod.playground.solidlab.be/user1/profile/card#me";
 
-        HTTPRequestAccess access = new HTTPRequestAccess(requestURL, "GET");
-        access.setAuthSolid(email, password, oidcIssuer, authWebId);
+        @Test
+        public void solidAuthWebsite() throws JoseException {
+            // this endpoint is protected by authentication
+            String requestURL = "https://pod.playground.solidlab.be/user1/profile/";
+            String email = "user1@pod.playground.solidlab.be";
+            String password = "user1";
+            String oidcIssuer = "https://pod.playground.solidlab.be/";
+            String authWebId = "https://pod.playground.solidlab.be/user1/profile/card#me";
 
-        try {
-            String actual = new String(access.getInputStream().readAllBytes());
-            System.out.println(actual);
-        } catch (Exception e) {
-            // this test essentially only checks if we get a proper response from this public facing pod, due to issues with DinD setup
-            fail();
+            HTTPRequestAccess access = new HTTPRequestAccess(requestURL, "GET");
+            access.setAuthSolid(email, password, oidcIssuer, authWebId);
+
+            try {
+                String actual = new String(access.getInputStream().readAllBytes());
+                System.out.println(actual);
+            } catch (Exception e) {
+                // this test essentially only checks if we get a proper response from this public facing pod, due to issues with DinD setup
+                fail();
+            }
         }
     }
-
 }

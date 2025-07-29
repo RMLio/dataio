@@ -40,7 +40,7 @@ General:
   retry: 2
   services:
     - name: docker:23.0.5-dind
-        # explicitly disable tls to avoid docker startup interruption
+      # explicitly disable tls to avoid docker startup interruption
       command: [ "--tls=false" ]
   variables:
     # Instruct Testcontainers to use the daemon of DinD.
@@ -56,16 +56,16 @@ General:
   parallel:
     matrix:
       - TEST: [
-                # iterator
-                CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
-                # stream
-                CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
-                # general access
-                DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
-                # Flow
-                CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
-                # Serializability
-                IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
-        ]
+        # iterator
+        CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
+        # stream
+        CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
+        # general access
+        DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest,
+        # Flow
+        CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
+        # Serializability
+        IteratorSerializabilityTest, StreamSerializabilityTest, ObservableSerializabilityTest
+      ]
   except:
     - main

@@ -35,7 +35,11 @@ public class JSONRecord extends Record {
 
             @Override
             public Set<Option> options() {
-                return Set.of(Option.DEFAULT_PATH_LEAF_TO_NULL);
+                return Set.of(
+                        Option.DEFAULT_PATH_LEAF_TO_NULL,
+                        Option.REQUIRE_PROPERTIES,
+                        Option.ALWAYS_RETURN_LIST
+                );
             }
 
             @Override

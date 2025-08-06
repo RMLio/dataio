@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import be.ugent.idlab.knows.dataio.access.compression.Compression;
 import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 
@@ -30,6 +32,7 @@ public class LocalFileAccess implements Access {
     private final String path;
     private String type;
     private final String encoding;
+    private final Compression compression;
 
     /**
      * This constructor takes the path and the base path of a file.
@@ -40,7 +43,7 @@ public class LocalFileAccess implements Access {
      * @param type     type of the file
      * @param encoding encoding of the file
      */
-    public LocalFileAccess(String path, String base, String type, Charset encoding) {
+    public LocalFileAccess(String path, String base, String type, Charset encoding, Compression compression) {
         if (base != null && !base.isEmpty()) {
             Path basePath = Path.of(base);
             this.path = basePath.resolve(path).toString();
@@ -50,7 +53,11 @@ public class LocalFileAccess implements Access {
 
         this.encoding = encoding.name();
         this.type = type;
+        this.compression = compression;
+    }
 
+    public LocalFileAccess(String path, String base, String type, Charset encoding) {
+        this(path, base, type, encoding, Compression.None);
     }
 
     /**
@@ -60,7 +67,7 @@ public class LocalFileAccess implements Access {
      * @param type      type of the file
      */
     public LocalFileAccess(String path, String basePath, String type) {
-        this(path, basePath, type, StandardCharsets.UTF_8);
+        this(path, basePath, type, StandardCharsets.UTF_8, Compression.None);
     }
 
     /**
@@ -82,8 +89,15 @@ public class LocalFileAccess implements Access {
     @Override
     public InputStream getInputStream() throws IOException {
         Path path = Path.of(this.path);
+
+        InputStream inputStream = switch (this.compression) {
+            case None -> Files.newInputStream(path, StandardOpenOption.READ);
+            case GZip ->  new GZIPInputStream(Files.newInputStream(path, StandardOpenOption.READ));
+        };
+
+
         return BOMInputStream.builder()
-                .setInputStream(Files.newInputStream(path, StandardOpenOption.READ))
+                .setInputStream(inputStream)
                 .get();
     }
 

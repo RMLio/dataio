@@ -1,5 +1,6 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import be.ugent.idlab.knows.dataio.access.compression.Compression;
 import be.ugent.idlab.knows.dataio.cores.LocalAccessTestCore;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assume;
@@ -7,13 +8,17 @@ import org.junit.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -21,7 +26,7 @@ import static org.junit.Assert.assertThrows;
 public class LocalAccessTest extends LocalAccessTestCore {
 
     @Test
-    public void relativePath() throws IOException, SQLException {
+    public void relativePath() throws IOException {
         String relative = "src/test/resources/local_access/file.txt";
 
         Access access = new LocalFileAccess("", relative, "txt", StandardCharsets.UTF_8);
@@ -32,7 +37,7 @@ public class LocalAccessTest extends LocalAccessTestCore {
     }
 
     @Test
-    public void absolutePath() throws IOException, SQLException {
+    public void absolutePath() throws IOException {
         String relative = "src/test/resources/local_access/file.txt";
         String absolute = new File(relative).getAbsolutePath();
         Access access = new LocalFileAccess(absolute, "", "txt", StandardCharsets.UTF_8);
@@ -44,7 +49,7 @@ public class LocalAccessTest extends LocalAccessTestCore {
     }
 
     @Test
-    public void relativeToBase() throws IOException, SQLException {
+    public void relativeToBase() throws IOException {
         String base = "src/test/resources/";
         String baseAbsolute = new File(base).getAbsolutePath();
         Access access = new LocalFileAccess("local_access/file.txt", baseAbsolute, "txt", StandardCharsets.UTF_8);
@@ -86,5 +91,25 @@ public class LocalAccessTest extends LocalAccessTestCore {
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException(e.getMessage());
         }
+    }
+
+    @Test
+    public void compression() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = new LocalFileAccess("access/file.json.gz", "src/test/resources", "gzip", Charset.defaultCharset(), Compression.GZip);
+        String expected = """
+                [
+                  {
+                    "id": 0
+                  },
+                  {
+                    "id": 1
+                  },
+                  {
+                    "id": 2
+                  }
+                ]""";
+
+        String actual = new String(access.getInputStream().readAllBytes());
+        assertEquals(expected, actual);
     }
 }

@@ -1,9 +1,13 @@
 package be.ugent.idlab.knows.dataio.access;
 
 import be.ugent.idlab.knows.dataio.access.compression.Compression;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tukaani.xz.XZInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,6 +21,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 
@@ -90,15 +96,50 @@ public class LocalFileAccess implements Access {
     public InputStream getInputStream() throws IOException {
         Path path = Path.of(this.path);
 
+        InputStream in = Files.newInputStream(path, StandardOpenOption.READ);
+
         InputStream inputStream = switch (this.compression) {
-            case None -> Files.newInputStream(path, StandardOpenOption.READ);
-            case GZip ->  new GZIPInputStream(Files.newInputStream(path, StandardOpenOption.READ));
+            case None -> in;
+            case GZip ->  getGZInputStream(in);
+            case Zip -> getZipInputStream(in);
+            case TarXZ -> getTarXZInputStream(in);
+            case TarGZ -> getTarGZInputStream(in);
         };
 
 
         return BOMInputStream.builder()
                 .setInputStream(inputStream)
                 .get();
+    }
+
+    private InputStream getTarGZInputStream(InputStream baseInputStream) throws IOException {
+        return getTarInputStream(getGZInputStream(baseInputStream));
+    }
+
+    private InputStream getTarXZInputStream(InputStream baseInputStream) throws IOException {
+        return getTarInputStream(getXZInputStream(baseInputStream));
+    }
+
+    private InputStream getZipInputStream(InputStream baseInputStream) throws IOException {
+        ZipInputStream zip = new ZipInputStream(baseInputStream);
+        // assumption: file to read is the first file in the stream
+        zip.getNextEntry();
+        return zip;
+    }
+
+    private InputStream getXZInputStream(InputStream baseInputStream) throws IOException {
+        return new XZInputStream(baseInputStream);
+    }
+
+    private InputStream getGZInputStream(InputStream baseInputStream) throws IOException {
+        return new GZIPInputStream(baseInputStream);
+    }
+
+    private InputStream getTarInputStream(InputStream baseInputStream) throws IOException {
+        TarArchiveInputStream tar = new TarArchiveInputStream(baseInputStream);
+        // assumption: file to read is the first file in the stream
+        tar.getNextEntry();
+        return tar;
     }
 
     /**

@@ -418,6 +418,13 @@
             <version>${fuseki.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- XZ processing library -->
+        <dependency>
+            <groupId>org.tukaani</groupId>
+            <artifactId>xz</artifactId>
+            <version>1.10</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -94,21 +93,147 @@ public class LocalAccessTest extends LocalAccessTestCore {
     }
 
     @Test
-    public void compression() throws SQLException, IOException, ParserConfigurationException, TransformerException {
-        Access access = new LocalFileAccess("access/file.json.gz", "src/test/resources", "gzip", Charset.defaultCharset(), Compression.GZip);
+    public void compressionGZip() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = new LocalFileAccess("access/compression/Friends.json.gz", "src/test/resources", "gzip", Charset.defaultCharset(), Compression.GZip);
         String expected = """
-                [
-                  {
-                    "id": 0
-                  },
-                  {
-                    "id": 1
-                  },
-                  {
-                    "id": 2
-                  }
-                ]""";
+               [
+                 {\s
+                   "id": 0,
+                   "name": "Monica Geller",
+                   "age": 33
+                 },
+                 {\s
+                   "id": 1,
+                   "name": "Rachel Green",
+                   "age": 34
+                 },
+                 {\s
+                   "id": 2,
+                   "name": "Joey Tribbiani",
+                   "age": 35
+                 },
+                 {\s
+                   "id": 3,
+                   "name": "Chandler Bing",
+                   "age": 36
+                 },
+                 {\s
+                   "id": 4,
+                   "name": "Ross Geller",
+                   "age": 37
+                 }
+               ]
+               """;
 
+        String actual = new String(access.getInputStream().readAllBytes());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void compressionZIP() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = new LocalFileAccess("access/compression/Friends.json.zip", "src/test/resources", "zip", Charset.defaultCharset(), Compression.Zip);
+        String expected = """
+               [
+                 {\s
+                   "id": 0,
+                   "name": "Monica Geller",
+                   "age": 33
+                 },
+                 {\s
+                   "id": 1,
+                   "name": "Rachel Green",
+                   "age": 34
+                 },
+                 {\s
+                   "id": 2,
+                   "name": "Joey Tribbiani",
+                   "age": 35
+                 },
+                 {\s
+                   "id": 3,
+                   "name": "Chandler Bing",
+                   "age": 36
+                 },
+                 {\s
+                   "id": 4,
+                   "name": "Ross Geller",
+                   "age": 37
+                 }
+               ]
+               """;
+        String actual = new String(access.getInputStream().readAllBytes());
+        assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void compressionTarGZ() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = new LocalFileAccess("access/compression/Friends.json.tar.gz", "src/test/resources", "tar.gz", Charset.defaultCharset(), Compression.TarGZ);
+        String expected = """
+               [
+                 {\s
+                   "id": 0,
+                   "name": "Monica Geller",
+                   "age": 33
+                 },
+                 {\s
+                   "id": 1,
+                   "name": "Rachel Green",
+                   "age": 34
+                 },
+                 {\s
+                   "id": 2,
+                   "name": "Joey Tribbiani",
+                   "age": 35
+                 },
+                 {\s
+                   "id": 3,
+                   "name": "Chandler Bing",
+                   "age": 36
+                 },
+                 {\s
+                   "id": 4,
+                   "name": "Ross Geller",
+                   "age": 37
+                 }
+               ]
+               """;
+        String actual = new String(access.getInputStream().readAllBytes());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void compressionTarXZ() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = new LocalFileAccess("access/compression/Friends.json.tar.xz", "src/test/resources", "tar.xz", Charset.defaultCharset(), Compression.TarXZ);
+        String expected = """
+               [
+                 {\s
+                   "id": 0,
+                   "name": "Monica Geller",
+                   "age": 33
+                 },
+                 {\s
+                   "id": 1,
+                   "name": "Rachel Green",
+                   "age": 34
+                 },
+                 {\s
+                   "id": 2,
+                   "name": "Joey Tribbiani",
+                   "age": 35
+                 },
+                 {\s
+                   "id": 3,
+                   "name": "Chandler Bing",
+                   "age": 36
+                 },
+                 {\s
+                   "id": 4,
+                   "name": "Ross Geller",
+                   "age": 37
+                 }
+               ]
+               """;
         String actual = new String(access.getInputStream().readAllBytes());
         assertEquals(expected, actual);
     }

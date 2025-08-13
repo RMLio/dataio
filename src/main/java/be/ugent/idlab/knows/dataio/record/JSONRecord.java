@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ValueNode;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import net.minidev.json.JSONArray;
 import org.jsfr.json.compiler.JsonPathCompiler;
 import org.jsfr.json.path.PathOperator;
 import org.slf4j.Logger;
@@ -107,8 +108,13 @@ public class JSONRecord extends Record {
         }
 
         try {
-            Object result = JsonPath.read(this.document, reference);
-            if (result != null) {
+            JSONArray result = JsonPath.read(this.document, reference);
+            boolean allNulls = true;
+            for (Object o : result) {
+                allNulls = allNulls && o == null;
+            }
+
+            if (!result.isEmpty() && !allNulls) {
                 return RecordValue.ok(result);
             } else {
                 return RecordValue.empty();

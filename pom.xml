@@ -199,6 +199,12 @@
             <version>20250107</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
         <!-- Library for generating JWTs -->
         <dependency>
             <groupId>org.bitbucket.b_c</groupId>

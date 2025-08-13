@@ -1,6 +1,10 @@
 package be.ugent.idlab.knows.dataio.record;
 
+import com.opencsv.CSVWriter;
+
+import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,5 +111,25 @@ public class CSVRecord extends Record {
         int result = data.hashCode();
         result = 31 * result + datatypes.hashCode();
         return result;
+    }
+
+    public String toCSVString() {
+        int size = this.data.size();
+        String[] header = new String[size];
+        String[] data = new String[size];
+
+        List<String> keys = this.data.keySet().stream().toList();
+
+        for (int i = 0; i < size; i++) {
+            String key = keys.get(i);
+            header[i] = key;
+            data[i] = this.data.get(key);
+        }
+
+        StringWriter sw = new StringWriter();
+        CSVWriter writer = new CSVWriter(sw);
+        writer.writeAll(List.of(header, data));
+
+        return sw.toString();
     }
 }

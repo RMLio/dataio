@@ -1,9 +1,7 @@
 package be.ugent.idlab.knows.dataio.access;
 
-import be.ugent.idlab.knows.dataio.access.compression.Compression;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import be.ugent.idlab.knows.dataio.compression.Compression;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
@@ -102,10 +99,11 @@ public class LocalFileAccess implements Access {
             case None -> in;
             case GZip ->  getGZInputStream(in);
             case Zip -> getZipInputStream(in);
+            case XZ -> getXZInputStream(in);
+            case Tar -> getTarInputStream(in);
             case TarXZ -> getTarXZInputStream(in);
             case TarGZ -> getTarGZInputStream(in);
         };
-
 
         return BOMInputStream.builder()
                 .setInputStream(inputStream)

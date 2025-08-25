@@ -61,7 +61,7 @@ General:
         # stream
         CSVStreamTest, CSVWStreamTest, ExcelStreamTest, JSONStreamTest, XMLStreamTest, ODSStreamTest,
         # general access
-        DatabaseTest$$*, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
+        PostgreSQLTest, MSSQLTest, MySQLTestcase, OracleTestcase, LocalAccessTest, SPARQLTest, WoTTest, HTTPRequestTest$$*,
         # Flow
         CSVObservableTest, CSVWObservableTest, ExcelObservableTest, JSONObservableTest, ODSObservableTest, XMLObservableTest,
         # Serializability

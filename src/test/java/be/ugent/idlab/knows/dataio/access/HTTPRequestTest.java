@@ -28,8 +28,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import static org.apache.commons.io.FileUtils.readFileToString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HTTPRequestTest {
 
@@ -80,9 +79,7 @@ public class HTTPRequestTest {
                 // wait for internal server to start running
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
-        @Disabled
         @Test
-        @Disabled("Due to issues with DinD and CSS container setup")
         public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
             // a workaround for dynamically discovering the host
             String host = solid.getHost();
@@ -98,7 +95,7 @@ public class HTTPRequestTest {
             String ip = solid.getHost();
 
 
-            String requestURL = String.format("http://%s:3000/user1/profile/", ip);
+            String requestURL = String.format("http://%s:3000/user1/dataio/data.csv", ip);
             String email = "user1@docker";
             String password = "user1";
             String oidcIssuer = String.format("http://%s:3000/", ip);
@@ -129,9 +126,10 @@ public class HTTPRequestTest {
 
             try {
                 String actual = new String(access.getInputStream().readAllBytes());
-                System.out.println(actual);
+                // assert the size is
+                assertTrue(actual.contains("<card> a ldp:Resource, <http://www.w3.org/ns/iana/media-types/text/turtle#Resource>;"));
+                assertTrue(actual.length() > 540);
             } catch (Exception e) {
-                // this test essentially only checks if we get a proper response from this public facing pod, due to issues with DinD setup
                 fail();
             }
         }

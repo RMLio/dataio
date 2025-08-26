@@ -47,9 +47,7 @@ public class Compressor {
             case GZip -> gzip(outputStream);
             case Zip -> zip(outputStream);
             case XZ -> xz(outputStream);
-            case Tar -> tar(outputStream);
-            case TarXZ -> xz(tar(outputStream));
-            case TarGZ -> gzip(tar(outputStream));
+            case Tar, TarXZ, TarGZ -> throw new IOException("Compression type not yet implemented: " + this.compression);
         };
     }
 

@@ -103,7 +103,9 @@ public class HTTPRequestAccess implements Access {
 
     @Override
     public InputStream getInputStream() throws IOException, SQLException, ParserConfigurationException, TransformerException {
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        HttpRequest.Builder requestBuilder = HttpRequest
+                .newBuilder()
+                .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                 .uri(URI.create(this.requestURL));
         if (this.methodBody != null) {
             requestBuilder = requestBuilder.method(this.methodName, HttpRequest.BodyPublishers.ofString(this.methodBody));
@@ -255,6 +257,7 @@ public class HTTPRequestAccess implements Access {
             String secret = creds.getString("secret");
 
             HttpRequest request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(oidcIssuer + ".well-known/openid-configuration"))
                     .GET()
                     .build();
@@ -275,6 +278,7 @@ public class HTTPRequestAccess implements Access {
             String base64ClientCredentials = Base64.getEncoder().encodeToString(concatCredentials.getBytes(StandardCharsets.UTF_8));
 
             request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(tokenEndpoint))
                     .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials&scope=webid", StandardCharsets.UTF_8))
                     .setHeader("Authorization", "Basic " + base64ClientCredentials)
@@ -340,6 +344,7 @@ public class HTTPRequestAccess implements Access {
             log.debug("Fetching account info");
             // fetch account info about the user
             HttpRequest request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(oidcIssuer + ".account/"))
                     .GET()
                     .build();
@@ -359,6 +364,7 @@ public class HTTPRequestAccess implements Access {
             log.debug("Logging in");
             String message = new JSONObject(Map.of("email", email, "password", password)).toString();
             request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(passwordURL))
                     .POST(HttpRequest.BodyPublishers.ofString(message, StandardCharsets.UTF_8))
                     .setHeader("Content-Type", "application/json")
@@ -373,6 +379,7 @@ public class HTTPRequestAccess implements Access {
 
             log.debug("Got authorization token");
             request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(oidcIssuer + ".account/"))
                     .GET()
                     .setHeader("Authorization", "CSS-Account-Token " + authToken)
@@ -391,6 +398,7 @@ public class HTTPRequestAccess implements Access {
             // finally, get the useful credentials by POSTing to the credentials URL
             message = new JSONObject(Map.of("name", "my-token", "webId", webId)).toString();
             request = HttpRequest.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1) // CSS server seems to have problems with HTTP/2 upgrade
                     .uri(URI.create(credentialsURL))
                     .POST(HttpRequest.BodyPublishers.ofString(message, StandardCharsets.UTF_8))
                     .setHeader("Content-Type", "application/json")

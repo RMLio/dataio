@@ -43,8 +43,8 @@ public class HTTPRequestAccess implements Access {
     protected String methodBody;
     protected Map<String, String> auth;
     protected Map<String, String> headers;
-    protected HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-    private EllipticCurveJsonWebKey jwk;
+    protected HttpClient httpClient = HttpClient.newBuilder().build();
+    private final EllipticCurveJsonWebKey jwk;
 
     /**
      * Constructor with method GET, empty authentication and empty headers
@@ -121,7 +121,7 @@ public class HTTPRequestAccess implements Access {
 
         try {
             HttpRequest request = requestBuilder.build();
-            System.out.println(request.uri());
+            log.debug(request.uri().toString());
             HttpResponse<String> response = this.httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException("Could not reach the server: " + response.body());
@@ -133,6 +133,10 @@ public class HTTPRequestAccess implements Access {
         }
     }
 
+    /**
+     * Set authentication key-values, added as headers to a HTTP request.
+     * @param auth Authentication key-values, to be added to a HTTP request.
+     */
     public void setAuth(Map<String, String> auth) {
         this.auth = auth;
     }
@@ -363,9 +367,6 @@ public class HTTPRequestAccess implements Access {
             if (response.statusCode() != HttpStatus.SC_OK) {
                 throw new IllegalStateException("Could not log in: " + response.body());
             }
-
-            System.out.println(email);
-            System.out.println(password);
 
             JSONObject loginInfo = new JSONObject(response.body());
             String authToken = loginInfo.getString("authorization");

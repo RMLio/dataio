@@ -4,7 +4,6 @@ import be.ugent.idlab.knows.dataio.record.CSVRecord;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
-import com.opencsv.exceptions.CsvException;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -34,9 +33,7 @@ public class DatabaseTest {
             Assertions.assertTrue(actual.contains(expected));
 
         } catch (SQLException | IOException e) {
-            System.err.print("An error occurred during test execution: ");
-            e.printStackTrace();
-            Assertions.fail();
+            Assertions.fail("An error occurred during test execution", e);
         }
     }
 
@@ -63,11 +60,11 @@ public class DatabaseTest {
     }
 
     private List<CSVRecord> getCSVFromDB(Access access) throws SQLException, IOException {
-        try (BOMInputStream inputStream = new BOMInputStream(access.getInputStream());
+        try (BOMInputStream inputStream = BOMInputStream.builder().setInputStream(access.getInputStream()).get();
              CSVReader reader = new CSVReaderBuilder(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                      .withSkipLines(0)
                      .withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                     .build()
+                     .build();
         ) {
 
             List<String[]> records = reader.readAll();
@@ -76,8 +73,6 @@ public class DatabaseTest {
                     .filter(r -> r.length != 0 && !(r.length == 1 && r[0] == null))
                     .map(r -> new CSVRecord(header, r, access.getDataTypes()))
                     .collect(Collectors.toList());
-        } catch (CsvException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,7 +91,6 @@ public class DatabaseTest {
 
         @Test
         public void testPostgres() {
-            System.out.println(postgreSQLContainer.getJdbcUrl());
             initializeDatabase("src/test/resources/db_setup/postgres_setup.sql", postgreSQLContainer);
             Access access = getRDBAccess(DatabaseType.POSTGRES, postgreSQLContainer);
 

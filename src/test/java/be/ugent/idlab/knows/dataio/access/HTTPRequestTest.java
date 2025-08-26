@@ -89,8 +89,6 @@ public class HTTPRequestTest {
             solid.start();
 //            Thread.sleep(10000);
 
-            System.out.println(solid.getEnv());
-
             // set up user1 folder
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.csv"), "/data/user1/dataio/data.csv");
             solid.copyFileToContainer(MountableFile.forClasspathResource("/community_solid_server/user1_content/data.acl"), "/data/user1/dataio/data.acl");
@@ -108,8 +106,6 @@ public class HTTPRequestTest {
             access.setAuthSolid(email, password, oidcIssuer, authWebId);
 
             String actual = new String(access.getInputStream().readAllBytes());
-
-            System.out.println(actual);
 
             try (FileInputStream fis = new FileInputStream("src/test/resources/community_solid_server/user1_content/data.csv")) {
                 String expected = new String(fis.readAllBytes());

@@ -2,6 +2,7 @@ package be.ugent.idlab.knows.dataio.record;
 
 import com.opencsv.CSVWriter;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -113,7 +114,12 @@ public class CSVRecord extends Record {
         return result;
     }
 
-    public String toCSVString() {
+    /**
+     * Writes this CSV record as a string, including headers.
+     * @return This CSV record as a CSV-serialized String.
+     * @throws IOException When writing to CSV goes wrong.
+     */
+    public String toCSVString() throws IOException {
         int size = this.data.size();
         String[] header = new String[size];
         String[] data = new String[size];
@@ -127,9 +133,9 @@ public class CSVRecord extends Record {
         }
 
         StringWriter sw = new StringWriter();
-        CSVWriter writer = new CSVWriter(sw);
-        writer.writeAll(List.of(header, data));
-
+        try (CSVWriter writer = new CSVWriter(sw)){
+            writer.writeAll(List.of(header, data));
+        }
         return sw.toString();
     }
 }

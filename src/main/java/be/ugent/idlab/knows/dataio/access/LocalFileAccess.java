@@ -29,7 +29,6 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
-    private static final int CONFIDENCE_LIMIT = 90;
     @Serial
     private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
@@ -45,6 +44,7 @@ public class LocalFileAccess implements Access {
      * @param base     base for the path. If path is not absolute, path is used relative to base to find the file
      * @param type     type of the file
      * @param encoding encoding of the file
+     * @param compression the compression type of the file
      */
     public LocalFileAccess(String path, String base, String type, Charset encoding, Compression compression) {
         if (base != null && !base.isEmpty()) {
@@ -59,6 +59,16 @@ public class LocalFileAccess implements Access {
         this.compression = compression;
     }
 
+    /**
+     * This constructor takes the path and the base path of a file.
+     * When using the relative path for the file, put it in base and leave path empty.
+     * The file is supposed to be uncompressed.
+     *
+     * @param path     the relative path of the file.
+     * @param base     base for the path. If path is not absolute, path is used relative to base to find the file
+     * @param type     type of the file
+     * @param encoding encoding of the file
+     */
     public LocalFileAccess(String path, String base, String type, Charset encoding) {
         this(path, base, type, encoding, Compression.None);
     }

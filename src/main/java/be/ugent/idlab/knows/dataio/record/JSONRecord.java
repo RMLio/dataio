@@ -51,20 +51,38 @@ public class JSONRecord extends Record {
     }
 
     private final Object document; // JSON object
-    private final String tag; // what iterator was used to obtain this.document
-    private final String path; // what specific path was taken to arrive at this.document
-    private final int index; // what index in an array thee element is at
+    private final String tag; // the iterator used to obtain this.document
+    private final String path; // the specific path taken to arrive at this.document
+    private final int index; // the index in an array this element is at
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private List<String> compiledPath;
 
+    /**
+     * Creates a JSONRecord, containing a (sub)document of the original.
+     * @param document  The JSON object obtained.
+     * @param tag       The high level JSONPath (`iterator` in RML speak) used to obtain this document object.
+     */
     public JSONRecord(Object document, String tag) {
         this(document, tag, "");
     }
 
+    /**
+     * Creates a JSONRecord, containing a (sub)document of the original.
+     * @param document  The JSON object obtained.
+     * @param tag       The high level JSONPath (`iterator` in RML speak) used to obtain this document object.
+     * @param path      A sub-path used to obtain this document object. E.g. the last segment of a JSONPath
+     */
     public JSONRecord(Object document, String tag, String path) {
         this(document, tag, path, -1);
     }
 
+    /**
+     * Creates a JSONRecord, containing a (sub)document of the original.
+     * @param document  The JSON object obtained.
+     * @param tag       The high level JSONPath (`iterator` in RML speak) used to obtain this document object.
+     * @param path      A sub-path used to obtain this document object. E.g. the last segment of a JSONPath
+     * @param index     If this record is an element of an array, the index of the record in that array.
+     */
     public JSONRecord(Object document, String tag, String path, int index) {
         this.document = document;
         this.tag = tag;

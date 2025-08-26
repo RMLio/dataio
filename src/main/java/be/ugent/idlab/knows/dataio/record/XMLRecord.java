@@ -17,9 +17,15 @@ public class XMLRecord extends Record {
 
     private final XdmItem item;
     private final XPathCompiler compiler;
-    private final int index; // what index in an array thee element is at
+    private final int index; // the index in an array this element is at
 
 
+    /**
+     * Creates an XMLRecord.
+     * @param item      The item in the XDM data model; the "current document"
+     * @param compiler  Holds static context for a compiled XPath.
+     * @param index     The index of the item in the global document.
+     */
     public XMLRecord(XdmItem item, XPathCompiler compiler, int index) {
         this.item = item;
         // Keep a reference to the XPath compiler for faster future queries

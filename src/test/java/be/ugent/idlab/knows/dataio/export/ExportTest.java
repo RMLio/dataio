@@ -58,7 +58,7 @@ public class ExportTest {
 
         @Test
         public void testZip() throws Exception {
-            FileExport export = new FileExport(file, Compression.Zip);
+            FileExport export = new FileExport(file, Compression.Zip, "output.txt");
             OutputStream out = export.getOutputStream();
             out.write(contents.getBytes());
             out.close();
@@ -85,7 +85,7 @@ public class ExportTest {
         @Disabled("Needs proper implementation")
         @Test
         public void testTar() throws Exception {
-            FileExport export = new FileExport(file, Compression.Tar);
+            FileExport export = new FileExport(file, Compression.Tar, "output.txt");
             OutputStream out = export.getOutputStream();
             out.write(contents.getBytes());
             out.close();
@@ -99,7 +99,7 @@ public class ExportTest {
         @Disabled("Needs proper implementation")
         @Test
         public void testTarGZ() throws Exception {
-            FileExport export = new FileExport(file, Compression.TarGZ);
+            FileExport export = new FileExport(file, Compression.TarGZ, "output.txt");
             TarOutputStream out = (TarOutputStream) export.getOutputStream();
             out.write(contents.getBytes());
             out.closeEntry();
@@ -113,7 +113,7 @@ public class ExportTest {
         @Disabled("Needs proper implementation")
         @Test
         public void testTarXZ() throws Exception {
-            FileExport export = new FileExport(file, Compression.TarXZ);
+            FileExport export = new FileExport(file, Compression.TarXZ, "output.txt");
             OutputStream out = export.getOutputStream();
             out.write(contents.getBytes());
             out.close();

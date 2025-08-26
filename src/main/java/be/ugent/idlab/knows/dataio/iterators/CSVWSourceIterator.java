@@ -149,6 +149,10 @@ public class CSVWSourceIterator extends SourceIterator {
         return this.next != null;
     }
 
+    /**
+     * Gets the current index (record nr) of the iterator.
+     * @return  The current record index, starting at 0. A value of {@code -1} means method {@code next} is not invoked yet.
+     */
     public int getIndex() {
         return this.index;
     }

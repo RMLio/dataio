@@ -71,7 +71,7 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // sanity check
-            assertEquals("John", record.get("firstName").getValue());
+            assertEquals(List.of("John"), record.get("firstName").getValue());
 
             // grab the whole path
             assertEquals("[0,people]", record.get("\\_PATH").getValue());
@@ -86,10 +86,10 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Record s1 = iterator.next();
-            assertEquals("BO", s1.get("ISO 3166").getValue());
+            assertEquals(List.of("BO"), s1.get("ISO 3166").getValue());
 
             Record s2 = iterator.next();
-            assertEquals("IE", s2.get("\"ISO 3166\"").getValue());
+            assertEquals(List.of("IE"), s2.get("\"ISO 3166\"").getValue());
         }
     }
 
@@ -145,10 +145,10 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // real property
-            assertEquals("foo", record.get("_PATH").getValue());
+            assertEquals(List.of("foo"), record.get("_PATH").getValue());
             // magic property
             assertEquals("[0,people]", record.get("\\_PATH").getValue());
-            assertTrue(record.get("\\\\_PATH").isNotFound());
+            assertTrue(record.get("\\\\_PATH").isEmpty());
         }
     }
 
@@ -159,7 +159,7 @@ public class JSONIteratorTest extends TestCore {
             while (jsonSourceIterator.hasNext()) {
                 Record source = jsonSourceIterator.next();
                 List<?> names = (List<?>) source.get("names").getValue();
-                List<String> expected = List.of("Jos", "Jef");
+                List<List<String>> expected = List.of(List.of("Jos", "Jef"));
                 assertEquals(expected, names);
                 System.out.println();
             }

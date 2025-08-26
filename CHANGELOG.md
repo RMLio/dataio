@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for getting data from HTTP servers, with optional Solid authentication
 
+## Added
+- Compression to access
+- A parameter `nulls` in the constructor of `CSVSourceIterator` to define null values for CSV fields.
+- A method `getIndex` in `CSVWSourceIterator` to know the current record number.
+
 ## [2.0.3] - 2025-01-30
 
 ### Fixed

@@ -31,6 +31,7 @@ public class CSVWSourceIterator extends SourceIterator {
     private transient String[] header;
     private transient String[] next;
     private transient Iterator<String[]> iterator;
+    private int index = -1;
 
     public CSVWSourceIterator(Access access, CSVWConfiguration config) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         this.access = access;
@@ -138,11 +139,21 @@ public class CSVWSourceIterator extends SourceIterator {
             line = applyTrimArray(line, config.getTrim());
         }
 
+        this.index++;
+
         return replaceNulls(new CSVRecord(header, line, this.access.getDataTypes()));
     }
 
     @Override
     public boolean hasNext() {
         return this.next != null;
+    }
+
+    /**
+     * Gets the current index (record nr) of the iterator.
+     * @return  The current record index, starting at 0. A value of {@code -1} means method {@code next} is not invoked yet.
+     */
+    public int getIndex() {
+        return this.index;
     }
 }

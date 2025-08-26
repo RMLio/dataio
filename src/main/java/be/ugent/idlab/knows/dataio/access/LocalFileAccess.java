@@ -1,8 +1,11 @@
 package be.ugent.idlab.knows.dataio.access;
 
+import be.ugent.idlab.knows.dataio.compression.Compression;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tukaani.xz.XZInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipInputStream;
 
 import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 
@@ -24,12 +29,12 @@ import static be.ugent.idlab.knows.dataio.utils.Utils.getHashOfString;
 public class LocalFileAccess implements Access {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileAccess.class);
-    private static final int CONFIDENCE_LIMIT = 90;
     @Serial
     private static final long serialVersionUID = -4721057992645925809L;
     private final String path;
     private String type;
     private final String encoding;
+    private final Compression compression;
 
     /**
      * This constructor takes the path and the base path of a file.
@@ -39,8 +44,9 @@ public class LocalFileAccess implements Access {
      * @param base     base for the path. If path is not absolute, path is used relative to base to find the file
      * @param type     type of the file
      * @param encoding encoding of the file
+     * @param compression the compression type of the file
      */
-    public LocalFileAccess(String path, String base, String type, Charset encoding) {
+    public LocalFileAccess(String path, String base, String type, Charset encoding, Compression compression) {
         if (base != null && !base.isEmpty()) {
             Path basePath = Path.of(base);
             this.path = basePath.resolve(path).toString();
@@ -50,7 +56,21 @@ public class LocalFileAccess implements Access {
 
         this.encoding = encoding.name();
         this.type = type;
+        this.compression = compression;
+    }
 
+    /**
+     * This constructor takes the path and the base path of a file.
+     * When using the relative path for the file, put it in base and leave path empty.
+     * The file is supposed to be uncompressed.
+     *
+     * @param path     the relative path of the file.
+     * @param base     base for the path. If path is not absolute, path is used relative to base to find the file
+     * @param type     type of the file
+     * @param encoding encoding of the file
+     */
+    public LocalFileAccess(String path, String base, String type, Charset encoding) {
+        this(path, base, type, encoding, Compression.None);
     }
 
     /**
@@ -60,7 +80,7 @@ public class LocalFileAccess implements Access {
      * @param type      type of the file
      */
     public LocalFileAccess(String path, String basePath, String type) {
-        this(path, basePath, type, StandardCharsets.UTF_8);
+        this(path, basePath, type, StandardCharsets.UTF_8, Compression.None);
     }
 
     /**
@@ -82,9 +102,52 @@ public class LocalFileAccess implements Access {
     @Override
     public InputStream getInputStream() throws IOException {
         Path path = Path.of(this.path);
+
+        InputStream in = Files.newInputStream(path, StandardOpenOption.READ);
+
+        InputStream inputStream = switch (this.compression) {
+            case None -> in;
+            case GZip ->  getGZInputStream(in);
+            case Zip -> getZipInputStream(in);
+            case XZ -> getXZInputStream(in);
+            case Tar -> getTarInputStream(in);
+            case TarXZ -> getTarXZInputStream(in);
+            case TarGZ -> getTarGZInputStream(in);
+        };
+
         return BOMInputStream.builder()
-                .setInputStream(Files.newInputStream(path, StandardOpenOption.READ))
+                .setInputStream(inputStream)
                 .get();
+    }
+
+    private InputStream getTarGZInputStream(InputStream baseInputStream) throws IOException {
+        return getTarInputStream(getGZInputStream(baseInputStream));
+    }
+
+    private InputStream getTarXZInputStream(InputStream baseInputStream) throws IOException {
+        return getTarInputStream(getXZInputStream(baseInputStream));
+    }
+
+    private InputStream getZipInputStream(InputStream baseInputStream) throws IOException {
+        ZipInputStream zip = new ZipInputStream(baseInputStream);
+        // assumption: file to read is the first file in the stream
+        zip.getNextEntry();
+        return zip;
+    }
+
+    private InputStream getXZInputStream(InputStream baseInputStream) throws IOException {
+        return new XZInputStream(baseInputStream);
+    }
+
+    private InputStream getGZInputStream(InputStream baseInputStream) throws IOException {
+        return new GZIPInputStream(baseInputStream);
+    }
+
+    private InputStream getTarInputStream(InputStream baseInputStream) throws IOException {
+        TarArchiveInputStream tar = new TarArchiveInputStream(baseInputStream);
+        // assumption: file to read is the first file in the stream
+        tar.getNextEntry();
+        return tar;
     }
 
     /**

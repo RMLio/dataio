@@ -17,11 +17,20 @@ public class XMLRecord extends Record {
 
     private final XdmItem item;
     private final XPathCompiler compiler;
+    private final int index; // the index in an array this element is at
 
-    public XMLRecord(XdmItem item, XPathCompiler compiler) {
+
+    /**
+     * Creates an XMLRecord.
+     * @param item      The item in the XDM data model; the "current document"
+     * @param compiler  Holds static context for a compiled XPath.
+     * @param index     The index of the item in the global document.
+     */
+    public XMLRecord(XdmItem item, XPathCompiler compiler, int index) {
         this.item = item;
         // Keep a reference to the XPath compiler for faster future queries
         this.compiler = compiler;
+        this.index = index;
     }
 
     /**
@@ -70,5 +79,13 @@ public class XMLRecord extends Record {
     @Override
     public int hashCode() {
         return Objects.hash(item, compiler);
+    }
+
+    public XdmItem getItem() {
+        return item;
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

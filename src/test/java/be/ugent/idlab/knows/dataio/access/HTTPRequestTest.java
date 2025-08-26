@@ -79,6 +79,7 @@ public class HTTPRequestTest {
                 // wait for internal server to start running
                 .waitingFor(Wait.forLogMessage(".*Listening to server.*", 1));
 
+        @Disabled("Due to issues with DinD and CSS container setup")
         @Test
         public void solid_auth() throws JoseException, SQLException, IOException, ParserConfigurationException, TransformerException, InterruptedException, URISyntaxException {
             // a workaround for dynamically discovering the host

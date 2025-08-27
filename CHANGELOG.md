@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.1.0] - 2025-08-27
+
 ### Added
 - Support for getting data from HTTP servers, with optional Solid authentication. At the moment only HTTP/1 works
 - Compression to access; TO DO: tar archives don't work yet.
@@ -151,6 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.1.0]: https://github.com/RMLio/dataio/compare/v2.0.3...v2.1.0
 [2.0.3]: https://github.com/RMLio/dataio/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/RMLio/dataio/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/RMLio/dataio/compare/v2.0.0...v2.0.1

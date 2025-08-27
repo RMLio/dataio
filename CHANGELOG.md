@@ -6,10 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
 ### Added
 - Support for getting data from HTTP servers, with optional Solid authentication. At the moment only HTTP/1 works
-
-## Added
 - Compression to access; TO DO: tar archives don't work yet.
 - A parameter `nulls` in the constructor of `CSVSourceIterator` to define null values for CSV fields.
 - A method `getIndex` in `CSVWSourceIterator` to know the current record number.

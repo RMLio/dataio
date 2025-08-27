@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.1.1] - 2025-08-27
+
 ### Fixed
 - Use Maven Central Portal for publishing new releases.
 
@@ -156,6 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.1.1]: https://github.com/RMLio/dataio/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/RMLio/dataio/compare/v2.0.3...v2.1.0
 [2.0.3]: https://github.com/RMLio/dataio/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/RMLio/dataio/compare/v2.0.1...v2.0.2

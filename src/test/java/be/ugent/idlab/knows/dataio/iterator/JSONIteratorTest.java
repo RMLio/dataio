@@ -10,10 +10,7 @@ import be.ugent.idlab.knows.dataio.record.Record;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,7 +68,7 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // sanity check
-            assertEquals(List.of("John"), record.get("firstName").getValue());
+            assertEquals("John", record.get("firstName").getValue());
 
             // grab the whole path
             assertEquals("[0,people]", record.get("\\_PATH").getValue());
@@ -86,10 +83,10 @@ public class JSONIteratorTest extends TestCore {
         Access access = makeLocalAccess("/json/multiword_keys.json", "", "json", StandardCharsets.UTF_8);
         try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$.*")) {
             Record s1 = iterator.next();
-            assertEquals(List.of("BO"), s1.get("ISO 3166").getValue());
+            assertEquals("BO", s1.get("ISO 3166").getValue());
 
             Record s2 = iterator.next();
-            assertEquals(List.of("IE"), s2.get("\"ISO 3166\"").getValue());
+            assertEquals("IE", s2.get("\"ISO 3166\"").getValue());
         }
     }
 
@@ -124,7 +121,7 @@ public class JSONIteratorTest extends TestCore {
      */
     @Test
     public void evaluate_json_lines() throws Exception {
-        List<Object> expected = List.of("10", "Venus", "11", "null", "12", "Serena");
+        List<Object> expected = Arrays.stream(new Object[]{"10", "Venus", "11", null, "12", "Serena"}).toList();
         Access access = makeLocalAccess("/json/data.jsonl", "", "jsonl", StandardCharsets.UTF_8);
         try (JSONLinesSourceIterator iterator = new JSONLinesSourceIterator(access, "$.*")) {
             List<Object> actual = new ArrayList<>();
@@ -145,10 +142,10 @@ public class JSONIteratorTest extends TestCore {
             assertTrue(iterator.hasNext());
             JSONRecord record = (JSONRecord) iterator.next();
             // real property
-            assertEquals(List.of("foo"), record.get("_PATH").getValue());
+            assertEquals("foo", record.get("_PATH").getValue());
             // magic property
             assertEquals("[0,people]", record.get("\\_PATH").getValue());
-            assertTrue(record.get("\\\\_PATH").isEmpty());
+            assertTrue(record.get("\\\\_PATH").isNotFound());
         }
     }
 
@@ -159,7 +156,7 @@ public class JSONIteratorTest extends TestCore {
             while (jsonSourceIterator.hasNext()) {
                 Record source = jsonSourceIterator.next();
                 List<?> names = (List<?>) source.get("names").getValue();
-                List<List<String>> expected = List.of(List.of("Jos", "Jef"));
+                List<String> expected = List.of("Jos", "Jef");
                 assertEquals(expected, names);
                 System.out.println();
             }

@@ -1,10 +1,10 @@
 package be.ugent.idlab.knows.dataio.record;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import com.jayway.jsonpath.*;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import net.minidev.json.JSONArray;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.PathNotFoundException;
 import org.jsfr.json.compiler.JsonPathCompiler;
 import org.jsfr.json.path.PathOperator;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,33 +21,6 @@ import java.util.regex.Pattern;
  * Every source corresponds with a JSON object in a data source.
  */
 public class JSONRecord extends Record {
-    // Configuration for Jayway to provide stable outputs
-    static {
-        Configuration.setDefaults(new Configuration.Defaults() {
-
-            private final JsonProvider jsonProvider = Configuration.defaultConfiguration().jsonProvider();
-            private final MappingProvider mappingProvider = Configuration.defaultConfiguration().mappingProvider();
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return Set.of(
-                        Option.DEFAULT_PATH_LEAF_TO_NULL,
-                        Option.REQUIRE_PROPERTIES,
-                        Option.ALWAYS_RETURN_LIST
-                );
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-        });
-    }
 
     private final Object document; // JSON object
     private final String tag; // the iterator used to obtain this.document
@@ -103,9 +75,13 @@ public class JSONRecord extends Record {
         }
 
         // if JSONPath was so specific that it reduced the document to a single entry, only acceptable reference is @
-        if (this.document instanceof ValueNode && reference.equals("@")) {
-            String v = ((ValueNode) this.document).asText();
-            return RecordValue.ok(v);
+        if (reference.trim().equals("@")) {
+            if (document instanceof NullNode) {
+                return RecordValue.empty();
+            } else if (document instanceof ValueNode) {
+                String v = ((ValueNode) this.document).asText();
+                return RecordValue.ok(v);
+            }
         }
 
         if (reference.startsWith("\"") && reference.endsWith("\"")) {
@@ -121,28 +97,18 @@ public class JSONRecord extends Record {
             reference = reference.startsWith(".") ? String.format("$%s", reference) : String.format("$.%s", reference);
         }
 
-        if (reference.equals("@")) {
-            reference = "";
-        }
-
         try {
-            JSONArray result = JsonPath.read(this.document, reference);
-            boolean allNulls = true;
-            for (Object o : result) {
-                allNulls = allNulls && o == null;
-            }
-
-            if (!result.isEmpty() && !allNulls) {
-                return RecordValue.ok(result);
-            } else {
+            Object result = JsonPath.read(this.document, reference);
+            if (result == null) {
                 return RecordValue.empty();
+            } else {
+                return RecordValue.ok(result);
             }
-
         } catch (PathNotFoundException e) {
             String message = "JSONPath '" + this.path + reference + "': " + e.getMessage();
             logger.warn(message, e);
             return RecordValue.notFound(message);
-        } catch (JsonPathException e) {
+        } catch (JsonPathException | IllegalArgumentException e) {
             String message = "JSONPath '" + this.path + reference + "': " + e.getMessage();
             logger.warn(message, e);
             return RecordValue.error(message);

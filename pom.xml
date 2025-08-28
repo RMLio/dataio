@@ -541,7 +541,6 @@
                                 </goals>
                                 <configuration>
                                     <keyname>6861488FA42A028D5378AF8833C4D74DDB5F1B28</keyname>
-                                    <passphraseServerId>6861488FA42A028D5378AF8833C4D74DDB5F1B28</passphraseServerId>
                                 </configuration>
                             </execution>
                         </executions>

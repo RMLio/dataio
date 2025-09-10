@@ -2,7 +2,9 @@ package be.ugent.idlab.knows.dataio.iterators.csvw;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class CSVWConfigurationBuilder {
     private char delimiter = ',';
@@ -12,7 +14,7 @@ public class CSVWConfigurationBuilder {
     private boolean skipHeader = false;
     private String commentPrefix = "#";
     private List<String> header = List.of();
-    private List<String> nulls = List.of();
+    private Collection<String> nulls = Set.of();
 
     private Charset encoding = StandardCharsets.UTF_8;
 
@@ -61,7 +63,7 @@ public class CSVWConfigurationBuilder {
         return this;
     }
 
-    public CSVWConfigurationBuilder withNulls(List<String> nulls) {
+    public CSVWConfigurationBuilder withNulls(Collection<String> nulls) {
         this.nulls = nulls;
         return this;
     }

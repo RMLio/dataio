@@ -7,7 +7,8 @@ import org.simpleflatmapper.lightningcsv.CsvParser;
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ import java.util.List;
  * <li> custom comment prefix, "#" by default </li>
  * <li> skipping the header, "false" by default </li>
  * <li> custom header, by default an empty list </li>
- * <li> a list of null fields: by default empty </li>
+ * <li> a collection of null fields: by default empty </li>
  * </ul>
  * As such, the default configuration parses regular CSV files.
  */
@@ -37,10 +38,10 @@ public final class CSVWConfiguration implements Serializable {
     private final boolean skipHeader;
     private final String commentPrefix;
     private final List<String> header;
-    private final List<String> nulls;
+    private final Collection<String> nulls;
     private final String encoding;
 
-    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, List<String> nulls, Charset encoding) {
+    CSVWConfiguration(char delimiter, char escapeCharacter, String trim, char quoteCharacter, boolean skipHeader, String commentPrefix, List<String> header, Collection<String> nulls, Charset encoding) {
         // opencsv parser options
         this.delimiter = delimiter;
         this.escapeCharacter = escapeCharacter;
@@ -52,7 +53,7 @@ public final class CSVWConfiguration implements Serializable {
         this.commentPrefix = commentPrefix;
         this.header = header;
 
-        List<String> nullValues = new ArrayList<>(nulls);
+        Collection<String> nullValues = new HashSet<>(nulls);
         nullValues.add(NewCSVNullInjector.NULL_VALUE); // add our special null value
 
         this.nulls = nullValues;
@@ -91,7 +92,7 @@ public final class CSVWConfiguration implements Serializable {
         return header;
     }
 
-    public List<String> getNulls() {
+    public Collection<String> getNulls() {
         return this.nulls;
     }
 

@@ -8,7 +8,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.Serial;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * An iterator for CSV Sources.
@@ -22,7 +22,7 @@ public class CSVSourceIterator extends CSVWSourceIterator {
         super(access, CSVWConfiguration.DEFAULT);
     }
 
-    public CSVSourceIterator(Access access, List<String> nulls) throws SQLException, IOException, ParserConfigurationException, TransformerException {
+    public CSVSourceIterator(Access access, Collection<String> nulls) throws SQLException, IOException, ParserConfigurationException, TransformerException {
         super(access, CSVWConfiguration.builder().withNulls(nulls).build());
     }
 }

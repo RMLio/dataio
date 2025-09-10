@@ -172,7 +172,7 @@ public class CSVWIteratorTest extends TestCore {
         public void test_1002a_nulls() throws Exception {
             Access access = new LocalFileAccess("", "src/test/resources/csvw/mapper/nulls.csv", "csv");
             CSVWConfiguration config = CSVWConfiguration.builder()
-                    .withNulls(List.of("NULL", "null"))
+                    .withNulls(Set.of("NULL", "null"))
                     .withDelimiter(';')
                     .build();
 

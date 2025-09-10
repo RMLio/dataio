@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- CSVWConfiguration: keep `nulls` in a `Collection` instead of a `List`.
+
 ## [2.1.2] - 2025-08-28
 
 ### Fixed

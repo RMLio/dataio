@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- XMLRecord: empty value is not marked empty.
+
+### Added
+- Tests for `CSVRecord` and `XMLRecord`
+
 ## [2.1.3] - 2025-09-10
 
 ### Changed

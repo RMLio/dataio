@@ -44,11 +44,21 @@ public class XMLRecord extends Record {
         try {
             XdmValue result = compiler.evaluate(reference, item);
             if (result.isEmpty()) {
-                return RecordValue.empty();
+                return RecordValue.notFound("Could not find element with reference '" + reference + "'.");
             } else {
                 List<String> results = new ArrayList<>();
-                result.forEach((node) -> results.add(node.getStringValue()));
-                return RecordValue.ok(results);
+                result.forEach((node) -> {
+                    String value = node.getStringValue();
+                    // An empty string is not considered "empty" by the XPath evaluator, so check on empty values here!
+                    if (!value.isEmpty()) {
+                        results.add(node.getStringValue());
+                    }
+                });
+                if (results.isEmpty()) {
+                    return RecordValue.empty();
+                } else {
+                    return RecordValue.ok(results);
+                }
             }
         } catch (SaxonApiException e1) {
             return RecordValue.error(e1.getMessage());

@@ -10,7 +10,7 @@ The easiest is to include DataIO as a maven dependency:
 <dependency>
     <groupId>be.ugent.idlab.knows</groupId>
     <artifactId>dataio</artifactId>
-    <version>2.1.5</version>
+    <version>2.1.6-SNAPSHOT</version>
 </dependency>
 ```
 Check the [maven central repository](https://central.sonatype.com/search?q=be.ugent.idlab.knows&namespace=be.ugent.idlab.knows&name=dataio)

@@ -56,6 +56,8 @@ General:
   parallel:
     matrix:
       - TEST: [
+        # records
+        CSVRecordTest, JSONRecordTest, XMLRecordTest
         # iterator
         CSVIteratorTest, CSVWIteratorTest, ExcelIteratorTest, HTMLIteratorTest, JSONIteratorTest, ODSIteratorTest, XMLIteratorTest,
         # stream

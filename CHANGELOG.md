@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- Added CSVRecordTest, JSONRecordTest and XMLRecordTest to GitLab CI.
+
 ## [2.1.5] - 2025-10-01
 
 ### Fixed

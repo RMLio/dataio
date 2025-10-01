@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- Address some vulnerabilities by following dependency updates:
+- Jena/Fuseki to 5.2.0
+- excel-streaming-reader to 5.1.1
+- jsurfer-jackson to 1.6.5
+- mysql-connector-j to 9.4.0
+- snowflake-jdbc to 3.23.1
+
 ## [2.1.4] - 2025-09-30
 
 ### Fixed

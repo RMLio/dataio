@@ -336,6 +336,13 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Embedded WebSocket server for tests -->
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.6</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.jopendocument</groupId>
             <artifactId>jOpenDocument</artifactId>

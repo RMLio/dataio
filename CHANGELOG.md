@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [2.2.0] - 2025-12-10
+
 ### Added
 - Websocket access class and tests
 
@@ -193,6 +196,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.2.0]: https://github.com/RMLio/dataio/compare/v2.1.5...v2.2.0
 [2.1.5]: https://github.com/RMLio/dataio/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/RMLio/dataio/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/RMLio/dataio/compare/v2.1.2...v2.1.3

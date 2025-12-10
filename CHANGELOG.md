@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Added CSVRecordTest, JSONRecordTest and XMLRecordTest to GitLab CI.
+- Oracle JDBC driver fix: switch to LTS version 21 and include xdb library (Fixes https://github.com/RMLio/rmlmapper-java/issues/266)
+- Update Microsoft SQL Server JDBC driver to 13.2.1.jre11 to avoid vulnerability. 
 
 ## [2.1.5] - 2025-10-01
 

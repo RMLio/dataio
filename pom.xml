@@ -238,14 +238,19 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>12.6.3.jre11</version>
+            <version>13.2.1.jre11</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11 -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc11</artifactId>
-            <version>23.4.0.24.05</version>
+            <version>21.20.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.xml</groupId>
+            <artifactId>xdb</artifactId>
+            <version>21.20.0.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->

@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -26,20 +27,25 @@ public class XMLSourceIterator extends SourceIterator {
     private final String stringIterator;
     private transient XdmSequenceIterator<XdmItem> iterator;
     private transient XPathCompiler compiler;
+    private final Map<String, String> namespaces;
     private int index = 0;
 
-    public XMLSourceIterator(Access access, String stringIterator) throws Exception {
+    public XMLSourceIterator(Access access, String stringIterator, Map<String, String> namespaces) throws Exception {
         this.access = access;
         this.stringIterator = stringIterator;
+        this.namespaces = namespaces;
         bootstrap();
     }
 
     /**
-     * Instantiates transient fields. This code needs to be run both at construction time and after deserialization
+     * Instantiates transient fields. This code needs to be run both at construction
+     * time and after deserialization
      *
-     * @throws IOException  can be thrown due to the consumption of the input stream. Same for SQLException.
+     * @throws IOException can be thrown due to the consumption of the input stream.
+     *                     Same for SQLException.
      */
-    private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException, SaxonApiException {
+    private void bootstrap()
+            throws SQLException, IOException, ParserConfigurationException, TransformerException, SaxonApiException {
         // Saxon processor to be reused across XPath query evaluations
         Processor saxProcessor = new Processor(false);
         DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
@@ -48,6 +54,11 @@ public class XMLSourceIterator extends SourceIterator {
             this.compiler = saxProcessor.newXPathCompiler();
             // Enable expression caching
             this.compiler.setCaching(true);
+            for (Map.Entry<String, String> entry : this.namespaces.entrySet()) {
+                String uri = entry.getValue();
+                String prefix = entry.getKey();
+                this.compiler.declareNamespace(prefix, uri);
+            }
             // Extract and register existing source namespaces into the XPath compiler
             SaxNamespaceResolver.registerNamespaces(this.compiler, document);
             // Execute iterator XPath query
@@ -57,7 +68,8 @@ public class XMLSourceIterator extends SourceIterator {
     }
 
     @Serial
-    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException, ParserConfigurationException, SaxonApiException, TransformerException {
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException, SQLException,
+            ParserConfigurationException, SaxonApiException, TransformerException {
         inputStream.defaultReadObject();
         bootstrap();
     }

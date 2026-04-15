@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -29,6 +30,10 @@ public class XMLSourceIterator extends SourceIterator {
     private transient XPathCompiler compiler;
     private final Map<String, String> namespaces;
     private int index = 0;
+
+    public XMLSourceIterator(Access access, String stringIterator ) throws Exception {
+        this(access, stringIterator, new HashMap<>()); 
+    }
 
     public XMLSourceIterator(Access access, String stringIterator, Map<String, String> namespaces) throws Exception {
         this.access = access;

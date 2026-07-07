@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Enable configuration of namespaces for xpath iterator
+- Add old constructor to XMLSourceIterator again
+
 ## [2.2.0] - 2025-12-10
 
 ### Added

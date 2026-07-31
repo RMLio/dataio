@@ -26,7 +26,7 @@ public class CSVWSourceIterator extends SourceIterator {
     @Serial
     private static final long serialVersionUID = -5824558388620967495L;
     private static final int BUFFER_SIZE = 1024 * 128; // 128 KiB
-    private final Access access;
+    private Access access;
     private final CSVWConfiguration config;
     private transient String[] header;
     private transient String[] next;
@@ -63,6 +63,26 @@ public class CSVWSourceIterator extends SourceIterator {
         }
 
         this.next = nextLine();
+    }
+
+    /**
+     * Points this iterator at another source and restarts the iteration, keeping the
+     * configuration it was constructed with.
+     * <p>
+     * Unlike the XML and JSON iterators, this saves no work: a CSV source has no
+     * expression to compile, and reusing the parser built from the configuration measured
+     * consistently slower than building it per source. It is offered so that a caller
+     * reading many sources can treat every reference formulation alike.
+     *
+     * @param access the source to read next
+     */
+    @Override
+    public void reset(Access access) throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        this.access = access;
+        this.index = -1;
+        this.header = null;
+        this.next = null;
+        bootstrap();
     }
 
     private String[] nextLine() {

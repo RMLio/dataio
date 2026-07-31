@@ -26,9 +26,11 @@ import java.util.NoSuchElementException;
  */
 public class JSONSourceIterator extends SourceIterator {
     private static final long serialVersionUID = 5727357114356164542L;
-    private final Access access;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private Access access;
     private final String iterationPath;
     private transient ResumableParser parser;
+    private transient SurfingConfiguration config;
     private transient InputStream inputStream;
     private transient String currentPath;
     private transient Object match = null;
@@ -64,11 +66,24 @@ public class JSONSourceIterator extends SourceIterator {
      * @throws SQLException
      */
     private void bootstrap() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        prepare();
         this.inputStream = access.getInputStream();
+        this.parser = JsonSurferJackson.INSTANCE.createResumableParser(this.inputStream, this.config);
+        this.parser.parse();
+    }
 
-        JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+    /**
+     * Builds the surfing configuration, which compiles the iteration path. It does not
+     * depend on the source, so it is built once however many sources this iterator is
+     * pointed at. Its binding writes into this iterator's own state, which is why the
+     * configuration belongs to a single iterator.
+     */
+    private void prepare() {
+        if (this.config != null) {
+            return;
+        }
 
-        SurfingConfiguration config = surfer
+        this.config = JsonSurferJackson.INSTANCE
                 .configBuilder()
                 .bind(iterationPath, (value, context) -> {
                     this.match = value;
@@ -78,8 +93,26 @@ public class JSONSourceIterator extends SourceIterator {
                     context.pause();
                 })
                 .build();
-        this.parser = surfer.createResumableParser(this.inputStream, config);
-        this.parser.parse();
+    }
+
+    /**
+     * Points this iterator at another source and restarts the iteration, keeping the
+     * compiled iteration path.
+     *
+     * @param access the source to read next
+     */
+    @Override
+    public void reset(Access access) throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        if (this.inputStream != null) {
+            this.inputStream.close();
+        }
+
+        this.access = access;
+        this.match = null;
+        this.currentPath = null;
+        this.hasMatch = false;
+        this.arrayIndex = 0;
+        bootstrap();
     }
 
     private void readObject(ObjectInputStream inputStream) throws Exception {
@@ -102,8 +135,7 @@ public class JSONSourceIterator extends SourceIterator {
             this.hasMatch = false;
 
             if (!(match instanceof ValueNode)) {
-                ObjectMapper mapper = new ObjectMapper();
-                match = mapper.convertValue(match, Map.class);
+                match = MAPPER.convertValue(match, Map.class);
             }
 
             return new JSONRecord(match, this.iterationPath, path, this.arrayIndex);

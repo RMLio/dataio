@@ -8,11 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- `SourceIterator.reset(Access)`, pointing an iterator at another source and restarting the iteration while keeping its configuration. Setting a source up costs more than reading it, so a caller that reads many sources with the same configuration — one record's worth of data at a time, say — can now construct a single iterator and point it at each source in turn. Implemented by the XML, JSON and CSV(W) iterators; the others report that they cannot be reused rather than returning the previous source's records. A reused iterator is stateful and cannot be shared between threads.
-
-### Changed
-- `XMLSourceIterator` keeps its Saxon processor, document builder and XPath compiler alive across sources, so the iterator's XPath is compiled once instead of per source. Reading 300 sources of 10 records measured ~4x faster.
-- `JSONSourceIterator` builds its surfing configuration, which compiles the iteration path, once instead of per source. Same measurement: ~3x faster.
+- Support for resetting a `SourceIterator` to be reused on other sources, see the README.
 
 ### Fixed
 - `JSONSourceIterator` no longer constructs an `ObjectMapper` for every record it reads.

@@ -42,6 +42,31 @@ getContentType: gives the content type of the access object.
 ### SourceIterator
 Interface which is an implementation of an Iterator<Record>, which overrides the remove and forEachRemaining as these function are trivial for each implementation.
 
+#### Reusing an iterator on other sources
+Setting a source up costs more than reading it: a parser has to be built and the iterator's
+expression compiled. A caller that reads many sources with the same configuration — one
+record's worth of data at a time, for instance — can construct a single iterator and point
+it at each source in turn with `reset(Access)`, instead of constructing one per source.
+
+```java
+XMLSourceIterator iterator = new XMLSourceIterator(firstAccess, "/people/person");
+// ... read the first source ...
+iterator.reset(secondAccess);   // same iterator, same XPath, another source
+```
+
+The XML, JSON and CSV(W) iterators support this; the others throw
+`UnsupportedOperationException` rather than returning the previous source's records. What is
+kept alive differs per format:
+
+| Iterator | Kept between sources | Effect |
+| --- | --- | --- |
+| `XMLSourceIterator` | Saxon processor, document builder and XPath compiler, so the iterator's XPath is compiled once | ~4x faster over 300 sources of 10 records |
+| `JSONSourceIterator` | the surfing configuration, which compiles the iteration path | ~3x faster, same measurement |
+| `CSVWSourceIterator` | nothing: a CSV source has no expression to compile | no gain; offered so callers can treat every reference formulation alike |
+
+A reused iterator is stateful: it belongs to whoever reset it until it is drained, and cannot
+be shared between threads. Constructing one per source remains safe.
+
 #### Important note on JSONPath
 As JSONPath is not yet standardized, compatibility issues may arise. We follow the implementation of JsonSurfer, with following additions
 

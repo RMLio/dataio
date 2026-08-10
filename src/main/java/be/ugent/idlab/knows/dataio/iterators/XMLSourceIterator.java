@@ -24,10 +24,11 @@ import java.util.NoSuchElementException;
 public class XMLSourceIterator extends SourceIterator {
     @Serial
     private static final long serialVersionUID = 5027462468699419883L;
-    private final Access access;
+    private Access access;
     private final String stringIterator;
     private transient XdmSequenceIterator<XdmItem> iterator;
     private transient XPathCompiler compiler;
+    private transient DocumentBuilder docBuilder;
     private final Map<String, String> namespaces;
     private int index = 0;
 
@@ -51,25 +52,55 @@ public class XMLSourceIterator extends SourceIterator {
      */
     private void bootstrap()
             throws SQLException, IOException, ParserConfigurationException, TransformerException, SaxonApiException {
-        // Saxon processor to be reused across XPath query evaluations
-        Processor saxProcessor = new Processor(false);
-        DocumentBuilder docBuilder = saxProcessor.newDocumentBuilder();
+        prepare();
         try (InputStream in = access.getInputStream()) {
             XdmNode document = docBuilder.build(new StreamSource(in));
-            this.compiler = saxProcessor.newXPathCompiler();
-            // Enable expression caching
-            this.compiler.setCaching(true);
-            for (Map.Entry<String, String> entry : this.namespaces.entrySet()) {
-                String uri = entry.getValue();
-                String prefix = entry.getKey();
-                this.compiler.declareNamespace(prefix, uri);
-            }
             // Extract and register existing source namespaces into the XPath compiler
             SaxNamespaceResolver.registerNamespaces(this.compiler, document);
             // Execute iterator XPath query
             XdmValue result = compiler.evaluate(this.stringIterator, document);
             this.iterator = result.iterator();
         }
+    }
+
+    /**
+     * Instantiates the parts that do not depend on the source: the Saxon processor, the
+     * document builder and the XPath compiler. Keeping them alive is what lets the
+     * compiler's expression cache survive, so that the iterator's XPath is compiled once
+     * however many sources this iterator is pointed at.
+     */
+    private void prepare() throws SaxonApiException {
+        if (this.compiler != null) {
+            return;
+        }
+
+        // Saxon processor to be reused across XPath query evaluations
+        Processor saxProcessor = new Processor(false);
+        this.docBuilder = saxProcessor.newDocumentBuilder();
+        this.compiler = saxProcessor.newXPathCompiler();
+        // Enable expression caching
+        this.compiler.setCaching(true);
+        for (Map.Entry<String, String> entry : this.namespaces.entrySet()) {
+            String uri = entry.getValue();
+            String prefix = entry.getKey();
+            this.compiler.declareNamespace(prefix, uri);
+        }
+    }
+
+    /**
+     * Points this iterator at another source and restarts the iteration, so that a single
+     * iterator can run over many sources without rebuilding its XPath machinery. The
+     * configuration it was constructed with, the iterator expression and the namespaces,
+     * is kept.
+     *
+     * @param access the source to read next
+     */
+    @Override
+    public void reset(Access access)
+            throws SQLException, IOException, ParserConfigurationException, TransformerException, SaxonApiException {
+        this.access = access;
+        this.index = 0;
+        bootstrap();
     }
 
     @Serial

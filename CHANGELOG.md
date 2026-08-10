@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Support for resetting a `SourceIterator` to be reused on other sources, see the README.
+
+### Fixed
+- `JSONSourceIterator` no longer constructs an `ObjectMapper` for every record it reads.
+
 ## [2.3.0] - 2026-07-07
 
 ### Added

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.4.0] - 2026-08-10
+
 ### Added
 - Support for resetting a `SourceIterator` to be reused on other sources, see the README.
 
@@ -208,6 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.4.0]: https://github.com/RMLio/dataio/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/RMLio/dataio/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/RMLio/dataio/compare/v2.1.5...v2.2.0
 [2.1.5]: https://github.com/RMLio/dataio/compare/v2.1.4...v2.1.5

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- `bump-version.sh`: optionally also commit, tag and push, triggering a release.
+
 ## [2.4.0] - 2026-08-10
 
 ### Added

@@ -8,9 +8,14 @@ include:
   - project: 'rml/util/ci-templates'
     ref: main
     file: 'CHANGELOG.gitlab-ci.yml'
+  # Deploy to Maven Central
   - project: 'rml/util/ci-templates'
     ref: main
     file: 'Maven-Central.gitlab-ci.yml'
+  # Check Javadoc
+  - project: 'rml/util/ci-templates'
+    ref: main
+    file: 'Javadoc-check.gitlab-ci.yml'
 
 
 variables:

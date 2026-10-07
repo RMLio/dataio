@@ -7,9 +7,14 @@ import be.ugent.idlab.knows.dataio.iterators.JSONLinesSourceIterator;
 import be.ugent.idlab.knows.dataio.iterators.JSONSourceIterator;
 import be.ugent.idlab.knows.dataio.record.JSONRecord;
 import be.ugent.idlab.knows.dataio.record.Record;
+import be.ugent.idlab.knows.dataio.record.RecordValue;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -152,7 +157,7 @@ public class JSONIteratorTest extends TestCore {
     @Test
     public void evaluate_nested_array() throws Exception {
         Access access = makeLocalAccess("/json/nested_array.json", "", "json", StandardCharsets.UTF_8);
-        try(JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.main_array[*]")) {
+        try (JSONSourceIterator jsonSourceIterator = new JSONSourceIterator(access, "$.main_array[*]")) {
             while (jsonSourceIterator.hasNext()) {
                 Record source = jsonSourceIterator.next();
                 List<?> names = (List<?>) source.get("names").getValue();
@@ -160,6 +165,21 @@ public class JSONIteratorTest extends TestCore {
                 assertEquals(expected, names);
                 System.out.println();
             }
+        }
+    }
+
+    /**
+     * <a href="https://github.com/RMLio/rmlmapper-java/issues/250">Link to the bug</a>
+     */
+    @Test
+    public void bug_250() throws SQLException, IOException, ParserConfigurationException, TransformerException {
+        Access access = makeLocalAccess("/json/bugs/bug_250/input.json", "", "json", StandardCharsets.UTF_8);
+        try (JSONSourceIterator iterator = new JSONSourceIterator(access, "$[*]")) {
+            Record first = iterator.next();
+            RecordValue value = first.get("[\"key 2\"][\"key 3\"]");
+            assertTrue(value.isOk());
+
+            assertEquals("value 3", value.getValue());
         }
     }
 }

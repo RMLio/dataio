@@ -88,8 +88,8 @@ public class JSONRecord extends Record {
             reference = reference.substring(1, reference.length() - 1);
         }
 
-
-        if (reference.contains(" ")) {
+        // a reference that is already a bracket expression, like ["key 2"], is not quoted again
+        if (!reference.startsWith("[") && reference.contains(" ")) {
             reference = String.format("['%s']", reference);
         }
 

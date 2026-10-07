@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Fixed
+- A JSONPath reference that is a bracket expression, such as `["key 2"]["key 3"]`, is no longer quoted again because it contains a space ([rmlmapper-java#250](https://github.com/RMLio/rmlmapper-java/issues/250)).
 - `bump-version.sh`: optionally also commit, tag and push, triggering a release.
 - `.gitlab-ci.yml`: include javadoc check.
 

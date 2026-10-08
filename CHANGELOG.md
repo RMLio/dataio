@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.4.1] - 2026-10-08
+
 ### Changed
 - Release tooling: `RELEASE.md` documents the steps; `bump-version.sh` checks the version format, commits, tags, pushes and moves to the next patch `-SNAPSHOT`; CI checks the Javadoc.
 
@@ -216,6 +218,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.4.1]: https://github.com/RMLio/dataio/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/RMLio/dataio/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/RMLio/dataio/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/RMLio/dataio/compare/v2.1.5...v2.2.0

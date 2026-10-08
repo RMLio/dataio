@@ -7,16 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-- `RELEASE.md`: step-by-step instructions for publishing a release.
-
 ### Changed
-- `bump-version.sh` moves the version to the next patch `-SNAPSHOT` after a pushed release, replacing the manual "Prepare for next development cycle" commit.
+- Release tooling: `RELEASE.md` documents the steps; `bump-version.sh` checks the version format, commits, tags, pushes and moves to the next patch `-SNAPSHOT`; CI checks the Javadoc.
 
 ### Fixed
-- A JSONPath reference that is a bracket expression, such as `["key 2"]["key 3"]`, is no longer quoted again because it contains a space ([rmlmapper-java#250](https://github.com/RMLio/rmlmapper-java/issues/250)).
-- `bump-version.sh`: optionally also commit, tag and push, triggering a release.
-- `.gitlab-ci.yml`: include javadoc check.
+- A JSONPath reference written as a bracket expression containing spaces, such as `["key 2"]["key 3"]`, resolves ([rmlmapper-java#250](https://github.com/RMLio/rmlmapper-java/issues/250)).
 
 ## [2.4.0] - 2026-08-10
 

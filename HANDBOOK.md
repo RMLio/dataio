@@ -37,6 +37,8 @@ Where things live:
 - `src/test/resources/`: test input files, grouped per format or access type.
 - `.gitlab-ci.yml`: GitLab CI (CHANGELOG check, Javadoc check, unit tests, Maven Central deploy).
 - `bump-version.sh`: release helper.
+- `RELEASE.md`: release steps.
+- `TODO.md`: open tasks.
 
 ## Agent request contract (for AI agents/LLMs)
 
@@ -103,13 +105,17 @@ and belongs to a single thread. The README documents the measured gains.
 - SpotBugs is the linter: `spotbugs-maven-plugin` 4.10.3.0
   with SpotBugs 4.10.3 is declared under `<pluginManagement>` in `pom.xml`. It is bound to no
   lifecycle phase, so builds and CI never fail on findings; run it on demand with
-  `mvn compile spotbugs:check`. Its current state is 52 findings, none fixed yet, mostly
-  `EI_EXPOSE_REP`/`EI_EXPOSE_REP2` (records and CSVW configuration hold caller-owned
-  collections) and `CT_CONSTRUCTOR_THROW`. No formatter is configured. CI includes a Javadoc
-  check from the shared `rml/util/ci-templates` project, so Javadoc must build cleanly.
+  `mvn compile spotbugs:check`. Its findings are mostly `EI_EXPOSE_REP`/`EI_EXPOSE_REP2`
+  (records and CSVW configuration hold caller-owned collections) and `CT_CONSTRUCTOR_THROW`.
+  No formatter is configured.
+- The tests run on Linux or in a container. Docker must be running for the Testcontainers
+  tests (with Docker Engine 29 or later, add `-Dapi.version=1.44`). On Windows, the
+  file-access tests fail because of `file:` paths (`/C:/…`). Full suite in a container:
+  `docker run --rm -v "$PWD":/src -w /src -v /var/run/docker.sock:/var/run/docker.sock -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal maven:3.9-eclipse-temurin-21 mvn -B verify -Dapi.version=1.44`.
 
 CI (`.gitlab-ci.yml`) has stages `lint`, `unittests` and `deploy`. The lint stage comes from
-the included templates: a check that `CHANGELOG.md` is updated, and the Javadoc check. The
+the included templates (shared `rml/util/ci-templates` project): a check that `CHANGELOG.md`
+is updated, and a Javadoc check, so Javadoc must build cleanly. The
 `General` unit test job runs on `maven:3-eclipse-temurin-17` with Docker-in-Docker and runs
 `mvn -Dtest="$TEST" test` once per entry of an explicit test-class matrix, on every branch
 except `main`. A new test class runs in CI only after it is added to that matrix; currently
@@ -135,9 +141,8 @@ outside the matrix.
 
 Step-by-step instructions are in [RELEASE.md](RELEASE.md); this section explains the tooling.
 
-`./bump-version.sh <version>` runs `mvn versions:set`, updates the version in `README.md`,
-optionally adds the version to `CHANGELOG.md` with `changefrog`, and optionally commits,
-creates a tag (`v<version>`, or the bare name for `testrelease-*`) and pushes it. The tag
-is meant to trigger the Maven Central deploy job (defined in the shared CI templates); the build uses the
-`release` profile (sources jar, Javadoc jar, GPG signing, `central-publishing-maven-plugin`).
-Finally, after a pushed release other than a `testrelease-*`, it moves the version to the next patch `-SNAPSHOT` (e.g. `2.4.1-SNAPSHOT` after `2.4.0`) and commits and pushes that as "Prepare for next development cycle".
+`bump-version.sh` accepts a version `X.Y.Z` or `testrelease-*` and stops on any other
+format. A `testrelease-*` version gets a tag with that bare name. The tag is meant to
+trigger the Maven Central deploy job, defined in the shared CI templates. That build uses
+the `release` profile in `pom.xml`: sources jar, Javadoc jar, GPG signing and
+`central-publishing-maven-plugin`.

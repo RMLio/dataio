@@ -40,7 +40,7 @@ Where things live:
 
 ## Agent request contract (for AI agents/LLMs)
 
-<!-- software-handbook contract: 2026-10-07 -->
+<!-- software-handbook contract: 2026-10-08 -->
 
 Every implementation request handled by an AI agent/LLM follows these constraints:
 
@@ -48,8 +48,9 @@ Every implementation request handled by an AI agent/LLM follows these constraint
   - fix the specific failing case or issue named in the request;
   - preserve existing passing behavior unless explicitly asked not to;
   - add or update a regression test when needed.
-- Make the smallest coherent patch.
+- Make the smallest coherent patch. A documentation error found along the way is fixed in the same patch.
 - Leave the code leaner after every request: remove what the change makes redundant (duplicate tests, parameters and options that no longer do anything, helpers that duplicate each other, comments that only repeat the code), and reuse shared functionality instead of adding a local variant. Use compiler warnings (`mvn compile`), SpotBugs (`mvn compile spotbugs:check`, see Build and test) and IDE inspection to find unused code, and keep Javadoc valid, because CI runs a Javadoc check.
+- Fix a transient environment problem (a stale PATH, a shell or editor that needs a restart) in the environment, by restarting or reconfiguring it; add no code that works around it.
 - **Push back** when a request would violate an established principle (e.g. breaking test hermeticity). Explain the principle and suggest a documentation-only fix instead of silently implementing the harmful change.
 - Update this handbook so the change is documented as well as implemented.
   - Document only the latest state, integrated in the surrounding narrative (principles, behavior, rationale), including the choices made and why.
@@ -137,5 +138,4 @@ optionally adds the version to `CHANGELOG.md` with `changefrog`, and optionally 
 creates a tag (`v<version>`, or the bare name for `testrelease-*`) and pushes it. The tag
 is meant to trigger the Maven Central deploy job (defined in the shared CI templates); the build uses the
 `release` profile (sources jar, Javadoc jar, GPG signing, `central-publishing-maven-plugin`).
-After a release, the version moves to the next `-SNAPSHOT` in a "Prepare for next
-development cycle" commit.
+Finally, after a pushed release other than a `testrelease-*`, it moves the version to the next patch `-SNAPSHOT` (e.g. `2.4.1-SNAPSHOT` after `2.4.0`) and commits and pushes that as "Prepare for next development cycle".

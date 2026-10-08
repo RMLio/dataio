@@ -4,6 +4,7 @@ Step-by-step instructions for publishing a release. [HANDBOOK.md](HANDBOOK.md) (
 
 ## Before you start
 
+- Everything changed since the previous release is reviewed: the code for correctness, and the documentation and changelog for accuracy and brevity.
 - bash (Git Bash on Windows), Maven, Java 17 or later, and `changefrog` (`npm install -g changefrog`), which writes the version section of `CHANGELOG.md`.
 - Push access to `origin` (https://gitlab.ilabt.imec.be/rml/proc/dataio).
 - You are on `development`, up to date with `origin/development`, with a clean working tree.

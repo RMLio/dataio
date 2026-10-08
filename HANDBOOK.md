@@ -133,6 +133,8 @@ outside the matrix.
 
 ## Release process
 
+Step-by-step instructions are in [RELEASE.md](RELEASE.md); this section explains the tooling.
+
 `./bump-version.sh <version>` runs `mvn versions:set`, updates the version in `README.md`,
 optionally adds the version to `CHANGELOG.md` with `changefrog`, and optionally commits,
 creates a tag (`v<version>`, or the bare name for `testrelease-*`) and pushes it. The tag

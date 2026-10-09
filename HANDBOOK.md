@@ -143,7 +143,6 @@ outside the matrix.
 Step-by-step instructions are in [RELEASE.md](RELEASE.md); this section explains the tooling.
 
 `bump-version.sh` accepts a version `X.Y.Z` or `testrelease-*` and stops on any other
-format. A `testrelease-*` version gets a tag with that bare name. The tag is meant to
-trigger the Maven Central deploy job, defined in the shared CI templates. That build uses
-the `release` profile in `pom.xml`: sources jar, Javadoc jar, GPG signing and
-`central-publishing-maven-plugin`.
+format. A `testrelease-*` version gets a tag with that bare name. A pushed tag runs the
+`Maven Central Deployment` job of the shared CI template (`Maven-Central.gitlab-ci.yml` in
+`rml/util/ci-templates`), which runs `mvn clean deploy -P release`.

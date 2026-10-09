@@ -20,7 +20,7 @@ Step-by-step instructions for publishing a release. [HANDBOOK.md](HANDBOOK.md) (
    - commits "Update version to <version>", pushes `development`, and creates and pushes the tag `v<version>`;
    - moves `pom.xml` to the next patch `-SNAPSHOT`, and commits and pushes "Prepare for next development cycle".
 2. Move `main` to the release: `git push origin v<version>^{commit}:main`. `main` always points at the latest release; the push succeeds only as a fast-forward.
-3. The tag pipeline (https://gitlab.ilabt.imec.be/rml/proc/dataio/-/pipelines) should build the release with the `release` Maven profile, sign it and deploy it to Maven Central. Check its deploy job; when it succeeds, the new version appears at https://repo1.maven.org/maven2/be/ugent/idlab/knows/dataio/ (this can take up to an hour).
+3. The tag pipeline (https://gitlab.ilabt.imec.be/rml/proc/dataio/-/pipelines) runs the `Maven Central Deployment` job, which builds the release with the `release` Maven profile, signs it and deploys it to Maven Central. The new version appears at https://repo1.maven.org/maven2/be/ugent/idlab/knows/dataio/ (this can take up to an hour).
 
 ## After the release
 

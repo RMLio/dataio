@@ -42,7 +42,7 @@ Where things live:
 
 ## Agent request contract (for AI agents/LLMs)
 
-<!-- software-handbook contract: 2026-10-08 -->
+<!-- software-handbook contract: 2026-10-09 -->
 
 Every implementation request handled by an AI agent/LLM follows these constraints:
 
@@ -50,6 +50,7 @@ Every implementation request handled by an AI agent/LLM follows these constraint
   - fix the specific failing case or issue named in the request;
   - preserve existing passing behavior unless explicitly asked not to;
   - add or update a regression test when needed.
+- Leave staging and committing to the maintainer. Edit staged files freely: the maintainer stages what they reviewed, so the unstaged diff shows the new changes.
 - Make the smallest coherent patch. A documentation error found along the way is fixed in the same patch.
 - Leave the code leaner after every request: remove what the change makes redundant (duplicate tests, parameters and options that no longer do anything, helpers that duplicate each other, comments that only repeat the code), and reuse shared functionality instead of adding a local variant. Use compiler warnings (`mvn compile`), SpotBugs (`mvn compile spotbugs:check`, see Build and test) and IDE inspection to find unused code, and keep Javadoc valid, because CI runs a Javadoc check.
 - Fix a transient environment problem (a stale PATH, a shell or editor that needs a restart) in the environment, by restarting or reconfiguring it; add no code that works around it.
@@ -59,7 +60,7 @@ Every implementation request handled by an AI agent/LLM follows these constraint
   - This contract holds only general rules for handling a request; project-specific guidance goes in the chapter on that topic.
 - Do not stop at making tests green; align the implementation with the specification or intended design, and document the semantic reason in this handbook.
 - Never remove or change existing tests (code or fixtures) without explicit permission. A change to an existing fixture (expected output, input, or data) is validated by the maintainer before it is kept, also when a tool writes it: propose the change with its reason, and keep it only after approval.
-- Update `CHANGELOG.md` for implementation changes: keep `## Unreleased` a short summary of what changed since the last release. A feature that is new since the last release is one Added line, which later fixes update instead of getting lines of their own; lines are for what a user of the last release notices.
+- Update `CHANGELOG.md` for every change, internal ones included (tests, CI, refactoring, removed code): keep `## Unreleased` a short summary of what changed since the last release. A feature that is new since the last release is one Added line, which later fixes update instead of getting lines of their own. Each line covers one concern; changes of the same concern share a line (such as editorial changes, or updated dependency versions). A line states what is true now, without the old behavior; a fix that only removes a divergence that should not have existed (one part behaving unlike the rest) gets a few words in the line of its concern at most.
 - Before a release, propose a review of everything changed since the previous release: the code for correctness, and the documentation and changelog for accuracy and brevity.
 - Check whether `README.md` needs updates for user-visible behavior or workflow changes, and update it when needed.
 - Write documentation (this handbook, READMEs, `TODO.md`, `CHANGELOG.md`, code comments) as plain positive statements: say what is true and leave out the contrast ("X, not Y"). Keep a negative only when it is the point itself, such as a prohibition, a warning, or a known limitation.
@@ -94,6 +95,7 @@ and belongs to a single thread. The README documents the measured gains.
 ## Build and test
 
 - Java 17 (`java.version` in `pom.xml`); Maven.
+- A library that dataio does not use is declared only to raise the version a dependency brings, also for dataio's consumers (Maven takes the nearest declaration): `commons-validator` 1.11.0 over odfdom's 1.7, whose commons-beanutils 1.9.4 has CVE-2025-48734. Check `mvn dependency:tree` after a dependency update.
 - Build and install locally: `mvn install`.
 - All tests: `mvn test`.
 - One test class: `mvn test -Dtest=CSVIteratorTest`; a nested class: `-Dtest='DatabaseTest$PostgreSQLTest'`.

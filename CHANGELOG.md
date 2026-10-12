@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Updated dependency on opencsv to 5.12.0, with its own commons-lang3 (3.18.0); `commons-validator` 1.11.0 is declared over odfdom's 1.7. Consumers get commons-beanutils 1.11.0 and commons-lang3 3.18.0 (CVE-2025-48734, CVE-2025-48924).
+
 ## [2.4.1] - 2026-10-08
 
 ### Changed

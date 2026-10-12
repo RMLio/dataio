@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.4.2] - 2026-10-12
+
 ### Changed
 - Updated dependency on opencsv to 5.12.0, with its own commons-lang3 (3.18.0); `commons-validator` 1.11.0 is declared over odfdom's 1.7. Consumers get commons-beanutils 1.11.0 and commons-lang3 3.18.0 (CVE-2025-48734, CVE-2025-48924).
 
@@ -221,6 +223,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated excel-streaming-reader to 4.0.5
 - Updated jena-fuseki-* to 4.9.0
 
+[2.4.2]: https://github.com/RMLio/dataio/compare/v2.4.1...v2.4.2
 [2.4.1]: https://github.com/RMLio/dataio/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/RMLio/dataio/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/RMLio/dataio/compare/v2.2.0...v2.3.0

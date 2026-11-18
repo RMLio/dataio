@@ -42,28 +42,30 @@ Where things live:
 
 ## Agent request contract (for AI agents/LLMs)
 
-<!-- software-handbook contract: 2026-10-09 -->
+<!-- software-handbook contract: 2026-11-18 -->
 
 Every implementation request handled by an AI agent/LLM follows these constraints:
 
 - If the request is a feature or bugfix:
   - fix the specific failing case or issue named in the request;
   - preserve existing passing behavior unless explicitly asked not to;
-  - add or update a regression test when needed.
+  - cover the change with a test: extend an existing test where one fits, add one only where none does, and remove the tests of removed or deprecated behavior.
 - Leave staging and committing to the maintainer. Edit staged files freely: the maintainer stages what they reviewed, so the unstaged diff shows the new changes.
-- Make the smallest coherent patch. A documentation error found along the way is fixed in the same patch.
+- Make one coherent patch per request: everything the request needs (code, tests, docs, changelog) and nothing unrelated. A documentation error found along the way is fixed in the same patch.
 - Leave the code leaner after every request: remove what the change makes redundant (duplicate tests, parameters and options that no longer do anything, helpers that duplicate each other, comments that only repeat the code), and reuse shared functionality instead of adding a local variant. Use compiler warnings (`mvn compile`), SpotBugs (`mvn compile spotbugs:check`, see Build and test) and IDE inspection to find unused code, and keep Javadoc valid, because CI runs a Javadoc check.
 - Fix a transient environment problem (a stale PATH, a shell or editor that needs a restart) in the environment, by restarting or reconfiguring it; add no code that works around it.
 - **Push back** when a request would violate an established principle (e.g. breaking test hermeticity). Explain the principle and suggest a documentation-only fix instead of silently implementing the harmful change.
-- Update this handbook so the change is documented as well as implemented.
-  - Document only the latest state, integrated in the surrounding narrative (principles, behavior, rationale), including the choices made and why.
+- Keep necessary internal implementation guidance and rationale in the handbook; put end-user and developer-facing setup, usage and workflows in the README. Give each fact one home in the repo and cross-reference rather than duplicate it. Code and docs stand on their own: they reference published sources (such as specifications) and no planning notes or files outside the repo.
+  - Update only the documentation affected by the change, integrated into the relevant existing section.
   - This contract holds only general rules for handling a request; project-specific guidance goes in the chapter on that topic.
-- Do not stop at making tests green; align the implementation with the specification or intended design, and document the semantic reason in this handbook.
-- Never remove or change existing tests (code or fixtures) without explicit permission. A change to an existing fixture (expected output, input, or data) is validated by the maintainer before it is kept, also when a tool writes it: propose the change with its reason, and keep it only after approval.
-- Update `CHANGELOG.md` for every change, internal ones included (tests, CI, refactoring, removed code): keep `## Unreleased` a short summary of what changed since the last release. A feature that is new since the last release is one Added line, which later fixes update instead of getting lines of their own. Each line covers one concern; changes of the same concern share a line (such as editorial changes, or updated dependency versions). A line states what is true now, without the old behavior; a fix that only removes a divergence that should not have existed (one part behaving unlike the rest) gets a few words in the line of its concern at most.
-- Before a release, propose a review of everything changed since the previous release: the code for correctness, and the documentation and changelog for accuracy and brevity.
+- Do not stop at making tests green; align the implementation with the specification or intended design, and document necessary semantic rationale in the handbook.
+- Update existing tests (code or fixtures) in the same patch when the change requires it, and list each update with its reason in the hand-over. Never weaken a test only to make it pass.
+- Update `CHANGELOG.md` for every change when the project keeps one, internal ones included (tests, CI, refactoring, removed code): keep `## Unreleased` a short summary of what changed since the last release. A feature that is new since the last release is one Added line, which later fixes update instead of getting lines of their own. Each line covers one concern; changes of the same concern share a line (such as editorial changes, or updated dependency versions). A line states what is true now, without the old behavior; a fix that only removes a divergence that should not have existed (one part behaving unlike the rest) gets a few words in the line of its concern at most.
+- Before handing over, review the patch as the maintainer would (correctness, leaner code and docs, changelog) and fix what you find, so the maintainer's review is the last round.
+- Before a release, review everything changed since the previous release (the code for correctness, the documentation and changelog for accuracy and brevity), check the dependencies (undeclared, outdated, vulnerable), and list the open items that change the released artifact, so they ship in this release.
+- Hand over in one short message: what is ready (with a commit message), what needs the maintainer's judgement (each non-obvious removal or changed test, with its evidence), what was verified (commands and results), and the maintainer's next actions in order. Details belong in the changelog and docs.
 - Check whether `README.md` needs updates for user-visible behavior or workflow changes, and update it when needed.
-- Write documentation (this handbook, READMEs, `TODO.md`, `CHANGELOG.md`, code comments) as plain positive statements: say what is true and leave out the contrast ("X, not Y"). Keep a negative only when it is the point itself, such as a prohibition, a warning, or a known limitation.
+- Write documentation (this handbook, READMEs, `TODO.md`, `CHANGELOG.md`, code comments) as plain positive statements: say what is true and leave out the contrast ("X, not Y"). Keep a negative only when it is the point itself, such as a prohibition, a warning, or a known limitation. Break the lines of code comments and Markdown at sentence and clause boundaries; a line is as long as its clause.
 - If there are difficulties during fulfillment, document them in the most appropriate existing handbook location (create a new chapter only when truly necessary) so future requests start with better context.
 - A preference or principle that the maintainer states while handling a request is documented so that every later request follows it: a general one in this contract (and in the software-handbook skill it comes from), a project-specific one in the handbook chapter it belongs to. When it is unclear which, ask.
 - When a request is a list of feedback (such as a `TODO.md`), clean up after handling it: remove the items that are done, keep every open item as a clear task (an open question or an offered follow-up is an open item), and remove temporary files created along the way.
